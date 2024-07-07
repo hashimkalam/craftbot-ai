@@ -79,4 +79,7 @@
   .sidebar-button {
     @apply hover:opacity-50 flex flex-col text-center lg:text-left lg:flex-row items-center gap-2 p-2 rounded-md bg-[#2991ee];
   }
+  .pointer {
+    @apply cursor-pointer
+  }
 }

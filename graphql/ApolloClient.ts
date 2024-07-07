@@ -8,7 +8,7 @@ import {
 export const BASE_URL =
   process.env.NODE_ENV !== "development"
     ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-    : "https://localhost:3000";
+    : "http://localhost:3000";
 
 // to sent req instead of the actual one to avoid exposing the key
 const httpLink = createHttpLink({
