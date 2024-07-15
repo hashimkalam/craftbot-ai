@@ -6,20 +6,21 @@ import { Input } from "@/components/ui/input";
 import { CREATE_CHATBOT } from "@/graphql/mutation";
 import { useMutation } from "@apollo/client";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 const CreateChatBot = () => {
   const { user } = useUser();
   const [name, setName] = useState("");
-  const router = useRouter();
+  // const router = useRouter();
 
   const [createChatbot, { data, loading, error }] = useMutation(
     CREATE_CHATBOT,
     {
       variables: {
         clerk_user_id: user?.id,
-        name: name,
+        name,
       },
     }
   );
@@ -29,10 +30,13 @@ const CreateChatBot = () => {
     e.preventDefault();
 
     try {
+      console.log("processing")
       const data = await createChatbot();
       setName("");
 
-      router.push(`/edit-chatbot/${data.data.insertChatbots.id}`);
+     // redirect(`/edit-chatbot/${data.data.insertChatbots.id}`);
+
+     console.log("bot created successfully")
     } catch (err) {
       console.error(err);
     }
@@ -42,7 +46,7 @@ const CreateChatBot = () => {
     return null;
   }
 
-  console.log('chatbot name ->', name)
+  console.log("chatbot name ->", name);
 
   return (
     <div className="flex flex-col items-center justify-center lg:flex-row md:space-x-10 bg-white p-10 rounded-md m-10">
