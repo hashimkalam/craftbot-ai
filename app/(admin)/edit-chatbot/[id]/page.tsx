@@ -9,6 +9,7 @@ import { ADD_CHARACTERISTIC, DELETE_CHATBOT } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
+import { formatISO } from "date-fns";
 import { Copy } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -85,6 +86,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         variables: {
           chatbotId: Number(id),
           content,
+          created_at: formatISO(new Date()), 
         },
       });
 

@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    console.log("result: ", result)
     const data = result.data;
     console.log("Query result: ", data);
 
