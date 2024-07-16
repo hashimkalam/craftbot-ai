@@ -6,11 +6,9 @@ import { useMutation } from "@apollo/client";
 import { OctagonX } from "lucide-react";
 import { toast } from "sonner";
 
-const Characteristic = ({
- // key,
+const Characteristic = ({ 
   characteristic,
-}: {
- // key: number;
+}: { 
   characteristic: ChatbotCharacteristic;
 }) => {
   const [removeCharacteristic] = useMutation(REMOVE_CHARACTERISTIC, {
@@ -21,7 +19,7 @@ const Characteristic = ({
     try {
       await removeCharacteristic({
         variables: {
-          id: characteristicId,
+          characteristicId,
         },
       });
     } catch (error) {
@@ -31,7 +29,7 @@ const Characteristic = ({
   };
 
   return (
-    <li /* key={key} */ className="relative p-10 bg-white border rounded-md">
+    <li key={characteristic.id} className="relative p-10 bg-white border rounded-md">
       {characteristic.content}
       <OctagonX
         className="w-6 h-6 text-white fill-red-500 absolute top-1 right-1 pointer hover:opacity-50"

@@ -5,7 +5,7 @@ import Characteristic from "@/components/Characteristic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/apolloClient";
-import { ADD_CHARACTERISTIC, DELETE_CHATBOT } from "@/graphql/mutation";
+import { ADD_CHARACTERISTIC, DELETE_CHATBOT, UPDATE_CHATBOT } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -13,7 +13,7 @@ import { formatISO } from "date-fns";
 import { Copy } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
@@ -23,14 +23,22 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
 
+  // delete chatbot mutation
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
     refetchQueries: ["GetChatbotById"], // refresh chatbots after deletion
     awaitRefetchQueries: true,
   });
 
+  // add characteristic mutation
   const [addCharacteristic] = useMutation(ADD_CHARACTERISTIC, {
-    refetchQueries: ["GetChatbotById"], // refresh chatbot after characteristic addition
+    refetchQueries: ["GetChatbotById"],
   });
+
+
+  // update chatbot mutation
+  const [updateChatbot] = useMutation(UPDATE_CHATBOT, {
+    refetchQueries: ["GetChatbotById"]
+  })
 
   console.log("characteristics: ", Characteristic)
 
@@ -77,7 +85,27 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     }
   };
 
-  const handleUpdateChatbot = () => {};
+  const handleUpdateChatbot = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+
+    try {
+      const promise = updateChatbot({
+        variables: {
+          id, 
+          name: chatbotName
+        }
+      })
+
+      toast.promise(promise, {
+        loading: "updating...",
+        success: "chatbot name successfully updated",
+        error: "failed to update chatbot name"
+      })
+    } catch (err) {
+      console.error("Failed to update chatbot: ", err)
+    }
+  };
 
   // add characteristic function
   const handleAddCharacteristic = async (content: string) => {

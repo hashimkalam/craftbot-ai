@@ -8,11 +8,12 @@ import { useMutation } from "@apollo/client";
 import { useUser } from "@clerk/nextjs";
 import { FormEvent, useState } from "react";
 import { formatISO } from "date-fns";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const CreateChatBot = () => {
   const { user } = useUser();
   const [name, setName] = useState("");
+  const router = useRouter();
 
   const [createChatbot, { data, loading, error }] = useMutation(
     CREATE_CHATBOT,
@@ -32,8 +33,9 @@ const CreateChatBot = () => {
       const data = await createChatbot();
       setName("");
       console.log("Bot created successfully:", data);
+
       // Redirect to edit page or handle success message
-      redirect(`/edit-chatbot/${data.data.insertChatbots.id}`);
+      router.push(`/edit-chatbot/${data.data.insertChatbots.id}`);
     } catch (err) {
       console.error(err);
     }
