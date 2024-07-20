@@ -58,10 +58,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
         </h2>
 
         <hr className="my-10" />
-        <Messages
-          messages={messages} 
-          chatbotName={name} 
-        />
+        <Messages messages={messages} chatbotName={name} />
       </div>
     );
   } catch (error) {
