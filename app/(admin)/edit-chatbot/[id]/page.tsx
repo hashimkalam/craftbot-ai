@@ -5,7 +5,11 @@ import Characteristic from "@/components/Characteristic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/apolloClient";
-import { ADD_CHARACTERISTIC, DELETE_CHATBOT, UPDATE_CHATBOT } from "@/graphql/mutation";
+import {
+  ADD_CHARACTERISTIC,
+  DELETE_CHATBOT,
+  UPDATE_CHATBOT,
+} from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -16,12 +20,18 @@ import { redirect } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
 
   const [chatbotName, setChatbotName] = useState("");
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
+  const [isOpen, setIsOpen] = useState(false);
 
   // delete chatbot mutation
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
@@ -34,13 +44,12 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     refetchQueries: ["GetChatbotById"],
   });
 
-
   // update chatbot mutation
   const [updateChatbot] = useMutation(UPDATE_CHATBOT, {
-    refetchQueries: ["GetChatbotById"]
-  })
+    refetchQueries: ["GetChatbotById"],
+  });
 
-  console.log("characteristics: ", Characteristic)
+  console.log("characteristics: ", Characteristic);
 
   // extract id of chatbot
   const { data, loading, error } = useQuery<
@@ -67,10 +76,12 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   // funtcion to delete chatbot
   const handleDelete = async (id: string) => {
     // prompts for confirmation
-    const isConfirmed = window.confirm(
+    /* const isConfirmed = window.confirm(
       "Are u sure about deleting the chatbot?"
     );
-    if (!isConfirmed) return;
+    if (!isConfirmed) return;*/
+
+    setIsOpen(true);
 
     try {
       const promise = deleteChatbot({ variables: { id } }); // calls mutation function with chatbot id
@@ -88,22 +99,21 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const handleUpdateChatbot = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-
     try {
       const promise = updateChatbot({
         variables: {
-          id, 
-          name: chatbotName
-        }
-      })
+          id,
+          name: chatbotName,
+        },
+      });
 
       toast.promise(promise, {
         loading: "updating...",
         success: "chatbot name successfully updated",
-        error: "failed to update chatbot name"
-      })
+        error: "failed to update chatbot name",
+      });
     } catch (err) {
-      console.error("Failed to update chatbot: ", err)
+      console.error("Failed to update chatbot: ", err);
     }
   };
 
@@ -114,7 +124,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         variables: {
           chatbotId: Number(id),
           content,
-          created_at: formatISO(new Date()), 
+          created_at: formatISO(new Date()),
         },
       });
 
@@ -139,8 +149,10 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
   if (!data?.chatbots) return redirect("/view-chatbots");
 
-
-  console.log("data?.chatbots?.chatbot_characteristics:-", data?.chatbots?.chatbot_characteristics)
+  console.log(
+    "data?.chatbots?.chatbot_characteristics:-",
+    data?.chatbots?.chatbot_characteristics
+  );
 
   return (
     <div className="px-0 md:p-10">
@@ -172,7 +184,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         <Button
           variant="destructive"
           className="absolute top-2 right-2 h-8 w-2"
-          onClick={() => handleDelete(id)}
+          onClick={() => setIsOpen(true)}
         >
           X
         </Button>
@@ -230,6 +242,28 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           </ul>
         </div>
       </section>
+
+      <div>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogContent className="w-full lg:max-w-[425px]">
+            <p>Are you sure you want to delete?</p>
+            <div className="space-x-4 flex">
+              <Button
+                onClick={() => handleDelete(id)}
+                className="bg-red-500 hover:bg-red-600 flex-1"
+              >
+                Yes
+              </Button>
+              <Button
+                onClick={() => setIsOpen(false)}
+                className="bg-[#4d7dfb] hover:bg-[#3068f5] flex-1"
+              >
+                No
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };

@@ -9,14 +9,18 @@ import {
 import { useEffect, useState } from "react";
 import Avatar from "./Avatar";
 import { AccordionContent } from "./ui/accordion";
-import Link from "next/link";
-import ReactTimeago from "react-timeago";
- 
+import { useRouter } from "next/navigation";
+import { useMutation } from "@apollo/client";
+import { DELETE_CHATSESSION } from "@/graphql/mutation";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
+import { ExternalLink, X } from "lucide-react";
 
 function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
+  const router = useRouter();
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
 
-  // sorts according to number of session available in each bot
+  // Sort according to the number of sessions available in each bot
   useEffect(() => {
     const sortedArray = [...chatbots].sort(
       (a, b) => b.chat_sessions.length - a.chat_sessions.length
@@ -25,7 +29,38 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
     setSortedChatbots(sortedArray);
   }, [chatbots]);
 
-  console.log("sortedChatbots: ", sortedChatbots);
+  const [deleteChatSession] = useMutation(DELETE_CHATSESSION, {
+    refetchQueries: ["GetChatbotById"], // refresh chatbots after deletion
+    awaitRefetchQueries: true,
+  });
+
+  const handleDelete = async (id: any, chatbotId: any) => {
+    try {
+      const promise = deleteChatSession({ variables: { id } }); // calls mutation function with chat session id
+      toast.promise(promise, {
+        loading: "Deleting",
+        success: "Successfully deleted ChatSession",
+        error: "Failed to delete ChatSession",
+      });
+
+      // Update state to remove the deleted session
+      setSortedChatbots((prevChatbots) =>
+        prevChatbots.map((chatbot) =>
+          chatbot.id === chatbotId
+            ? {
+                ...chatbot,
+                chat_sessions: chatbot.chat_sessions.filter(
+                  (session) => session.id !== id
+                ),
+              }
+            : chatbot
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting ChatSession: ", error);
+      toast.error("Failed to delete ChatSession");
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -44,31 +79,47 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                   <AccordionTrigger className="w-full">
                     <div className="flex text-left items-center w-full">
                       <Avatar seed={chatbot.name} className="h-10 w-10 mr-4" />
-                     <div className="flex items-center justify-between w-full">
-                      <p>{chatbot.name}</p>
-                      <p className="pr-4 font-bold text-right">
-                        {chatbot.chat_sessions.length} sessions
-                      </p></div>
+                      <div className="flex items-center justify-between w-full">
+                        <p>{chatbot.name}</p>
+                        <p className="pr-4 font-bold text-right hover:underline">
+                          {chatbot.chat_sessions.length} sessions
+                        </p>
+                      </div>
                     </div>
                   </AccordionTrigger>
 
                   <AccordionContent className="space-y-5 p-5 bg-gray-100 rounded-md">
                     {chatbot.chat_sessions.map((session) => (
-                      <Link
-                        href={`/review-sessions/${session.id}`}
+                      <div
                         key={session.id}
-                        className="relative p-10 bg-[#2991ee] text-white rounded-md block"
+                        className="relative p-10 bg-[#2991ee] text-white rounded-md flex items-center justify-between"
                       >
-                        <p className="text-lg font-bold">
-                          {session.guests?.name || "Annonymous"}
-                        </p>
-                        <p className="text-sm font-light">
-                          {session.guests?.email || "No email provided"}
-                        </p>
-                      {/*  <p className="absolute top-5 right-5 text-sm">
-                          <ReactTimeago data={new Date(session.created_at)} />
-                        </p> */}
-                      </Link>
+                        <div>
+                          <p className="text-lg font-bold">
+                            {session.guests?.name || "Anonymous"}
+                          </p>
+                          <p className="text-sm font-light">
+                            {session.guests?.email || "No email provided"}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col">
+                          <Button
+                            className="bg-white hover:bg-gray-300 text-black p-5 cursor-pointer m-2"
+                            onClick={() =>
+                              router.push(`/review-sessions/${session.id}`)
+                            }
+                          >
+                            <ExternalLink />
+                          </Button>
+                          <Button
+                            className="bg-red-500 hover:bg-red-600 p-5  cursor-pointer m-2"
+                            onClick={() => handleDelete(session.id, chatbot.id)}
+                          >
+                            <X />
+                          </Button>
+                        </div>
+                      </div>
                     ))}
                   </AccordionContent>
                 </>

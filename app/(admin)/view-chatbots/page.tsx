@@ -31,9 +31,9 @@ async function ViewChatbots() {
     console.log("userId: ", userId);
     console.log("response: ", response?.data?.chatbotsList);
 
-    const {data} = response
-    console.log("data: ", data?.chatbotsList)
-    
+    const { data } = response;
+    console.log("data: ", data?.chatbotsList);
+
     // Ensure data is properly fetched
     if (!data) {
       return <div>No chatbots found for this user.</div>;

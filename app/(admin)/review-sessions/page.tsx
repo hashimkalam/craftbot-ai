@@ -7,7 +7,6 @@ import {
   GetUserChatbotsVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
-import React from "react";
 
 async function ReviewSessions() {
   const { userId } = await auth();

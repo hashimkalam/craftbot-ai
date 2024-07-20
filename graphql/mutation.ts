@@ -33,6 +33,14 @@ export const DELETE_CHATBOT = gql`
   }
 `;
 
+export const DELETE_CHATSESSION = gql`
+  mutation DeleteChatSession($id: Int!) {
+    deleteChat_sessions(id: $id) {
+      id
+    }
+  }
+`;
+
 export const ADD_CHARACTERISTIC = gql`
   mutation AddCharacteristic(
     $chatbotId: Int!
