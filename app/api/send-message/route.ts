@@ -10,15 +10,20 @@ import {
 } from "@/types/types";
 import { formatISO } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { CohereClient } from 'cohere-ai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const cohereApiKey = process.env.COHERE_API_KEY;
+
+if (!cohereApiKey) {
+  throw new Error("COHERE_API_KEY is not defined in the environment variables");
+}
+
+// Initialize the Cohere client
+const cohere = new CohereClient({
+  token: cohereApiKey,
 });
 
 export async function POST(req: NextRequest) {
-  //desruct the json and get the values
   const { chat_session_id, chatbot_id, content, name } = await req.json();
   console.log(
     "chat_session_id: ",
@@ -32,7 +37,7 @@ export async function POST(req: NextRequest) {
   );
 
   try {
-    // fetch chatbot characteristics
+    // Fetch chatbot characteristics
     const { data } = await serverClient.query<GetChatbotByIdResponse>({
       query: GET_CHATBOT_BY_ID,
       variables: { id: chatbot_id },
@@ -44,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "chatbot not found" }, { status: 404 });
     }
 
-    // fetch users prev msgs
+    // Fetch user's previous messages
     const { data: messagesData } =
       await serverClient.query<MessagesByChatSessionIdResponse>({
         query: GET_MESSAGES_BY_CHAT_SESSION_ID,
@@ -53,51 +58,50 @@ export async function POST(req: NextRequest) {
       });
     const prevMessages = messagesData.chat_sessions.messages;
 
-    // formating msg for cater openai criteria
-    const formattedPrevMessages: ChatCompletionMessageParam[] =
-      prevMessages.map((message) => ({
-        role: message.sender === "ai" ? "system" : "user",
-        name: message.sender === "ai" ? "system" : name,
-        content: message.content,
-      }));
+    // Format message for Cohere
+    const formattedPrevMessages = prevMessages.map((message) => ({
+      role: message.sender === "ai" ? "system" : "user",
+      content: message.content,
+    }));
 
-    // combine characteristics into a symtem prompt
+    // Combine characteristics into a system prompt
     const systemPrompt = chatbot.chatbot_characteristics
       .map((char) => char.content)
       .join(" + ");
     console.log("systemPrompt: ", systemPrompt);
 
-    const messages: ChatCompletionMessageParam[] = [
+    // Construct the prompt
+    const prompt = [
       {
         role: "system",
-        name: "system",
-        content: `you are a helpful assistent talking to ${name}. if a generic question is asked which is not relevant or in the same scope or fomarin as the points in mentioned in the key info seciton, kindly inform the user the are only allowed to search for the specified content. Use Emojis where possible. here are some key info that you need to be aware of , these are elements your may be asked about: ${systemPrompt}`,
+        content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. Use Emojis where possible. Be funny - add a lot of humour. Be motivating and helpful. Here are some key info that you need to be aware of: ${systemPrompt}`,
       },
       ...formattedPrevMessages,
       {
         role: "user",
-        name: name,
         content: content,
       },
     ];
 
-    // send msg to open ai api
-    const openaiRes = await openai.chat.completions.create({
-      messages: messages,
-      model: "gpt-3.5-turbo",
+    // Generate response using Cohere
+    const response = await cohere.generate({
+      model: 'command', // Ensure you use the correct model name
+      prompt: prompt.map(p => p.content).join("\n"), // Join prompt array as a string
+      maxTokens: 100, // Adjust token limit as needed
     });
 
-    const aiResponse = openaiRes?.choices?.[0]?.message?.content?.trim();
+    // const aiResponse = response.body?.generations[0]?.text?.trim();
+    const aiResponse = response.generations[0].text.trim()
+    console.log("aiResponse: ", aiResponse);
 
-    // errpr msg if no response
     if (!aiResponse) {
       return NextResponse.json({
-        error: "failed to generate ai response",
+        error: "failed to generate AI response",
         status: 500,
       });
     }
 
-    // save users msg in db
+    // Save user's message in the database
     await serverClient.mutate({
       mutation: INSERT_MESSAGE,
       variables: {
@@ -108,24 +112,22 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // save ai response too
+    // Save AI response too
     const aiMessageResult = await serverClient.mutate({
       mutation: INSERT_MESSAGE,
       variables: {
         chat_session_id,
         sender: "ai",
-        content,
+        content: aiResponse,
         created_at: formatISO(new Date()),
       },
     });
 
-    // return ap res to the client
     return NextResponse.json({
       id: aiMessageResult?.data?.insertMessages?.id,
       content: aiResponse,
     });
 
-    
   } catch (error) {
     console.error("error sending msg: ", error);
     return NextResponse.json({ error }, { status: 500 });
