@@ -103,7 +103,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                           </p>
                         </div>
 
-                        <div className="flex flex-col">
+                        <div className="flex">
                           <Button
                             className="bg-white hover:bg-gray-300 text-black p-5 cursor-pointer m-2"
                             onClick={() =>

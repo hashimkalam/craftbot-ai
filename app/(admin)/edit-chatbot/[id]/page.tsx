@@ -75,14 +75,6 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
   // funtcion to delete chatbot
   const handleDelete = async (id: string) => {
-    // prompts for confirmation
-    /* const isConfirmed = window.confirm(
-      "Are u sure about deleting the chatbot?"
-    );
-    if (!isConfirmed) return;*/
-
-    setIsOpen(true);
-
     try {
       const promise = deleteChatbot({ variables: { id } }); // calls mutation function with chatbot id
       toast.promise(promise, {
