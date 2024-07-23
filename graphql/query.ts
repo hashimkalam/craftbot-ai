@@ -4,6 +4,7 @@ export const GET_USER_CHATBOTS = gql`
   query GetUserChatbots {
     chatbotsList {
       id
+      clerk_user_id
       name
       chat_sessions {
         id
@@ -43,9 +44,10 @@ export const GET_CHATBOT_BY_ID = gql`
 `;
 
 export const GET_CHATBOT_BY_USER = gql`
-  query GetChatbotsList {
+  query GetChatbotsByUser {
     chatbotsList {
       id
+      clerk_user_id
       name
       created_at
       chatbot_characteristics {
@@ -68,8 +70,8 @@ export const GET_CHATBOT_BY_USER = gql`
 `;
 
 export const GET_CHAT_SESSION_MESSAGES = gql`
-  query GetChatSessionMessages($id: Int!)  {
-    chat_sessions(id: $id)  {
+  query GetChatSessionMessages($id: Int!) {
+    chat_sessions(id: $id) {
       id
       created_at
       messages {
