@@ -1,4 +1,5 @@
-import client from "@/graphql/client";
+ 
+import client from "@/graphql/apolloClient";
 import {
   INSERT_CHAT_SESSION,
   INSERT_GUEST,
