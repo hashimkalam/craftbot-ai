@@ -1,5 +1,4 @@
- 
-import client from "@/graphql/apolloClient";
+import { client } from "@/graphql/apolloClient";
 import {
   INSERT_CHAT_SESSION,
   INSERT_GUEST,
@@ -52,11 +51,14 @@ export async function startNewChat(
         created_at: formatISO(new Date()),
       },
     });
-    console.log("messageResult: ", messageResult); 
+    console.log("messageResult: ", messageResult);
 
     console.log("New Chat Successfully Created!! :>>>> ");
     return chatSessionId;
   } catch (error) {
-    console.error("Error starting new chat session: ", JSON.stringify(error, null, 2));
+    console.error(
+      "Error starting new chat session: ",
+      JSON.stringify(error, null, 2)
+    );
   }
 }

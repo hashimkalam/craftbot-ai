@@ -31,10 +31,9 @@ const defaultOptions: DefaultOptions = {
   },
 };
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache(),
   defaultOptions: defaultOptions,
 });
-
-export default client;
+ 
