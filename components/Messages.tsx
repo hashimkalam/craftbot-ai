@@ -2,12 +2,13 @@
 
 import { Message } from "@/types/types";
 import { usePathname } from "next/navigation";
-import Avatar from "./Avatar";
+import logo from "@/public/images/just_logo.png";
 import { UserCircle } from "lucide-react";
 
 import ReactMarkDown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 function Messages({
   messages,
@@ -48,10 +49,8 @@ function Messages({
 
             <div className={`chat-image avatar w-10 ${!isSender && "-mr-4"}`}>
               {isSender ? (
-                <Avatar
-                  seed={chatbotName}
-                  className="h-12 w-12 bg-white rounded-full border-2 border-[#2991ee]"
-                />
+                <Image src={logo} alt="Logo" className="h-12 w-12" />
+                        
               ) : (
                 <UserCircle className="text-[#2991ee]" />
               )}

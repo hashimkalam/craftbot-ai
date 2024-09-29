@@ -47,15 +47,15 @@ export default async function Home() {
   if (userId) redirect("/dashboard");
 
   return (
-    <main className="bg-gradient-to-bl from-white dark:from-gray-900 to-indigo-600 dark:to-indigo-900 flex-1 overflow-scroll p-2 lg:p-5 relative">
+    <main className="bg-gradient-to-bl from-white dark:from-gray-900 to-primary dark:to-indigo-900 flex-1 overflow-scroll p-2 lg:p-5 relative">
       <div className="absolute top-8 right-8 z-50">
         <ModeToggle />
       </div>
 
-      <div className="bg-white dark:bg-black/50 py-24 sm:p-32 rounded-md drop-shadow-xl">
+      <div className="bg-white/95 dark:bg-black/50 py-24 sm:p-32 rounded-md drop-shadow-xl">
         <div className="flex flex-col justify-center items-center mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="text-base font-semibold leading-7 text-indigo-600 capitalize">
+            <h2 className="text-base font-semibold leading-7 text-primary capitalize">
               Your AI chatbot solution
             </h2>
 
@@ -65,7 +65,7 @@ export default async function Home() {
 
             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
               Welcome to{" "}
-              <span className="font-bold text-indigo-600">Custom Chatbot Generator.</span>
+              <span className="font-bold text-primary">Custom Chatbot Generator.</span>
               <br />
               <br />
               Design and deploy your own AI chatbots in minutes! Our tool allows you to
@@ -78,7 +78,7 @@ export default async function Home() {
           </div>
 
           <Button asChild className="mt-10">
-            <Link href="/dashboard">
+            <Link href="/dashboard" className="dark:text-white">
               {userId ? "Go to Your Chatbots" : "Get Started"}
             </Link>
           </Button>
@@ -110,7 +110,7 @@ export default async function Home() {
                 <dt className="inline font-semibold text-gray-900">
                   <feature.icon
                     aria-hidden="true"
-                    className="absolute left-1 top-1 h-5 w-5 text-indigo-600"
+                    className="absolute left-1 top-1 h-5 w-5 text-primary"
                   />
                 </dt>
 

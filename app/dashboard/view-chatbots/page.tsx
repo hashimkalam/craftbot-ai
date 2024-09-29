@@ -1,4 +1,4 @@
-import Avatar from "@/components/Avatar";
+import logo from "@/public/images/just_logo.png"
 import { Button } from "@/components/ui/button";
 import { GET_CHATBOT_BY_USER } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
@@ -8,6 +8,7 @@ import {
   GetChatbotsByUserDataVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic"; // prevent caching - for updated content
@@ -40,7 +41,7 @@ async function ViewChatbots() {
             create one!
           </p>
           <Link href="/dashboard/create-chatbot">
-            <Button className="bg-[#64b5f5] text-white p-3 rounded-md mt-5">
+            <Button className="bg-primary/95 hover:bg-primary text-white p-3 rounded-md mt-5">
               Create Chatbot
             </Button>
           </Link>
@@ -71,7 +72,7 @@ async function ViewChatbots() {
               <li className="relative p-10 border rounded-md max-w-3xl bg-white">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
-                    <Avatar seed={chatbot.name} />
+                  <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
                     <h2 className="text-xl font-bold">{chatbot.name}</h2>
                   </div>
                   <p className="absolute top-5 right-5 text-xs text-gray-400">

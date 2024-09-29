@@ -1,6 +1,5 @@
 "use client";
 
-import Avatar from "@/components/Avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CREATE_CHATBOT } from "@/graphql/mutation";
@@ -9,6 +8,8 @@ import { useUser } from "@clerk/nextjs";
 import { FormEvent, useState } from "react";
 import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import logo from "@/public/images/just_logo.png"
 
 const CreateChatBot = () => {
   const { user } = useUser();
@@ -47,7 +48,7 @@ const CreateChatBot = () => {
 
   return (
     <div className="flex flex-col items-center justify-center lg:flex-row md:space-x-10 bg-white p-10 rounded-md m-10">
-      <Avatar seed="create-chatbot" />
+      <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
       <div>
         <h1 className="text-xl lg:text-3xl font-semibold">Create</h1>
         <h2 className="font-light">

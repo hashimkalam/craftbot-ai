@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
 import { useEffect, useState } from "react";
-import Avatar from "./Avatar";
+import logo from "@/public/images/just_logo.png";
 import { AccordionContent } from "./ui/accordion";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { ExternalLink, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   const router = useRouter();
@@ -82,10 +83,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                     <>
                       <AccordionTrigger className="w-full">
                         <div className="flex text-left items-center w-full">
-                          <Avatar
-                            seed={chatbot.name}
-                            className="h-10 w-10 mr-4"
-                          />
+                          <Image src={logo} alt="Logo" className="h-10 w-10 mr-4" />
                           <div className="flex items-center justify-between w-full">
                             <p>{chatbot.name}</p>
                             <p className="pr-4 font-bold text-right hover:underline">
@@ -146,7 +144,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
               on the button below to create one!
             </p>
             <Link href="/dashboard/create-chatbot">
-              <Button className="bg-[#64b5f5] text-white p-3 rounded-md mt-5">
+              <Button className="bg-primary/95 hover:bg-primary text-white p-3 rounded-md mt-5">
                 Create Chatbot
               </Button>
             </Link>

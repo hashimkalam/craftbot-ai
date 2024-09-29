@@ -1,6 +1,9 @@
 "use client";
 
-import Avatar from "@/components/Avatar";
+
+import Image from "next/image";
+import logo from "@/public/images/just_logo.png"
+
 import Characteristic from "@/components/Characteristic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,13 +136,13 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   if (loading)
     return (
       <div className="mx-auto animate-spin p-10">
-        <Avatar seed="PAPAFAM Support Agent" />
+        <Image src={logo} alt="Logo" className="w-24 lg:w-32" />
       </div>
     );
 
   if (error) return <p>Error: {error.message}</p>;
 
-  if (!data?.chatbots) return redirect("/view-chatbots");
+  if (!data?.chatbots) return redirect("/dashboard/view-chatbots");
 
   console.log(
     "data?.chatbots?.chatbot_characteristics:-",
@@ -151,7 +154,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
       <div className="text-white text-sm md:sticky md:top-10 sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-[#2991ee] ">
         <h2 className="font-bold">Link to chat</h2>
         <p className="text-sm italic text-white">
-          SHare the link to start conversations with your chatbot
+          Share the link to start conversations with your chatbot
         </p>
 
         <div className="text-black flex items-center space-x-2">
@@ -182,7 +185,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </Button>
 
         <div className="flex space-x-4">
-          <Avatar seed={chatbotName} />
+          <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
 
           <form
             onSubmit={handleUpdateChatbot}

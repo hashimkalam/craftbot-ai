@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Sidebar = () => {
   return (
-    <div className="bg-white text-white p-5">
+    <div className="bg-white text-white p-5 border-r-primary border-[1px]">
       <ul className="gap-5 flex lg:flex-col">
         <li className="flex-1">
           <Link href="/dashboard//create-chatbot" className="sidebar-button">
@@ -16,7 +16,7 @@ const Sidebar = () => {
         </li>
 
         <li className="flex-1">
-          <Link href="/dashboard//view-chatbots" className="sidebar-button">
+          <Link href="/dashboard/view-chatbots" className="sidebar-button">
             <PencilLine className="h-6 w-6 lg:h-8 lg:w-8" />
             <div className="hidden md:inline">
               <p className="text-xl">Edit</p>
