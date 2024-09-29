@@ -14,7 +14,7 @@ export default function Home() {
         conversations.
       </h2>
 
-      <Link href="/create-chatbot">
+      <Link href="/dashboard/create-chatbot">
         <Button className="bg-[#64b5f5]">
           Lets get started by creating your first chatbot
         </Button>

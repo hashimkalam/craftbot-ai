@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ApolloProviderWrapper from "@/components/ApolloProvider";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "Assistly AI",
@@ -20,7 +21,14 @@ export default function RootLayout({
       <ClerkProvider>
         <html lang="en">
           <body className="min-h-screen flex">
-            {children} <Toaster position="bottom-center" />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children} <Toaster position="bottom-center" />
+            </ThemeProvider>
           </body>
         </html>
       </ClerkProvider>

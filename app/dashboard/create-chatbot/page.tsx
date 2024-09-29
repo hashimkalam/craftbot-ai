@@ -35,7 +35,7 @@ const CreateChatBot = () => {
       console.log("Bot created successfully:", data);
 
       // Redirect to edit page or handle success message
-      router.push(`/edit-chatbot/${data.data.insertChatbots.id}`);
+      router.push(`/dashboard/edit-chatbot/${data.data.insertChatbots.id}`);
     } catch (err) {
       console.error(err);
     }

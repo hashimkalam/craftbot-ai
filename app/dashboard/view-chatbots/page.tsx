@@ -39,7 +39,7 @@ async function ViewChatbots() {
             You have not created any chatbots yet. Click on the button below to
             create one!
           </p>
-          <Link href="/create-chatbot">
+          <Link href="/dashboard/create-chatbot">
             <Button className="bg-[#64b5f5] text-white p-3 rounded-md mt-5">
               Create Chatbot
             </Button>
@@ -67,7 +67,7 @@ async function ViewChatbots() {
 
         <ul className="flex flex-col space-y-5">
           {filteredChatbots.map((chatbot) => (
-            <Link href={`/edit-chatbot/${chatbot.id}`} key={chatbot.id}>
+            <Link href={`/dashboard/edit-chatbot/${chatbot.id}`} key={chatbot.id}>
               <li className="relative p-10 border rounded-md max-w-3xl bg-white">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">

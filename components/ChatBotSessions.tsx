@@ -114,7 +114,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                               <Button
                                 className="bg-white hover:bg-gray-300 text-black p-5 cursor-pointer m-2"
                                 onClick={() =>
-                                  router.push(`/review-sessions/${session.id}`)
+                                  router.push(`/dashboard/review-sessions/${session.id}`)
                                 }
                               >
                                 <ExternalLink />
@@ -145,7 +145,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
               You have not created any chatbots yet to even have sessions. Click
               on the button below to create one!
             </p>
-            <Link href="/create-chatbot">
+            <Link href="/dashboard/create-chatbot">
               <Button className="bg-[#64b5f5] text-white p-3 rounded-md mt-5">
                 Create Chatbot
               </Button>

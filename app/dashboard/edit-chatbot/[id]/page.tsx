@@ -4,7 +4,7 @@ import Avatar from "@/components/Avatar";
 import Characteristic from "@/components/Characteristic";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BASE_URL } from "@/graphql/apolloClient";
+import { BASE_URL } from "@/graphql/ApolloClient";
 import {
   ADD_CHARACTERISTIC,
   DELETE_CHATBOT,
