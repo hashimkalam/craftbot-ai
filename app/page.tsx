@@ -69,7 +69,7 @@ export default async function Home() {
               <br />
               <br />
               Design and deploy your own AI chatbots in minutes! Our tool allows you to
-              customize your bot's personality and functionality, making it suitable for
+              customize your bot&lsquos personality and functionality, making it suitable for
               any application, from customer support to personal assistants. 
               Transform your ideas into interactive conversations with{" "}
               <span className="font-bold">Custom Chatbot Generator</span>, boosting your
