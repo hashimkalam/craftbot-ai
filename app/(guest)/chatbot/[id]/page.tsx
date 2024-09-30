@@ -1,6 +1,6 @@
 "use client";
 
-import logo from "@/public/images/just_logo.png"
+import logo from "@/public/images/just_logo.png";
 import Messages from "@/components/Messages";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle, 
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
+import { Mic } from "lucide-react";
+import VoiceOver from "@/components/VoiceOver";
 
 const formSchema = z.object({
   message: z.string().min(2, "Your message is too short!!"),
@@ -49,6 +51,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [voice, setVoice] = useState(false);
 
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
@@ -238,43 +241,69 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           </div>
         </div>
 
-        <Messages
-          messages={messages}
-          chatbotName={chatbotData?.chatbots?.name!}
-        />
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex items-start sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
-          >
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel hidden>Message</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Type a messsage..."
-                      {...field}
-                      className="p-8"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              className="h-full"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+        {voice ? (
+          <div className="h-full flex items-center justify-center relative">
+            <button
+              onClick={() => setVoice(false)}
+              className="absolute top-5 right-5"
             >
-              Send
-            </Button>
-          </form>
-        </Form>
+              Back To Text
+            </button>
+            <div>
+           
+
+              <VoiceOver />
+            </div>
+          </div>
+        ) : (
+          <>
+            {" "}
+            <Messages
+              messages={messages}
+              chatbotName={chatbotData?.chatbots?.name!}
+            />
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
+              >
+                <button
+                  onClick={() => setVoice(true)}
+                  className="border-[2px] border-black rounded-full p-2 opacity-90 hover:opacity-100 hover:bg-primary hover:text-white ease-in-out duration-300 cursor-pointer"
+                >
+                  <Mic />
+                </button>
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel hidden>Message</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Type a messsage..."
+                          {...field}
+                          className="p-8"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="h-full"
+                  disabled={
+                    form.formState.isSubmitting || !form.formState.isValid
+                  }
+                >
+                  Send
+                </Button>
+              </form>
+            </Form>
+          </>
+        )}
       </div>
     </div>
   );

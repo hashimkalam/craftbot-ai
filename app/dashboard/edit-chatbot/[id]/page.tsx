@@ -1,8 +1,7 @@
 "use client";
 
-
 import Image from "next/image";
-import logo from "@/public/images/just_logo.png"
+import logo from "@/public/images/just_logo.png";
 
 import Characteristic from "@/components/Characteristic";
 import { Button } from "@/components/ui/button";
@@ -23,15 +22,17 @@ import { redirect } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+
+import type { StaticImageData } from "next/image";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
 
   const [chatbotName, setChatbotName] = useState("");
+  const [currentImage, setCurrentImage] = useState<StaticImageData | string>(
+    logo
+  );
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
@@ -99,6 +100,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         variables: {
           id,
           name: chatbotName,
+          image: currentImage
         },
       });
 
@@ -136,7 +138,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   if (loading)
     return (
       <div className="mx-auto animate-spin p-10">
-        <Image src={logo} alt="Logo" className="w-24 lg:w-32" />
+        <Image src={currentImage} alt="Logo" className="w-24 lg:w-32" />
       </div>
     );
 
@@ -148,6 +150,37 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     "data?.chatbots?.chatbot_characteristics:-",
     data?.chatbots?.chatbot_characteristics
   );
+
+  const updateIcon = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*"; // Accept only image files
+
+    input.onchange = (event: Event) => {
+      const target = event.target as HTMLInputElement; // Type casting to handle null check
+
+      if (target && target.files && target.files[0]) {
+        const file = target.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          if (typeof reader.result === "string") {
+            // Only set the image if reader.result is a string (base64)
+            setCurrentImage(reader.result);
+          }
+        };
+
+        reader.readAsDataURL(file); // Read file as Data URL to display image
+        console.log("reader.readAsDataURL(file): ", file);
+      } else {
+        // If no file is selected, reset to default logo
+        setCurrentImage(logo);
+      }
+    };
+
+    // Trigger the file input dialog
+    input.click();
+  };
 
   return (
     <div className="px-0 md:p-10">
@@ -185,8 +218,18 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </Button>
 
         <div className="flex space-x-4">
-          <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
-
+          {/*<div onClick={updateIcon}>
+            Use the `Image` component for static logo
+            {typeof currentImage === "string" &&
+            currentImage.startsWith("data:image") ? (
+              // If it's a base64 image, use a normal <img> tag
+              <img src={currentImage} alt="Logo" className="w-16 lg:w-24" />
+            ) : (
+              // If it's the default static image, use Next.js's Image component
+              <Image src={currentImage} alt="Logo" className="w-16 lg:w-24" />
+            )}
+          </div>*/}
+          <Image src={currentImage} alt="Logo" className="w-16 lg:w-24" />
           <form
             onSubmit={handleUpdateChatbot}
             className="flex flex-1 space-2-x items-center"
