@@ -7,14 +7,12 @@ import {
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
 import { useEffect, useState } from "react";
-import logo from "@/public/images/just_logo.png";
-import { AccordionContent } from "./ui/accordion";
+import logo from "@/public/images/just_logo.png"; 
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { ExternalLink, X } from "lucide-react";
+import { Button } from "./ui/button"; 
 import Link from "next/link";
 import Image from "next/image";
 
@@ -77,68 +75,38 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                 <AccordionItem
                   key={chatbot.id}
                   value={`item-${chatbot.id}`}
+                  onClick={() =>
+                    router.push(`/dashboard/analytics/${chatbot.name}`)
+                  }
                   className="px-10 py-5"
                 >
-                  {hasSessions ? (
-                    <>
-                      <AccordionTrigger className="w-full">
-                        <div className="flex text-left items-center w-full">
-                          <Image src={logo} alt="Logo" className="h-10 w-10 mr-4" />
-                          <div className="flex items-center justify-between w-full">
-                            <p>{chatbot.name}</p>
+                  <>
+                    <AccordionTrigger className="w-full">
+                      <div className="flex text-left items-center w-full">
+                        <Image
+                          src={logo}
+                          alt="Logo"
+                          className="h-10 w-10 mr-4"
+                        />
+                        <div className="flex items-center justify-between w-full">
+                          <p>{chatbot.name}</p>
+                          {hasSessions ? (
                             <p className="pr-4 font-bold text-right hover:underline">
                               {chatbot.chat_sessions.length} sessions
                             </p>
-                          </div>
+                          ) : (
+                            <p className="font-light">(No Sessions)</p>
+                          )}
                         </div>
-                      </AccordionTrigger>
-
-                      <AccordionContent className="space-y-5 p-5 bg-gray-100 rounded-md">
-                        {chatbot.chat_sessions.map((session) => (
-                          <div
-                            key={session.id}
-                            className="relative p-10 bg-[#2991ee] text-white rounded-md flex items-center justify-between"
-                          >
-                            <div>
-                              <p className="text-lg font-bold">
-                                {session.guests?.name || "Anonymous"}
-                              </p>
-                              <p className="text-sm font-light">
-                                {session.guests?.email || "No email provided"}
-                              </p>
-                            </div>
-
-                            <div className="flex">
-                              <Button
-                                className="bg-white hover:bg-gray-300 text-black p-5 cursor-pointer m-2"
-                                onClick={() =>
-                                  router.push(`/dashboard/review-sessions/${session.id}`)
-                                }
-                              >
-                                <ExternalLink />
-                              </Button>
-                              <Button
-                                className="bg-red-500 hover:bg-red-600 p-5  cursor-pointer m-2"
-                                onClick={() =>
-                                  handleDelete(session.id, chatbot.id)
-                                }
-                              >
-                                <X />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </AccordionContent>
-                    </>
-                  ) : (
-                    <p className="font-light">(No Sessions)</p>
-                  )}
+                      </div>
+                    </AccordionTrigger>
+                  </>
                 </AccordionItem>
               );
             })}
           </>
         ) : (
-          <div className="bg-gray-100"> 
+          <div className="bg-gray-100">
             <p>
               You have not created any chatbots yet to even have sessions. Click
               on the button below to create one!
