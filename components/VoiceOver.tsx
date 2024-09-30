@@ -6,8 +6,7 @@ import { useRef, useState } from "react";
 
 function AudioTranscriber() {
   const { user } = useUser();
-  if (!user) return null; // Return null if no user is authenticated
-
+  
   // State variables for audio recording
   const [isRecording, setIsRecording] = useState(false);
   const [recordedAudio, setRecordedAudio] = useState<string | null>(null);
@@ -81,6 +80,11 @@ function AudioTranscriber() {
     }
   };
 
+  // Render loading state if the user is not authenticated
+  if (!user) {
+    return <div className="h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="h-screen flex flex-col items-center justify-center relative">
       <div className="space-y-8 pb-24 flex flex-col item-center justify-center">
@@ -101,13 +105,6 @@ function AudioTranscriber() {
         )}
 
         {isRecording && <div>Recording... You can stop anytime.</div>}
-
-        {/*{recordedAudio && (
-          <div className="w-[50%] mx-auto">
-            <h3>Recorded Speech:</h3>
-            <audio src={recordedAudio} controls />
-          </div>
-        )}*/}
 
         {transcribing && <div>Transcribing...</div>}
 
