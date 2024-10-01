@@ -9,14 +9,16 @@ import {
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs"; // Using dayjs for date manipulation
+import dayjs from "dayjs";
 
 interface TotalTimeUsedPerDayProps {
   filteredSessions: ChatSession[];
+  handleTotalMessages: (count: number) => void; // Add a prop for the total messages callback
 }
 
 const TotalTimeUsedPerDay = ({
   filteredSessions,
+  handleTotalMessages, // Destructure the prop
 }: TotalTimeUsedPerDayProps) => {
   const [ids, setIds] = useState<number[]>([]);
   const [messagesBySession, setMessagesBySession] = useState<{
@@ -57,6 +59,10 @@ const TotalTimeUsedPerDay = ({
           });
 
           setMessagesBySession(messageMap);
+          
+          // Calculate total message count
+          const totalMessageCount = allMessages.reduce((count, { messages }) => count + messages.length, 0);
+          handleTotalMessages(totalMessageCount); // Call the callback with total count
         } catch (error) {
           console.error("Error fetching messages: ", error);
         }
@@ -64,7 +70,7 @@ const TotalTimeUsedPerDay = ({
     };
 
     fetchAllMessages();
-  }, [ids, fetchMessages]); // Ensure that fetchMessages is in the dependency array
+  }, [ids, fetchMessages, handleTotalMessages]); // Ensure handleTotalMessages is in the dependency array
 
   // Calculate total time spent across all sessions
   const getTotalTimeSpent = () => {

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
 import { Chatbot } from "@/types/types";
@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { ExternalLink, X } from "lucide-react";
 import PieChartComponent from "./PieChartComponent";
-import TotalTImeUsedPerDay from "./TotalTImeUsedPerDay";
+import TotalTimeUsedPerDay from "./TotalTImeUsedPerDay";
+import ChatSessionTable from "./ChatSessionTable";
 
 function Index({
   chatbots,
@@ -21,6 +22,7 @@ function Index({
   const router = useRouter();
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
+  const [totalMessages, setTotalMessages] = useState<number>(0);
 
   // Sort according to the number of sessions available in each bot
   useEffect(() => {
@@ -45,7 +47,6 @@ function Index({
     refetchQueries: ["GetChatbotById"],
     awaitRefetchQueries: true,
     onCompleted: () => {
-      // The promise has completed, update the state here
       toast.success("Successfully deleted ChatSession");
     },
     onError: (error) => {
@@ -55,12 +56,10 @@ function Index({
   });
 
   const handleDelete = async (id: any) => {
-    // Show loading toast
     const promise = deleteChatSession({ variables: { id } });
     toast.promise(promise, {
       loading: "Deleting...",
       success: () => {
-        // Remove the session from the filteredSessions state
         setFilteredSessions((prevSessions) =>
           prevSessions.filter((session) => session.id !== id)
         );
@@ -70,58 +69,74 @@ function Index({
     });
   };
 
+  // Handle the total messages count from TotalTimeUsedPerDay
+  const handleTotalMessages = (messagesCount: number) => {
+    setTotalMessages(messagesCount);
+  };
+
   return (
     <div className="min-h-screen">
-      <div className="relative">
-        <div className="bg-gray-200 h-[50vh] flex items-center">
+      <div className="relative mt-12">
+        <div className="bg-gray-200 h-[50vh] flex flex-col relative rounded-lg">
+          <h1 className="text-xl font-bold underline ml-2">
+            Total Messages Usage
+          </h1>
           <PieChartComponent
-            sessionsCount={filteredSessions.length}
-            maxLimit={20}
+            messageCount={totalMessages}
+            maxLimit={100}
           />
         </div>
-        <div className="bg-gray-300 absolute top-5 right-5">
-          <TotalTImeUsedPerDay filteredSessions={filteredSessions} /> 
+        <div className="bg-gray-300 absolute top-5 right-5 rounded-lg p-2">
+          <TotalTimeUsedPerDay
+            filteredSessions={filteredSessions}
+            handleTotalMessages={handleTotalMessages}
+          />
         </div>
       </div>
 
-      <div className="space-y-5 p-5 bg-gray-100 rounded-md">
+      {/*<div className="space-y-5 p-5 bg-gray-100 rounded-md">
         {filteredSessions.length !== 0 ? (
-          filteredSessions.map((session) => (
-            <div
-              key={session.id}
-              className="relative p-3 px-4 bg-primary text-white rounded-md flex items-center justify-between gap-2"
-            >
-              <div>
-                <p className="text-lg font-bold">
-                  {session.guests?.name || "Anonymous"}
-                </p>
-                <p className="text-sm font-light">
-                  {session.guests?.email || "No email provided"}
-                </p>
-              </div>
+          <>
+            {filteredSessions.map((session) => (
+              <div
+                key={session.id}
+                className="relative p-3 px-4 bg-primary text-white rounded-md flex items-center justify-between gap-2"
+              >
+                <div>
+                  <p className="text-lg font-bold">
+                    {session.guests?.name || "Anonymous"}
+                  </p>
+                  <p className="text-sm font-light">
+                    {session.guests?.email || "No email provided"}
+                  </p>
+                </div>
 
-              <div className="flex">
-                <Button
-                  className="bg-red-500 hover:bg-red-600 cursor-pointer m-1"
-                  onClick={() => handleDelete(session.id)}
-                >
-                  <X size={18} className="-m-1" />
-                </Button>
-                <Button
-                  className="bg-white hover:bg-gray-300 text-black cursor-pointer m-1"
-                  onClick={() =>
-                    router.push(`/dashboard/review-sessions/${session.id}`)
-                  }
-                >
-                  <ExternalLink size={18} className="-m-1" />
-                </Button>
+                <div className="flex">
+                  <Button
+                    className="bg-red-500 hover:bg-red-600 cursor-pointer m-1"
+                    onClick={() => handleDelete(session.id)}
+                  >
+                    <X size={18} className="-m-1" />
+                  </Button>
+                  <Button
+                    className="bg-white hover:bg-gray-300 text-black cursor-pointer m-1"
+                    onClick={() =>
+                      router.push(`/dashboard/review-sessions/${session.id}`)
+                    }
+                  >
+                    <ExternalLink size={18} className="-m-1" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))
+            ))} 
+          </>
         ) : (
-          <p>No sessions available for this chatbot.</p>
+          <p>No chat sessions available.</p>
         )}
-      </div>
+      </div>*/}
+
+
+      <ChatSessionTable filteredSessions={filteredSessions} />
     </div>
   );
 }

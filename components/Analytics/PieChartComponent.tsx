@@ -11,17 +11,18 @@ import {
 const COLORS = ["#FF0000", "#007FFF"]; // Colors for the pie segments
 
 interface PieChartProps {
-  sessionsCount: number; // Current number of sessions
+  messageCount: number; // Current number of sessions
   maxLimit: number; // Maximum sessions allowed
 }
 
 const PieChartComponent: React.FC<PieChartProps> = ({
-  sessionsCount,
+  messageCount,
   maxLimit,
 }) => {
+  const remainingCount = maxLimit - messageCount
   const data = [
-    { name: "Used", value: sessionsCount },
-    { name: "Remaining", value: maxLimit - sessionsCount },
+    { name: `Used (${messageCount})`, value: messageCount },
+    { name: `Remaining (${remainingCount})`, value: remainingCount },
   ];
 
   return (
