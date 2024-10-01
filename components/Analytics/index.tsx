@@ -12,10 +12,10 @@ import ChatSessionTable from "./ChatSessionTable";
 
 function Index({
   chatbots,
-  chatbotName,
+  chatbotId,
 }: {
   chatbots: Chatbot[];
-  chatbotName: string;
+  chatbotId: number;
 }) {
   const router = useRouter();
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
@@ -31,15 +31,26 @@ function Index({
     setSortedChatbots(sortedArray);
   }, [chatbots]);
 
-  // Filter sessions based on the chatbotName
+  // Filter sessions based on the chatbotId
   useEffect(() => {
-    if (chatbotName) {
+    console.log("chatbotId: ", chatbotId);
+    if (chatbotId) {
       const currentChatbot = sortedChatbots.find(
-        (chatbot) => chatbot.name === chatbotName
+        (chatbot) => Number(chatbot.id) === Number(chatbotId)
       );
-      setFilteredSessions(currentChatbot ? currentChatbot.chat_sessions : []);
+      console.log("currentChatbot: ", currentChatbot);
+      if (currentChatbot) {
+        console.log("Chat Sessions: ", currentChatbot.chat_sessions);
+        setFilteredSessions(currentChatbot.chat_sessions);
+      } else {
+        console.log("No matching chatbot found.");
+        setFilteredSessions([]);
+      }
     }
-  }, [chatbotName, sortedChatbots]);
+  }, [chatbotId, sortedChatbots]);
+
+  console.log("sortedChatbots: ", sortedChatbots);
+  console.log("filteredSessions: ", filteredSessions);
 
   const [deleteChatSession] = useMutation(DELETE_CHATSESSION, {
     refetchQueries: ["GetChatbotById"],
@@ -72,6 +83,8 @@ function Index({
     setTotalMessages(messagesCount);
   };
 
+  console.log("totalMessages: ", totalMessages);
+
   return (
     <div className="min-h-screen">
       <div className="relative mt-12">
@@ -79,10 +92,7 @@ function Index({
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
-          <PieChartComponent
-            messageCount={totalMessages}
-            maxLimit={100}
-          />
+          <PieChartComponent messageCount={totalMessages} maxLimit={100} />
         </div>
         <div className="bg-gray-300 absolute top-5 right-5 rounded-lg p-2">
           <TotalTimeUsedPerDay
@@ -132,7 +142,6 @@ function Index({
           <p>No chat sessions available.</p>
         )}
       </div>*/}
-
 
       <ChatSessionTable filteredSessions={filteredSessions} />
     </div>

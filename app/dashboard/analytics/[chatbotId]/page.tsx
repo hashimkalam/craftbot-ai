@@ -10,11 +10,11 @@ import { auth } from "@clerk/nextjs/server";
 
 type Props = {
   params: {
-    chatbotName: string;
+    chatbotId: number;
   };
 };
 
-async function ReviewSessions({ params: { chatbotName } }: Props) {
+async function ReviewSessions({ params: { chatbotId } }: Props) {
   const { userId } = await auth();
   if (!userId) return <div>User ID not found. Please log in.</div>;
 
@@ -42,12 +42,12 @@ async function ReviewSessions({ params: { chatbotName } }: Props) {
 
   return (
     <div className="flex-1 px-10 min-h-screen">
-      <h1 className="text-xl lg:text-3xl font-semibold mt-10">Chat Sessions - ({chatbotName})</h1>
+      <h1 className="text-xl lg:text-3xl font-semibold mt-10">Chat Sessions - ({chatbotId})</h1>
       <h2 className="mb-5">
         Review all the chat sessions the chat bots have and with your customers
       </h2>
  
-      <Index chatbots={filteredChatbots} chatbotName={chatbotName} />
+      <Index chatbots={filteredChatbots} chatbotId={chatbotId} />
     </div>
   );
 }

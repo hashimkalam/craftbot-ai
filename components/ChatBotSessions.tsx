@@ -76,7 +76,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                   key={chatbot.id}
                   value={`item-${chatbot.id}`}
                   onClick={() =>
-                    router.push(`/dashboard/analytics/${chatbot.name}`)
+                    router.push(`/dashboard/analytics/${chatbot.id}`)
                   }
                   className="px-10 py-5"
                 >

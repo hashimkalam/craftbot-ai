@@ -1,3 +1,4 @@
+import FeedbackForm from "@/components/FeedbackForm";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -19,6 +20,8 @@ export default function Home() {
           Lets get started by creating your first chatbot
         </Button>
       </Link>
+
+      <FeedbackForm />
     </main>
   );
 }

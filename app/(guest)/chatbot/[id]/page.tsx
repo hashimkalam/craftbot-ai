@@ -51,13 +51,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sentiment, setSentiment] = useState<string>("");
   const [voice, setVoice] = useState(false);
 
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      message: "",
+      message: ""
     },
   });
 
@@ -126,6 +127,28 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       return;
     }
 
+    try {
+      const response = await fetch('/api/analyzeSentiment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: message }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+
+      const data = await response.json();
+      // Assuming the response contains 'sentiment' and 'score'
+      console.log(data)
+      setSentiment(data.sentiment); // 'positive', 'negative', or 'neutral'
+    } catch (error) {
+      console.error('Error sending feedback:', error);
+    }
+
     // optimistically update ui w user's msg
     const userMessage: Message = {
       id: Date.now(),
@@ -133,6 +156,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
       sender: "user",
+      sentiment: sentiment
     };
 
     // showing loading state for ai response
@@ -142,6 +166,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
       sender: "ai",
+      sentiment: sentiment
     };
 
     // set messages
