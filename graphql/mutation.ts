@@ -88,6 +88,17 @@ export const INSERT_MESSAGE = gql`
   }
 `;
 
+export const INSERT_FEEDBACK = gql`
+  mutation InsertFeedback($chat_session_id: Int!, $content: String!, $created_at: String!) {
+    insertFeedback(input: { chat_session_id: $chat_session_id, content: $content, created_at: $created_at }) {
+      id
+      content
+      created_at
+    }
+  }
+`;
+
+
 export const INSERT_GUEST = gql`
   mutation InsertGuest(
     $name: String!
@@ -129,3 +140,4 @@ export const GET_MESSAGES_BY_CHAT_SESSION_ID = gql`
     }
   }
 `;
+

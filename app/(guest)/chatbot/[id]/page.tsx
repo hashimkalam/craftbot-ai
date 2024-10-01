@@ -17,6 +17,7 @@ import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { startNewChat } from "@/lib/server/startNewChat";
 import {
+  Feedback,
   GetChatbotByIdResponse,
   Message,
   MessageByChatSessionIdVariables,
@@ -51,14 +52,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  // const [sentiment, setSentiment] = useState<string>("");
-  const [voice, setVoice] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [mode, setMode] = useState(0);
 
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      message: ""
+      message: "",
     },
   });
 
@@ -107,7 +108,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     setIsOpen(false);
   };
 
-  // onsuvmit function
+  // onsubmit function
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     const { message: formMessage } = values;
@@ -126,28 +127,6 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     if (!message.trim()) {
       return;
     }
-    /*
-    try {
-      const response = await fetch('/api/analyzeSentiment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: message }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-
-      const data = await response.json();
-      // Assuming the response contains 'sentiment' and 'score'
-      console.log(data)
-      setSentiment(data.sentiment); // 'positive', 'negative', or 'neutral'
-    } catch (error) {
-      console.error('Error sending feedback:', error);
-    }*/
 
     // optimistically update ui w user's msg
     const userMessage: Message = {
@@ -204,6 +183,78 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     }
   }
 
+  async function onSubmitFeedback(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    const { message: formMessage } = values;
+
+    const feedback = formMessage;
+    form.reset();
+
+    // Open form box if necessary data not taken - email and name
+    if (!name || !email) {
+      setIsOpen(true);
+      setLoading(false);
+      return;
+    }
+
+    // Optimistically update UI with user's message
+    const userFeedback: Feedback = {
+      id: Date.now(),
+      chat_session_id: chatId,
+      content: feedback,
+      created_at: new Date().toISOString(), 
+    };
+
+    // showing loading state for ai response
+    const loadingMessage: Message = {
+      id: Date.now() + 1,
+      content: "AI Thinking...",
+      created_at: new Date().toISOString(),
+      chat_session_id: chatId,
+      sender: "ai",
+    };
+
+    // Set messages
+    setFeedback((prevFeedback) => [...prevFeedback, userFeedback]);
+
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,  
+          content: feedback,
+          created_at: new Date().toISOString(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      console.log("AI result response: ", result);
+
+      // Updating loading message from AI with actual response
+      setFeedback((prevFeedback) =>
+        prevFeedback.map((msg) =>
+          msg.id === loadingMessage.id
+            ? { ...msg, content: result.content, id: result.id }
+            : msg
+        )
+      );
+
+      // Optionally handle any UI feedback on success
+    } catch (error) {
+      console.error("Error sending feedback: ", error);
+      // Optionally handle UI error feedback
+    } finally {
+      setLoading(false); // Ensure loading state is reset
+    }
+  }
+
   return (
     <div className="w-full flex bg-gray-100">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -256,77 +307,70 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       </Dialog>
 
       <div className="flex flex-col w-full max-w-3xl mx-auto bg-white md:rounded-t-lg shadow-2xl md:mt-10">
-        <div className="pb-4 border-b sticky top-0 z-50 bg-[#4d7dfb] py-5 px-10 text-white md:rounded-t-lg flex items-center space-x-4">
+        <div className="pb-4 border-b sticky top-0 z-50 bg-primary py-5 px-10 text-white md:rounded-t-lg flex items-center space-x-4">
           <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
           <div>
             <h1 className="truncate text-lg">{chatbotData?.chatbots.name}</h1>
             <p className="text-sm text-gray-300">Typically replies instantly</p>
           </div>
         </div>
+        <div className="flex justify-evenly text-center text-white">
+          <button
+            onClick={() => setMode(0)}
+            className={`cursor-pointer w-full py-2 ${
+              mode === 0 ? "bg-primary font-bold" : "bg-primary/80"
+            }`}
+          >
+            Get To Know More
+          </button>
+          <p
+            onClick={() => setMode(1)}
+            className={`cursor-pointer w-full py-2 ${
+              mode === 1 ? "bg-primary font-bold" : "bg-primary/80"
+            }`}
+          >
+            Feedback
+          </p>
+        </div>
 
-        {voice ? (
-          <div className="h-full flex items-center justify-center relative">
-            <button
-              onClick={() => setVoice(false)}
-              className="absolute top-5 right-5"
-            >
-              Back To Text
-            </button>
-            <div>
-           
-
-              <VoiceOver />
-            </div>
-          </div>
-        ) : (
-          <>
-            {" "}
-            <Messages
-              messages={messages}
-              chatbotName={chatbotData?.chatbots?.name!}
+        <Messages
+          messages={messages}
+          feedback={feedback}
+          chatbotName={chatbotData?.chatbots?.name!}
+          mode={mode}
+        />
+        <Form {...form}>
+          <form
+            onSubmit={mode===0 ? form.handleSubmit(onSubmit) : form.handleSubmit(onSubmitFeedback)}
+            className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
+          >
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel hidden>Message</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Type a messsage..."
+                      {...field}
+                      className="p-6"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
-              >
-                <button
-                  onClick={() => setVoice(true)}
-                  className="border-[2px] border-black rounded-full p-2 opacity-90 hover:opacity-100 hover:bg-primary hover:text-white ease-in-out duration-300 cursor-pointer"
-                >
-                  <Mic />
-                </button>
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel hidden>Message</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Type a messsage..."
-                          {...field}
-                          className="p-8"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                <Button
-                  type="submit"
-                  className="h-full"
-                  disabled={
-                    form.formState.isSubmitting || !form.formState.isValid
-                  }
-                >
-                  Send
-                </Button>
-              </form>
-            </Form>
-          </>
-        )}
+            <Button
+              type="submit"
+              className="h-full"
+              disabled={form.formState.isSubmitting || !form.formState.isValid}
+            >
+              Send
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );

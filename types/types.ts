@@ -45,6 +45,15 @@ export interface Message {
   sender: "ai" | "user";
 }
 
+export interface Feedback {
+  id: number;
+  chat_session_id: number;
+  content: string;
+  created_at: string;
+}
+
+
+
 export interface GetChatbotByIdResponse {
   chatbots: Chatbot;
 }

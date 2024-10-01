@@ -468,4 +468,18 @@ type Mutation {
       """
       configuration: "postgresql_config"
     )
+
+  # Insert a new feedback entry
+  insertFeedback(
+    chat_session_id: Int!
+    content: String!
+    created_at: DateTime!
+  ): Feedback
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      table: "feedback"
+      dml: INSERT
+      configuration: "postgresql_config"
+    )
 }
