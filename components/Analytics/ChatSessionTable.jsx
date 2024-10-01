@@ -61,10 +61,10 @@ const ChatSessionTable = ({ filteredSessions }) => {
   );
 
   return (
-    <div className="space-y-5 p-5 bg-gray-100 rounded-md">
+    <div className="space-y-5 p-5 w-full rounded-md">
       {filteredSessions.length > 0 ? (
         <>
-          <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
+          <table {...getTableProps()} className="w-full bg-white border border-gray-200">
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
@@ -125,7 +125,7 @@ const ChatSessionTable = ({ filteredSessions }) => {
                 {">"}
               </button>
               <button
-                className="bg-gray-300 text-black px-2 py-1 rounded"
+                className="bg-gray-300 hover:bg-gray-500 text-black px-2 py-1 rounded"
                 onClick={() => gotoPage(Math.ceil(filteredSessions.length / pageSize) - 1)} // Go to last page
                 disabled={!canNextPage}
               >
