@@ -61,7 +61,6 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
     previousPage,
     setPageSize,
     state: { pageIndex, pageSize },
-    // Note: Use the types from 'react-table' to define the table instance
   }: TableInstance<ChatSession> = useTable<ChatSession>(
     {
       columns,
@@ -77,10 +76,10 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
         <>
           <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
             <thead>
-              {headerGroups.map(headerGroup => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map(column => (
-                    <th {...column.getHeaderProps()} className="px-4 py-2 border-b text-left text-gray-600">
+              {headerGroups.map((headerGroup: any) => (
+                <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column: any) => (
+                    <th key={column.id} {...column.getHeaderProps()} className="px-4 py-2 border-b text-left text-gray-600">
                       {column.render("Header")}
                     </th>
                   ))}
@@ -91,9 +90,9 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
               {page.map((row: any) => {
                 prepareRow(row);
                 return (
-                  <tr {...row.getRowProps()} className="hover:bg-gray-50">
+                  <tr key={row?.id} {...row.getRowProps()} className="hover:bg-gray-50">
                     {row.cells.map((cell: any) => (
-                      <td {...cell.getCellProps()} className="px-4 py-2 border-b">
+                      <td key={cell.id} {...cell.getCellProps()} className="px-4 py-2 border-b">
                         {cell.render("Cell")}
                       </td>
                     ))}
