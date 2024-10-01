@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
-import { ExternalLink, X } from "lucide-react";
 import PieChartComponent from "./PieChartComponent";
 import TotalTimeUsedPerDay from "./TotalTImeUsedPerDay";
 import ChatSessionTable from "./ChatSessionTable";

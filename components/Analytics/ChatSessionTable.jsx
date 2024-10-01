@@ -2,25 +2,15 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  useTable,
-  usePagination,
-  TableInstance,
-  Column,
-} from "react-table";
+import { useTable, usePagination } from "react-table";
 import { Button } from "../ui/button";
 import { ExternalLink } from "lucide-react";
-import { ChatSession } from "@/types/types"; // Import your types here
 
-interface ChatSessionTableProps {
-  filteredSessions: ChatSession[];
-}
-
-const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions }) => {
+const ChatSessionTable = ({ filteredSessions }) => {
   const router = useRouter();
 
   // Define columns for the table
-  const columns: Column<ChatSession>[] = React.useMemo(
+  const columns = React.useMemo(
     () => [
       {
         Header: "Guest Name",
@@ -29,12 +19,12 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
       {
         Header: "Email",
         accessor: "guests.email",
-        Cell: ({ value }: { value?: string }) => value || "No email provided", // Handling empty email
+        Cell: ({ value }) => value || "No email provided", // Handling empty email
       },
       {
         Header: "Actions",
         accessor: "id",
-        Cell: ({ value }: { value: string }) => (
+        Cell: ({ value }) => (
           <Button
             className="bg-white hover:bg-gray-300 text-black cursor-pointer m-1"
             onClick={() => router.push(`/dashboard/review-sessions/${value}`)}
@@ -61,7 +51,7 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
     previousPage,
     setPageSize,
     state: { pageIndex, pageSize },
-  }: TableInstance<ChatSession> = useTable<ChatSession>(
+  } = useTable(
     {
       columns,
       data: filteredSessions,
@@ -76,9 +66,9 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
         <>
           <table {...getTableProps()} className="min-w-full bg-white border border-gray-200">
             <thead>
-              {headerGroups.map((headerGroup: any) => (
+              {headerGroups.map((headerGroup) => (
                 <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column: any) => (
+                  {headerGroup.headers.map((column) => (
                     <th key={column.id} {...column.getHeaderProps()} className="px-4 py-2 border-b text-left text-gray-600">
                       {column.render("Header")}
                     </th>
@@ -87,11 +77,11 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
               ))}
             </thead>
             <tbody {...getTableBodyProps()}>
-              {page.map((row: any) => {
+              {page.map((row) => {
                 prepareRow(row);
                 return (
-                  <tr key={row?.id} {...row.getRowProps()} className="hover:bg-gray-50">
-                    {row.cells.map((cell: any) => (
+                  <tr key={row.id} {...row.getRowProps()} className="hover:bg-gray-50">
+                    {row.cells.map((cell) => (
                       <td key={cell.id} {...cell.getCellProps()} className="px-4 py-2 border-b">
                         {cell.render("Cell")}
                       </td>
@@ -145,12 +135,12 @@ const ChatSessionTable: React.FC<ChatSessionTableProps> = ({ filteredSessions })
             <div>
               <select
                 value={pageSize}
-                onChange={e => {
+                onChange={(e) => {
                   setPageSize(Number(e.target.value));
                 }}
                 className="border border-gray-300 rounded"
               >
-                {[5, 10, 15, 20].map(size => (
+                {[5, 10, 15, 20].map((size) => (
                   <option key={size} value={size}>
                     Show {size}
                   </option>
