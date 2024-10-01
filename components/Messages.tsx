@@ -56,7 +56,7 @@ function Messages({
               )}
             </div>
 
-            <p
+            <div
               className={`chat-bubble text-white ${
                 isSender
                   ? "chat-bubble-primary bg-[#4d7dfb]"
@@ -69,7 +69,7 @@ function Messages({
               >
                 {message.content}
               </ReactMarkDown>
-            </p>
+            </div>
           </div>
         );
       })}

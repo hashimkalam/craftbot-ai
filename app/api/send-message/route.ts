@@ -74,7 +74,9 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. Use Emojis where possible. Be funny - add a lot of humour. Be motivating and helpful. Here are some key info that you need to be aware of: ${systemPrompt}`,
+        content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. 
+        Use Emojis where possible. Be funny - add a lot of humour. Be motivating and helpful. Here are some key info that you need to be aware of: ${systemPrompt}
+        Please make it concise and straight forward.`,
       },
       ...formattedPrevMessages,
       {

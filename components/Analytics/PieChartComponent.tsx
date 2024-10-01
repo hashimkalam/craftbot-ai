@@ -15,7 +15,10 @@ interface PieChartProps {
   maxLimit: number; // Maximum sessions allowed
 }
 
-const PieChartComponent: React.FC<PieChartProps> = ({ sessionsCount, maxLimit }) => {
+const PieChartComponent: React.FC<PieChartProps> = ({
+  sessionsCount,
+  maxLimit,
+}) => {
   const data = [
     { name: "Used", value: sessionsCount },
     { name: "Remaining", value: maxLimit - sessionsCount },
@@ -29,8 +32,8 @@ const PieChartComponent: React.FC<PieChartProps> = ({ sessionsCount, maxLimit })
           cx="50%"
           cy="50%"
           labelLine={false}
-          outerRadius={80}
-          fill="#8884d8"
+          outerRadius={120}
+          fill="#ff00000"
           dataKey="value"
         >
           {data.map((entry, index) => (
