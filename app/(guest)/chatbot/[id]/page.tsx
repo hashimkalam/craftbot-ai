@@ -51,7 +51,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [sentiment, setSentiment] = useState<string>("");
+  // const [sentiment, setSentiment] = useState<string>("");
   const [voice, setVoice] = useState(false);
 
   // form setup
@@ -126,7 +126,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     if (!message.trim()) {
       return;
     }
-
+    /*
     try {
       const response = await fetch('/api/analyzeSentiment', {
         method: 'POST',
@@ -147,7 +147,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       setSentiment(data.sentiment); // 'positive', 'negative', or 'neutral'
     } catch (error) {
       console.error('Error sending feedback:', error);
-    }
+    }*/
 
     // optimistically update ui w user's msg
     const userMessage: Message = {
@@ -156,7 +156,6 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
       sender: "user",
-      sentiment: sentiment
     };
 
     // showing loading state for ai response
@@ -166,7 +165,6 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
       sender: "ai",
-      sentiment: sentiment
     };
 
     // set messages
