@@ -46,7 +46,7 @@ export interface Message {
 }
 
 export interface Feedback {
-  id: number;
+  // id: number;
   chat_session_id: number;
   content: string;
   created_at: string;

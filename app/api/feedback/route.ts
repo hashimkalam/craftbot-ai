@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const feedbackResult = await serverClient.mutate({
       mutation: INSERT_FEEDBACK, // Ensure you have a GraphQL mutation to insert feedback
       variables: {
-        id,
+        chat_session_id: Number(id),
         content,
         created_at: formatISO(new Date()), // Current timestamp
       },

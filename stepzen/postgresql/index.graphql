@@ -51,6 +51,13 @@ type Messages {
   sender: String!
 }
 
+type Feedback {
+  chat_session_id: Int!  
+  content: String!
+  created_at: DateTime!
+}
+
+
 """
 The following queries are just a set of examples of how to access your schema.
 Feel free to modify them or aggregate more.
@@ -468,7 +475,6 @@ type Mutation {
       """
       configuration: "postgresql_config"
     )
-
   # Insert a new feedback entry
   insertFeedback(
     chat_session_id: Int!

@@ -89,9 +89,9 @@ export const INSERT_MESSAGE = gql`
 `;
 
 export const INSERT_FEEDBACK = gql`
-  mutation InsertFeedback($chat_session_id: Int!, $content: String!, $created_at: String!) {
-    insertFeedback(input: { chat_session_id: $chat_session_id, content: $content, created_at: $created_at }) {
-      id
+  mutation InsertFeedback($chat_session_id: Int!, $content: String!, $created_at: DateTime!) {
+    insertFeedback(chat_session_id: $chat_session_id, content: $content, created_at: $created_at) {
+      chat_session_id
       content
       created_at
     }
