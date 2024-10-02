@@ -11,29 +11,33 @@ import Image from "next/image";
 
 function Messages({
   messages,
-  feedback,
+  feedback = [],
   chatbotName,
-  mode, // Use mode to determine which messages to display
+  mode,
 }: {
   messages?: Message[];
   feedback?: Feedback[];
   chatbotName?: string;
-  mode: number; // 0 for messages, 1 for feedback
+  mode?: number; // 0 for messages, 1 for feedback
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const path = usePathname();
   const isReviewPage = path.includes("review-sessions");
 
+  // Log feedback data for debugging
+  console.log("Feedback Data: ", feedback);
+
   // Set allMessages based on the mode, ensuring it's always an array
-  const allMessages: Message[] = mode === 0 
-    ? messages || [] // Use messages when mode is 0, fallback to an empty array if undefined
-    : feedback?.map(item => ({
-        id: item.id,
-        content: item.content,
-        created_at: item.created_at,
-        chat_session_id: 0, // Assuming chat_session_id should be a number
-        sender: "ai", // Assuming this is correct
-      })) || []; // Use feedback when mode is 1, fallback to an empty array if undefined
+  const allMessages: Message[] =
+    mode === 0
+      ? messages || [] // Use messages when mode is 0, fallback to an empty array if undefined
+      : feedback?.map((item) => ({
+          id: item.chat_session_id || 0, // Ensure chat_session_id is provided, or default to 0
+          content: item.content,
+          created_at: item.created_at,
+          chat_session_id: item.chat_session_id || 0, // Use chat_session_id from feedback
+          sender: "ai", // Assuming sender is always 'ai' for feedback items
+        })) || []; // Use feedback when mode is 1, fallback to an empty array if undefined
 
   console.log("Messages: ", allMessages);
   console.log("Chatbot Name: ", chatbotName);

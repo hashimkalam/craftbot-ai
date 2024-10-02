@@ -46,7 +46,7 @@ export interface Message {
 }
 
 export interface Feedback {
-  // id: number;
+  id: number;
   chat_session_id: number;
   content: string;
   created_at: string;
@@ -85,6 +85,7 @@ export interface GetChatSessionMessagesResponse {
     id: number;
     created_at: string;
     messages: Message[];
+    feedback: Feedback[];
     chatbots: {
       name: string;
     };

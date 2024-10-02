@@ -90,3 +90,13 @@ export const GET_CHAT_SESSION_MESSAGES = gql`
     }
   }
 `;
+
+export const GET_FEEDBACK_MESSAGES = gql`
+  query GetFeedbackMessages {
+    feedbackList {
+      chat_session_id
+      content
+      created_at
+    }
+  }
+`;

@@ -52,9 +52,12 @@ type Messages {
 }
 
 type Feedback {
-  chat_session_id: Int!  
+  chat_session_id: Int
+  chat_sessions: Chat_sessions
+    @materializer(query: "chat_sessionsUsingFeedback_chat_session_id_fkey")
   content: String!
   created_at: DateTime!
+  id: Int!
 }
 
 
@@ -106,6 +109,17 @@ type Query {
       configuration: "postgresql_config"
     )
   chat_sessionsUsingMessages_chat_session_id_fkey(
+    chat_session_id: Int!
+  ): Chat_sessions
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      query: """
+      SELECT "chatbot_id", "created_at", "guest_id", "id" FROM "chat_sessions" WHERE "id" = $1
+      """
+      configuration: "postgresql_config"
+    )
+  chat_sessionsUsingFeedback_chat_session_id_fkey(
     chat_session_id: Int!
   ): Chat_sessions
     @dbquery(
@@ -261,6 +275,42 @@ type Query {
       schema: "public"
       query: """
       SELECT "chat_session_id", "content", "created_at", "id", "sender" FROM "messages" WHERE "chat_session_id" = $1
+      """
+      configuration: "postgresql_config"
+    )
+  "Queries for type 'Feedback' "
+  feedback(id: Int!): Feedback
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      table: "feedback"
+      configuration: "postgresql_config"
+    )
+    
+  feedbackList: [Feedback]
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      table: "feedback"
+      configuration: "postgresql_config"
+    )
+    
+  feedbackPaginatedList(first: Int, after: Int): [Feedback]
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      query: """
+      SELECT "chat_session_id", "content", "created_at", "id" FROM "feedback" ORDER BY "id" LIMIT $1 OFFSET $2
+      """
+      configuration: "postgresql_config"
+    )
+    
+  feedbackUsingFeedback_chat_session_id_fkey(chat_session_id: Int!): [Feedback]
+    @dbquery(
+      type: "postgresql"
+      schema: "public"
+      query: """
+      SELECT * FROM feedback WHERE chat_session_id = $1
       """
       configuration: "postgresql_config"
     )

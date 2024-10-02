@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
+import { GET_FEEDBACK_BY_CHAT_SESSION_ID, GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { startNewChat } from "@/lib/server/startNewChat";
 import {
@@ -38,8 +38,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import { Mic } from "lucide-react";
-import VoiceOver from "@/components/VoiceOver";
 
 const formSchema = z.object({
   message: z.string().min(2, "Your message is too short!!"),
@@ -73,27 +71,33 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
   console.log("chatbotData: ", chatbotData);
 
-  // get messages by chatsessionId
-  const {
-    loading: loadingQuery,
-    error,
-    data,
-  } = useQuery<
-    MessagesByChatSessionIdResponse,
-    MessageByChatSessionIdVariables
-  >(GET_MESSAGES_BY_CHAT_SESSION_ID, {
-    variables: {
-      chat_session_id: chatId,
-    },
+   // Fetch Messages
+   const {
+    loading: loadingMessages,
+    error: errorMessages,
+    data: messagesData,
+  } = useQuery(GET_MESSAGES_BY_CHAT_SESSION_ID, {
+    variables: { chat_session_id: chatId },
     skip: !chatId,
   });
 
+  // Fetch Feedback
+  const {
+    loading: loadingFeedback,
+    error: errorFeedback,
+    data: feedbackData,
+  } = useQuery(GET_FEEDBACK_BY_CHAT_SESSION_ID, {
+    variables: { chat_session_id: chatId },
+    skip: !chatId,
+  });
+  
+
   // data has the messages content
   useEffect(() => {
-    if (data) {
-      setMessages(data?.chat_sessions?.messages);
+    if (messagesData) {
+      setMessages(messagesData?.chat_sessions?.messages);
     }
-  }, [data]);
+  }, [messagesData]);
   console.log("messages: ", messages);
 
   const handleInfoSubmit = async (e: React.FormEvent) => {
@@ -239,10 +243,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
       // Updating loading message from AI with actual response
       setFeedback((prevFeedback) =>
-        prevFeedback.map((msg) =>
-          msg.id === loadingMessage.id
-            ? { ...msg, content: result.content, id: result.id }
-            : msg
+        prevFeedback.map((feedback) =>
+          feedback.id === loadingMessage.id
+            ? { ...feedback, content: result.content, id: result.id }
+            : feedback
         )
       );
 
