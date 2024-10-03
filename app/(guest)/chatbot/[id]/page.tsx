@@ -1,6 +1,6 @@
 "use client";
 
-import logo from "@/public/images/just_logo.png"; 
+import logo from "@/public/images/just_logo.png";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,14 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GET_FEEDBACK_BY_CHAT_SESSION_ID, GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
+import {
+  GET_FEEDBACK_BY_CHAT_SESSION_ID,
+  GET_MESSAGES_BY_CHAT_SESSION_ID,
+} from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { startNewChat } from "@/lib/server/startNewChat";
-import {
-  Feedback,
-  GetChatbotByIdResponse,
-  Message,
-} from "@/types/types";
+import { Feedback, GetChatbotByIdResponse, Message } from "@/types/types";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -36,6 +35,7 @@ import {
 } from "@/components/ui/form";
 import Image from "next/image";
 import MessagesContainer from "@/components/MessagesContainer";
+import Messages from "@/components/Messages";
 
 const formSchema = z.object({
   message: z.string().min(2, "Your message is too short!!"),
@@ -48,8 +48,9 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [feedback, setFeedback] = useState<Feedback[]>([]); 
-  const [sentiment, setSentiment] = useState<string | null>(null); 
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [sentiment, setSentiment] = useState<string | null>(null);
+  const [mode, setMode] = useState(0);
 
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,8 +70,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
   console.log("chatbotData: ", chatbotData);
 
-   // Fetch Messages
-   const {
+  // Fetch Messages
+  const {
     loading: loadingMessages,
     error: errorMessages,
     data: messagesData,
@@ -88,7 +89,6 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     variables: { chat_session_id: chatId },
     skip: !chatId,
   });
-  
 
   // data has the messages content
   useEffect(() => {
@@ -111,7 +111,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   };
 
   // onsubmit function
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmitMessage(values: z.infer<typeof formSchema>) {
     setLoading(true);
     const { message: formMessage } = values;
 
@@ -166,7 +166,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           chat_session_id: chatId,
           chatbot_id: id,
           content: message,
-          sentiment: sentiment
+          sentiment: sentiment,
         }),
       });
 
@@ -189,10 +189,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   async function onSubmitFeedback(values: z.infer<typeof formSchema>) {
     setLoading(true);
     const { message: formMessage } = values;
-  
+
     const feedback = formMessage;
     form.reset();
-  
+
     // Open form box if necessary data not taken - email and name
     if (!name || !email) {
       setIsOpen(true);
@@ -201,20 +201,20 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     }
 
     // Get sentiment before submitting feedback
-    let sentiment; 
+    let sentiment;
 
     // Call handleSentiment and wait for it to finish
     sentiment = await handleSentiment(feedback);
-  
+
     // Optimistically update UI with user's message
     const userFeedback: Feedback = {
       id: Date.now(),
       chat_session_id: chatId,
       content: feedback,
       sentiment: sentiment,
-      created_at: new Date().toISOString(), 
+      created_at: new Date().toISOString(),
     };
-  
+
     // showing loading state for ai response
     const loadingMessage: Message = {
       id: Date.now() + 1,
@@ -223,11 +223,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       chat_session_id: chatId,
       sender: "ai",
     };
-  
+
     // Set messages
     setFeedback((prevFeedback) => [...prevFeedback, userFeedback]);
-  
-  
+
     try {
       // Proceed to submit feedback with sentiment
       const response = await fetch("/api/feedback", {
@@ -239,17 +238,17 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           id: chatId,
           content: feedback,
           sentiment,
-          chatbot_id: id
+          chatbot_id: id,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       const result = await response.json();
       console.log("AI result response: ", result);
-  
+
       // Updating loading message from AI with actual response
       setFeedback((prevFeedback) =>
         prevFeedback.map((feedback) =>
@@ -258,7 +257,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             : feedback
         )
       );
-  
+
       // Optionally handle any UI feedback on success
     } catch (error) {
       console.error("Error sending feedback: ", error);
@@ -267,30 +266,30 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       setLoading(false); // Ensure loading state is reset
     }
   }
-  
+
   // Modify handleSentiment to return the sentiment
   const handleSentiment = async (feedback: string) => {
     try {
-      const response = await fetch('/api/analyzeSentiment', {
-        method: 'POST',
+      const response = await fetch("/api/analyzeSentiment", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text: feedback }), // Pass the feedback text here
       });
-  
+
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
-  
+
       const data = await response.json();
       // Assuming the response contains 'sentiment' and 'score'
       console.log(data);
       setSentiment(data.sentiment); // 'positive', 'negative', or 'neutral'
-  
+
       return data.sentiment; // Return the sentiment
     } catch (error) {
-      console.error('Error sending feedback:', error);
+      console.error("Error sending feedback:", error);
       return null; // Return null or handle as necessary
     }
   };
@@ -354,13 +353,39 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             <p className="text-sm text-gray-300">Typically replies instantly</p>
           </div>
         </div>
-        
-        {/* Pass fetched data to a client-side component */}
-        <MessagesContainer messages={messages} feedback={feedback} chatbotName={name}  />
-        
+        <div className="flex justify-evenly text-center text-white">
+          <button
+            onClick={() => setMode(0)}
+            className={`cursor-pointer w-full py-2 ${
+              mode === 0 ? "bg-primary font-bold" : "bg-primary/80"
+            }`}
+          >
+            Get To Know More
+          </button>
+          <p
+            onClick={() => setMode(1)}
+            className={`cursor-pointer w-full py-2 ${
+              mode === 1 ? "bg-primary font-bold" : "bg-primary/80"
+            }`}
+          >
+            Feedback
+          </p>
+        </div>
+
+        <Messages
+          messages={messages}
+          feedback={feedback}
+          chatbotName={name}
+          mode={mode} // Use the mode to determine whether to show messages or feedback
+        />
+
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmitFeedback)}
+            onSubmit={
+              mode === 0
+                ? form.handleSubmit(onSubmitMessage)
+                : form.handleSubmit(onSubmitFeedback)
+            }
             className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
           >
             <FormField

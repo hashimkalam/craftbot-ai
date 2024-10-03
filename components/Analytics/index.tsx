@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { Chatbot } from "@/types/types";
 import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import PieChartComponent from "./PieChartComponent";
 import TotalTimeUsedPerDay from "./TotalTImeUsedPerDay";
 import ChatSessionTable from "./ChatSessionTable";
+import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
 
 function Index({
   chatbots,
@@ -15,7 +16,7 @@ function Index({
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
-}) { 
+}) {
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
   const [totalMessages, setTotalMessages] = useState<number>(0);
@@ -82,10 +83,10 @@ function Index({
     setTotalMessages(messagesCount);
   };
 
-    // Handle the total feedback count from TotalTimeUsedPerDay
-    const handleTotalFeedback = (feedbackCount: number) => {
-      setTotalFeedback(feedbackCount);
-    };
+  // Handle the total feedback count from TotalTimeUsedPerDay
+  const handleTotalFeedback = (feedbackCount: number) => {
+    setTotalFeedback(feedbackCount);
+  };
 
   console.log("totalMessages: ", totalMessages);
 
@@ -98,11 +99,19 @@ function Index({
           </h1>
           <PieChartComponent messageCount={totalMessages} maxLimit={100} />
         </div>
+
+        <div className="bg-gray-200 h-[50vh] flex flex-col relative rounded-lg mt-12">
+          <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
+          <FeedbackSentimentCalc
+            filteredSessions={filteredSessions}
+            handleTotalFeedback={handleTotalFeedback}
+          />
+        </div>
+
         <div className="bg-gray-300 absolute top-5 right-5 rounded-lg p-2">
           <TotalTimeUsedPerDay
             filteredSessions={filteredSessions}
             handleTotalMessages={handleTotalMessages}
-            handleTotalFeedback={handleTotalFeedback} 
           />
         </div>
       </div>
