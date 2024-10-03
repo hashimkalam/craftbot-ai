@@ -6,8 +6,8 @@ import { formatISO } from "date-fns";
 export async function POST(req: NextRequest) {
   console.log("Received request for feedback submission."); // Log the request receipt
 
-  const { id, content } = await req.json(); // Expecting id and feedback content
-  console.log("Extracted data: ", { id, content }); // Log the extracted data
+  const { id, content, sentiment } = await req.json(); // Expecting id and feedback content
+  console.log("Extracted data: ", { id, content, sentiment }); // Log the extracted data
 
   try {
     // Validate inputs
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       variables: {
         chat_session_id: Number(id),
         content,
+        sentiment,
         created_at: formatISO(new Date()), // Current timestamp
       },
     });

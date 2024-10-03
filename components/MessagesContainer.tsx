@@ -17,7 +17,7 @@ function MessagesContainer({
   const [mode, setMode] = useState(0); // This state is client-side
 
   return (
-    <div> 
+    <div className="h-full"> 
       <ReviewSessionMode mode={mode} setMode={setMode} />
 
       {/* Pass mode to Messages */}
@@ -27,6 +27,7 @@ function MessagesContainer({
         chatbotName={chatbotName}
         mode={mode} // Use the mode to determine whether to show messages or feedback
       />
+      
     </div>
   );
 }
