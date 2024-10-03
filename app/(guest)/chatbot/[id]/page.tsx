@@ -1,7 +1,6 @@
 "use client";
 
-import logo from "@/public/images/just_logo.png";
-import Messages from "@/components/Messages";
+import logo from "@/public/images/just_logo.png"; 
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,8 +19,6 @@ import {
   Feedback,
   GetChatbotByIdResponse,
   Message,
-  MessageByChatSessionIdVariables,
-  MessagesByChatSessionIdResponse,
 } from "@/types/types";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
@@ -202,12 +199,19 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       setLoading(false);
       return;
     }
+
+    // Get sentiment before submitting feedback
+    let sentiment; 
+
+    // Call handleSentiment and wait for it to finish
+    sentiment = await handleSentiment(feedback);
   
     // Optimistically update UI with user's message
     const userFeedback: Feedback = {
       id: Date.now(),
       chat_session_id: chatId,
       content: feedback,
+      sentiment: sentiment,
       created_at: new Date().toISOString(), 
     };
   
@@ -223,13 +227,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     // Set messages
     setFeedback((prevFeedback) => [...prevFeedback, userFeedback]);
   
-    // Get sentiment before submitting feedback
-    let sentiment; // Declare sentiment variable
   
     try {
-      // Call handleSentiment and wait for it to finish
-      sentiment = await handleSentiment(feedback);
-  
       // Proceed to submit feedback with sentiment
       const response = await fetch("/api/feedback", {
         method: "POST",
@@ -237,10 +236,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: id,
+          id: chatId,
           content: feedback,
-          sentiment, // Include sentiment here
-          created_at: new Date().toISOString(),
+          sentiment,
+          chatbot_id: id
         }),
       });
   
@@ -295,9 +294,6 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       return null; // Return null or handle as necessary
     }
   };
-  
-
-
 
   return (
     <div className="w-full flex bg-gray-100">

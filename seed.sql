@@ -39,6 +39,15 @@ CREATE TABLE messages (
     sender VARCHAR(50) NOT NULL -- 'user' or 'ai'
 );
 
+CREATE TABLE feedback (
+  id SERIAL PRIMARY KEY,
+  chat_session_id INT NOT NULL,
+  content TEXT NOT NULL,
+  sentiment TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL
+);
+
+
 -- ----------------------------------------------
 -- This step is more of a BUG FIX to ensure that the created_at column is set to the current timestamp when a new record is inserted. 
 -- We experienced a strange issue with this but usually its not necessary to do this.

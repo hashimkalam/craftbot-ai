@@ -8,13 +8,7 @@ import {
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
 
-type Props = {
-  params: {
-    chatbotId: number;
-  };
-};
-
-async function ReviewSessions({ params: { chatbotId } }: Props) {
+async function ReviewSessions({ params: { chatbotId } }: { params: { chatbotId: number } }) {
   const { userId } = await auth();
   if (!userId) return <div>User ID not found. Please log in.</div>;
 

@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
     const sentiments = sentimentData[0]; // Get the first item (the array of sentiments)
     
     // Initialize variables to hold the sentiment results
-    let sentimentLabel = '';
+    let sentimentLabel = 'NEUTRAL'; // Default to neutral
     let sentimentScore = 0;
 
-    // Determine the sentiment based on the scores
+    // Loop through sentiments to determine the strongest sentiment
     sentiments.forEach((sentiment: { label: string; score: number }) => {
       if (sentiment.label === 'POSITIVE' && sentiment.score > sentimentScore) {
         sentimentLabel = 'POSITIVE';
@@ -41,11 +41,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Check for neutral sentiment
-    if (sentimentScore >= 0.4 && sentimentScore <= 0.6) {
+    // Check for neutral sentiment based on the score
+    if (sentimentScore >= 0.1 && sentimentScore <= 0.9) {
       sentimentLabel = 'NEUTRAL';
-      sentimentScore = (sentiments.find((sentiment: { label: string; }) => sentiment.label === 'POSITIVE')?.score || 0) +
-                       (sentiments.find((sentiment: { label: string; }) => sentiment.label === 'NEGATIVE')?.score || 0);
+      sentimentScore = 0; // Set score to 0 for neutral sentiment
     }
 
     return NextResponse.json({ sentiment: sentimentLabel, score: sentimentScore });

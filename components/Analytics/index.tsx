@@ -1,6 +1,5 @@
 "use client";
-
-import { useRouter } from "next/navigation";
+ 
 import { Chatbot } from "@/types/types";
 import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
@@ -16,11 +15,11 @@ function Index({
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
-}) {
-  const router = useRouter();
+}) { 
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
   const [totalMessages, setTotalMessages] = useState<number>(0);
+  const [totalFeedback, setTotalFeedback] = useState<number>(0);
 
   // Sort according to the number of sessions available in each bot
   useEffect(() => {
@@ -83,6 +82,11 @@ function Index({
     setTotalMessages(messagesCount);
   };
 
+    // Handle the total feedback count from TotalTimeUsedPerDay
+    const handleTotalFeedback = (feedbackCount: number) => {
+      setTotalFeedback(feedbackCount);
+    };
+
   console.log("totalMessages: ", totalMessages);
 
   return (
@@ -98,50 +102,10 @@ function Index({
           <TotalTimeUsedPerDay
             filteredSessions={filteredSessions}
             handleTotalMessages={handleTotalMessages}
+            handleTotalFeedback={handleTotalFeedback} 
           />
         </div>
       </div>
-
-      {/*<div className="space-y-5 p-5 bg-gray-100 rounded-md">
-        {filteredSessions.length !== 0 ? (
-          <>
-            {filteredSessions.map((session) => (
-              <div
-                key={session.id}
-                className="relative p-3 px-4 bg-primary text-white rounded-md flex items-center justify-between gap-2"
-              >
-                <div>
-                  <p className="text-lg font-bold">
-                    {session.guests?.name || "Anonymous"}
-                  </p>
-                  <p className="text-sm font-light">
-                    {session.guests?.email || "No email provided"}
-                  </p>
-                </div>
-
-                <div className="flex">
-                  <Button
-                    className="bg-red-500 hover:bg-red-600 cursor-pointer m-1"
-                    onClick={() => handleDelete(session.id)}
-                  >
-                    <X size={18} className="-m-1" />
-                  </Button>
-                  <Button
-                    className="bg-white hover:bg-gray-300 text-black cursor-pointer m-1"
-                    onClick={() =>
-                      router.push(`/dashboard/review-sessions/${session.id}`)
-                    }
-                  >
-                    <ExternalLink size={18} className="-m-1" />
-                  </Button>
-                </div>
-              </div>
-            ))} 
-          </>
-        ) : (
-          <p>No chat sessions available.</p>
-        )}
-      </div>*/}
 
       <ChatSessionTable filteredSessions={filteredSessions} />
     </div>

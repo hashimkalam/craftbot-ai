@@ -8,6 +8,8 @@ type Chat_sessions {
   id: Int!
   messages: [Messages]
     @materializer(query: "messagesUsingMessages_chat_session_id_fkey")
+  feedbacks: [Feedback]
+    @materializer(query: "feedbackUsingFeedback_chat_session_id_fkey")
 }
 
 type Chatbot_characteristics {
@@ -305,13 +307,12 @@ type Query {
       """
       configuration: "postgresql_config"
     )
-    
-  feedbackUsingFeedback_chat_session_id_fkey(chat_session_id: Int!): [Feedback]
+  feedbackUsingFeedback_chat_session_id_fkey(id: Int!): [Feedback]
     @dbquery(
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT * FROM feedback WHERE chat_session_id = $1
+      SELECT "chat_session_id", "content", "created_at", "id", "sentiment" FROM "feedback" WHERE "chat_session_id" = $1
       """
       configuration: "postgresql_config"
     )

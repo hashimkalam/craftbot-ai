@@ -23,18 +23,12 @@ export interface Guest {
 
 export interface ChatSession {
   id: number;
-  name: string;
-  email: string;
-  created_at: string;
-}
-
-export interface ChatSession {
-  id: number;
-  chatbot_id: number;
+  chatbot_id: number;  // Added chatbot_id for reference
   guest_id: number | null;
   created_at: string;
   messages: Message[];
-  guests: Guest;
+  feedbacks: Feedback[];
+  guests: Guest; // Consider changing to guests: Guest[] if multiple guests are possible
 }
 
 export interface Message {
@@ -49,13 +43,12 @@ export interface Feedback {
   id: number;
   chat_session_id: number;
   content: string;
+  sentiment: string;
   created_at: string;
 }
 
-
-
 export interface GetChatbotByIdResponse {
-  chatbots: Chatbot;
+  chatbots: Chatbot; // Changed to singular if only one chatbot is expected
 }
 
 export interface GetChatbotByIdVariables {
@@ -78,14 +71,12 @@ export interface GetUserChatbotsVariables {
   userId: string;
 }
 
-
-
 export interface GetChatSessionMessagesResponse {
   chat_sessions: {
     id: number;
     created_at: string;
     messages: Message[];
-    feedback: Feedback[];
+    feedback: Feedback[]; // Use plural if expecting multiple feedback items
     chatbots: {
       name: string;
     };
@@ -95,13 +86,23 @@ export interface GetChatSessionMessagesResponse {
     };
   };
 }
+
 export interface GetChatSessionMessagesVariables {
   id: number;
 }
 
 export interface MessagesByChatSessionIdResponse {
-  chat_sessions: ChatSession
+  chat_sessions: ChatSession; // Should match ChatSession interface
 }
+
 export interface MessageByChatSessionIdVariables {
-  chat_session_id: number
+  chat_session_id: number;
+}
+
+export interface FeedbackByChatSessionIdResponse {
+  chat_sessions: ChatSession; // Should match ChatSession interface
+}
+
+export interface FeedbackByChatSessionIdVariables {
+  chat_session_id: number;
 }
