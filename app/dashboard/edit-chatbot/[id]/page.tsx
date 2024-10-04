@@ -69,8 +69,6 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   useEffect(() => {
     if (data) {
       setChatbotName(data.chatbots?.name);
-
-      console.log("chatbot name retrieved -> ", chatbotName);
     }
   }, [data]);
 
