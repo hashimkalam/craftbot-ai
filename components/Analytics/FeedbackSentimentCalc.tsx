@@ -13,7 +13,7 @@ import { useEffect, useState, Suspense, lazy } from "react";
 
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
-interface TotalTimeUsedPerDayProps {
+interface FeedbackSentimentCalcProps {
   filteredSessions: ChatSession[];
   handleTotalFeedback: (count: number) => void;
 }
@@ -21,7 +21,7 @@ interface TotalTimeUsedPerDayProps {
 function FeedbackSentimentCalc({
   filteredSessions,
   handleTotalFeedback,
-}: TotalTimeUsedPerDayProps) {
+}: FeedbackSentimentCalcProps) {
   const [ids, setIds] = useState<number[]>([]);
   const [feedbackBySession, setFeedbackBySession] = useState<{
     [key: number]: Feedback[];

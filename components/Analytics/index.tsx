@@ -9,7 +9,7 @@ import Loading from "@/app/dashboard/loading";
 import CountDisplayAnimation from "./CountDisplayAnimation";
 
 const PieChartComponent = lazy(() => import("./PieChartComponent"));
-const TotalTimeUsedPerDay = lazy(() => import("./TotalTimeUsedPerDay"));
+const TotalTimeInteracted = lazy(() => import("./TotalTimeInteracted"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
 const FeedbackSentimentCalc = lazy(() => import("./FeedbackSentimentCalc"));
 
@@ -97,12 +97,12 @@ function Index({
     });
   };
 
-  // Handle the total messages count from TotalTimeUsedPerDay
+  // Handle the total messages count from TotalTimeInteracted
   const handleTotalMessages = (messagesCount: number) => {
     setTotalMessages(messagesCount);
   };
 
-  // Handle the total feedback count from TotalTimeUsedPerDay
+  // Handle the total feedback count from TotalTimeInteracted
   const handleTotalFeedback = (feedbackCount: number) => {
     setTotalFeedback(feedbackCount);
   };
@@ -114,7 +114,7 @@ function Index({
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
           <Suspense fallback={<Loading />}>
-            <TotalTimeUsedPerDay
+            <TotalTimeInteracted
               filteredSessions={filteredSessions}
               handleTotalMessages={handleTotalMessages}
             />
