@@ -1,17 +1,12 @@
 "use client";
 
-import {
-  GET_MESSAGES_BY_CHAT_SESSION_ID,
-  GET_FEEDBACK_BY_CHAT_SESSION_ID,
-} from "@/graphql/mutation";
+import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
   Message,
   Feedback,
   MessageByChatSessionIdVariables,
   MessagesByChatSessionIdResponse,
-  FeedbackByChatSessionIdResponse,
-  FeedbackByChatSessionIdVariables,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
@@ -29,9 +24,6 @@ const TotalTimeUsedPerDay = ({
   const [ids, setIds] = useState<number[]>([]);
   const [messagesBySession, setMessagesBySession] = useState<{
     [key: number]: Message[];
-  }>({});
-  const [feedbackBySession, setFeedbackBySession] = useState<{
-    [key: number]: Feedback[];
   }>({});
 
   const [fetchMessages, { loading: loadingMessages, error: errorMessages }] =

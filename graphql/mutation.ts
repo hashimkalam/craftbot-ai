@@ -90,27 +90,26 @@ export const INSERT_MESSAGE = gql`
 
 export const INSERT_FEEDBACK = gql`
   mutation InsertFeedback(
-    $chat_session_id: Int!, 
-    $content: String!,
+    $chat_session_id: Int!
+    $content: String!
     $sender: String!
-    $sentiment: String!, 
+    $sentiment: String!
     $created_at: DateTime!
   ) {
     insertFeedbacks(
-      chat_session_id: $chat_session_id, 
-      content: $content, 
-      sentiment: $sentiment,
-      sender: $sender 
+      chat_session_id: $chat_session_id
+      content: $content
+      sender: $sender
+      sentiment: $sentiment
       created_at: $created_at
     ) {
       id
       content
       sender
-      sentiment 
+      sentiment
     }
   }
 `;
-
 
 export const INSERT_GUEST = gql`
   mutation InsertGuest(
@@ -168,4 +167,3 @@ export const GET_FEEDBACKS_BY_CHAT_SESSION_ID = gql`
     }
   }
 `;
-

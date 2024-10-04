@@ -188,23 +188,23 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   async function onSubmitFeedback(values: z.infer<typeof formSchema>) {
     setLoading(true);
     const { message: formMessage } = values;
-  
+
     const feedback = formMessage;
     form.reset();
-  
+
     // Open form box if necessary data not taken - email and name
     if (!name || !email) {
       setIsOpen(true);
       setLoading(false);
       return;
     }
-  
+
     // Get sentiment before submitting feedback
     let sentiment;
-  
+
     // Call handleSentiment and wait for it to finish
     sentiment = await handleSentiment(feedback);
-  
+
     // Optimistically update UI with user's message
     const userFeedback: Feedback = {
       id: Date.now(),
@@ -214,10 +214,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       sender: "user",
       created_at: new Date().toISOString(),
     };
-  
+
     // Set messages with the user feedback first
     setFeedbacks((prevFeedback) => [...prevFeedback, userFeedback]);
-  
+
     // Showing loading state for AI response
     const loadingFeedback: Feedback = {
       id: Date.now() + 1, // Ensure unique ID for loading message
@@ -227,13 +227,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       chat_session_id: chatId,
       sender: "ai",
     };
-  
+
     // Add the loading feedback immediately after user feedback
-    setFeedbacks((prevFeedback) => [
-      ...prevFeedback,
-      loadingFeedback,
-    ]);
-  
+    setFeedbacks((prevFeedback) => [...prevFeedback, loadingFeedback]);
+
     try {
       // Proceed to submit feedback with sentiment
       const response = await fetch("/api/feedback", {
@@ -248,19 +245,21 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           chatbot_id: id,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       const result = await response.json();
       console.log("AI result response: ", result);
-  
+
       // Now update feedback with AI response, replacing the loading feedback
       setFeedbacks((prevFeedback) => {
         // Find index of the loading feedback
-        const loadingIndex = prevFeedback.findIndex(f => f.content === "AI Thinking...");
-  
+        const loadingIndex = prevFeedback.findIndex(
+          (f) => f.content === "AI Thinking..."
+        );
+
         if (loadingIndex !== -1) {
           // Replace loading feedback with the actual AI response
           return [
@@ -276,19 +275,21 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             ...prevFeedback.slice(loadingIndex + 1), // Messages after loading
           ];
         }
-  
+
         // If for some reason loading feedback not found, return original prevFeedback
         return prevFeedback;
       });
-  
+
       // Optionally handle any UI feedback on success
     } catch (error) {
       console.error("Error sending feedback: ", error);
       // Optionally handle UI error feedback
       setFeedbacks((prevFeedback) => {
         // Find index of the loading feedback
-        const loadingIndex = prevFeedback.findIndex(f => f.content === "AI Thinking...");
-  
+        const loadingIndex = prevFeedback.findIndex(
+          (f) => f.content === "AI Thinking..."
+        );
+
         if (loadingIndex !== -1) {
           // Replace loading feedback with an error message
           return [
@@ -296,7 +297,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             {
               id: Date.now() + 3, // Ensure unique ID for error message
               chat_session_id: chatId,
-              content: "Sorry, there was an error getting the AI response. Please try again.",
+              content:
+                "Sorry, there was an error getting the AI response. Please try again.",
               sentiment: "NEUTRAL",
               sender: "ai",
               created_at: new Date().toISOString(),
@@ -304,16 +306,13 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             ...prevFeedback.slice(loadingIndex + 1),
           ];
         }
-  
+
         return prevFeedback;
       });
     } finally {
       setLoading(false); // Ensure loading state is reset
     }
   }
-  
-  
-  
 
   // Modify handleSentiment to return the sentiment
   const handleSentiment = async (feedback: string) => {

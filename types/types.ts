@@ -23,7 +23,7 @@ export interface Guest {
 
 export interface ChatSession {
   id: number;
-  chatbot_id: number;  // Added chatbot_id for reference
+  chatbot_id: number; // Added chatbot_id for reference
   guest_id: number | null;
   created_at: string;
   messages: Message[];
@@ -49,7 +49,7 @@ export interface Feedback {
 }
 
 export interface GetChatbotByIdResponse {
-  chatbots: Chatbot; // Changed to singular if only one chatbot is expected
+  chatbots: Chatbot;
 }
 
 export interface GetChatbotByIdVariables {
@@ -104,6 +104,6 @@ export interface FeedbackByChatSessionIdResponse {
   chat_sessions: ChatSession;
 }
 
-export interface FeedbackByChatSessionIdVariables {
+export interface FeedbacksByChatSessionIdVariables {
   chat_session_id: number;
 }

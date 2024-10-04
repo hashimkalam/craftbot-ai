@@ -64,7 +64,6 @@ type Feedbacks {
   sender: String!
 }
 
-
 """
 The following queries are just a set of examples of how to access your schema.
 Feel free to modify them or aggregate more.
@@ -290,7 +289,7 @@ type Query {
       table: "feedbacks"
       configuration: "postgresql_config"
     )
-    
+
   feedbacksList: [Feedbacks]
     @dbquery(
       type: "postgresql"
@@ -298,7 +297,7 @@ type Query {
       table: "feedbacks"
       configuration: "postgresql_config"
     )
-    
+
   feedbacksPaginatedList(first: Int, after: Int): [Feedbacks]
     @dbquery(
       type: "postgresql"
@@ -313,7 +312,7 @@ type Query {
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "chat_session_id", "content", "created_at", "id", "sentiment" FROM "feedbacks" WHERE "chat_session_id" = $1
+      SELECT * FROM "feedbacks" WHERE "chat_session_id" = $1
       """
       configuration: "postgresql_config"
     )

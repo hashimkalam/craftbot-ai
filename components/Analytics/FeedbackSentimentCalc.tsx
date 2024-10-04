@@ -5,7 +5,7 @@ import {
   ChatSession,
   Feedback,
   FeedbackByChatSessionIdResponse,
-  FeedbackByChatSessionIdVariables,
+  FeedbacksByChatSessionIdVariables,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
@@ -35,24 +35,29 @@ function FeedbackSentimentCalc({
   const [fetchFeedback, { loading: loadingFeedback, error: errorFeedback }] =
     useLazyQuery<
       FeedbackByChatSessionIdResponse,
-      FeedbackByChatSessionIdVariables
+      FeedbacksByChatSessionIdVariables
     >(GET_FEEDBACKS_BY_CHAT_SESSION_ID);
 
   useEffect(() => {
     const sessionIds: number[] = filteredSessions.map((session) => session.id);
     setIds(sessionIds);
+    console.log("Filtered Session IDs: ", sessionIds); // Log session IDs
   }, [filteredSessions]);
 
   useEffect(() => {
     const fetchAllData = async () => {
       if (ids.length > 0) {
+        console.log("Fetching feedbacks for IDs: ", ids); // Log IDs before fetching data
         try {
           const allFeedbacks = await Promise.all(
             ids.map(async (chatId) => {
               const { data: feedbackData } = await fetchFeedback({
                 variables: { chat_session_id: chatId },
               });
-              console.log("feedbackData: ", feedbackData); // Log feedback data
+              console.log(
+                `Feedback Data for Chat ID ${chatId}: `,
+                feedbackData
+              ); // Log feedback data for each ID
 
               return {
                 chatId,
@@ -69,6 +74,9 @@ function FeedbackSentimentCalc({
           allFeedbacks.forEach(({ chatId, feedback }) => {
             feedbackMap[chatId] = feedback;
 
+            // Log feedbacks collected for each session
+            console.log(`Collected Feedback for Chat ID ${chatId}: `, feedback);
+
             // Count the number of feedbacks for each sentiment
             feedback.forEach((fb) => {
               if (fb.sentiment === "NEUTRAL") totalNeutral++;
@@ -78,6 +86,7 @@ function FeedbackSentimentCalc({
           });
 
           setFeedbackBySession(feedbackMap);
+          console.log("Feedback by Session: ", feedbackMap); // Log feedbacks mapped by session ID
 
           // Update the state with the total count for each sentiment
           setSentimentCount({
@@ -85,12 +94,18 @@ function FeedbackSentimentCalc({
             POSITIVE: totalPositive,
             NEGATIVE: totalNegative,
           });
+          console.log("Sentiment Count: ", {
+            NEUTRAL: totalNeutral,
+            POSITIVE: totalPositive,
+            NEGATIVE: totalNegative,
+          }); // Log sentiment counts
 
           const totalFeedbackCount = allFeedbacks.reduce(
             (count, { feedback }) => count + feedback.length,
             0
           );
 
+          console.log("Total Feedback Count: ", totalFeedbackCount); // Log total feedback count
           handleTotalFeedback(totalFeedbackCount);
         } catch (error) {
           console.error("Error fetching data: ", error);
@@ -104,8 +119,8 @@ function FeedbackSentimentCalc({
   return (
     <div>
       {/* Render Feedback */}
-      <div>
-        {/* {Object.entries(feedbackBySession).map(([sessionId, feedbacks]) => (
+      {/* <div>
+        {Object.entries(feedbackBySession).map(([sessionId, feedbacks]) => (
           <div key={sessionId}>
             <h4>Chat Session ID: {sessionId}</h4>
             {feedbacks.length > 0 ? (
@@ -132,8 +147,9 @@ function FeedbackSentimentCalc({
               <p>Error fetching feedback: {errorFeedback.message}</p>
             )}
           </div>
-        ))} */}
+        ))}
       </div>
+      */}
 
       <SentimentPieChart
         neutral={sentimentCount.NEUTRAL}
