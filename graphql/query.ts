@@ -80,6 +80,13 @@ export const GET_CHAT_SESSION_MESSAGES = gql`
         created_at
         sender
       }
+      feedbacks { 
+        id
+        content  
+        sentiment
+        created_at
+        sender
+      }
       chatbots {
         name
       }
@@ -94,9 +101,24 @@ export const GET_CHAT_SESSION_MESSAGES = gql`
 export const GET_FEEDBACK_MESSAGES = gql`
   query GetFeedbackMessages {
     feedbackList {
+      id
       chat_session_id
       content
+      sentiment
       created_at
+      sender
+      chat_session {
+        id
+        created_at
+        guests {
+          name
+          email
+        }
+        chatbots {
+          id
+          name
+        }
+      }
     }
   }
 `;

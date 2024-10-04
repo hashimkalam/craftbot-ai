@@ -102,10 +102,10 @@ function Index({
 
         <div className="bg-gray-200 h-[50vh] flex flex-col relative rounded-lg mt-12">
           <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
-          <FeedbackSentimentCalc
+          {/*<FeedbackSentimentCalc
             filteredSessions={filteredSessions}
             handleTotalFeedback={handleTotalFeedback}
-          />
+          />*/}
         </div>
 
         <div className="bg-gray-300 absolute top-5 right-5 rounded-lg p-2">

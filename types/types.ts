@@ -35,14 +35,15 @@ export interface Message {
   id: number;
   chat_session_id: number;
   content: string;
-  created_at: string;
   sender: "ai" | "user";
+  created_at: string;
 }
 
 export interface Feedback {
   id: number;
   chat_session_id: number;
   content: string;
+  sender: "ai" | "user";
   sentiment: string;
   created_at: string;
 }
@@ -76,7 +77,7 @@ export interface GetChatSessionMessagesResponse {
     id: number;
     created_at: string;
     messages: Message[];
-    feedback: Feedback[]; // Use plural if expecting multiple feedback items
+    feedbacks: Feedback[];
     chatbots: {
       name: string;
     };
@@ -92,7 +93,7 @@ export interface GetChatSessionMessagesVariables {
 }
 
 export interface MessagesByChatSessionIdResponse {
-  chat_sessions: ChatSession; // Should match ChatSession interface
+  chat_sessions: ChatSession;
 }
 
 export interface MessageByChatSessionIdVariables {
@@ -100,7 +101,7 @@ export interface MessageByChatSessionIdVariables {
 }
 
 export interface FeedbackByChatSessionIdResponse {
-  chat_sessions: ChatSession; // Should match ChatSession interface
+  chat_sessions: ChatSession;
 }
 
 export interface FeedbackByChatSessionIdVariables {

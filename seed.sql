@@ -41,10 +41,11 @@ CREATE TABLE messages (
 
 CREATE TABLE feedback (
   id SERIAL PRIMARY KEY,
-  chat_session_id INT NOT NULL,
+  chat_session_id INT REFERENCES chat_sessions(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   sentiment TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL
+  sender VARCHAR(50) NOT NULL
 );
 
 

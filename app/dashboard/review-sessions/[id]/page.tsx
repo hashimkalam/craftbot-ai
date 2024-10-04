@@ -10,12 +10,18 @@ export const dynamic = "force-dynamic"; // no caching
 
 async function ReviewSession({ params: { id } }: { params: { id: string } }) {
   try {
+    // Parse and validate chat session ID
+    const chatSessionId = parseInt(id);
+    if (isNaN(chatSessionId)) {
+      return <div>Invalid session ID.</div>;
+    }
+
     const response = await serverClient.query<
       GetChatSessionMessagesResponse,
       GetChatSessionMessagesVariables
     >({
       query: GET_CHAT_SESSION_MESSAGES,
-      variables: { id: parseInt(id as string) },
+      variables: { id: chatSessionId },
     });
 
     console.log("id: ", id);
@@ -32,11 +38,13 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
     const chatSession = chat_sessions;
     const {
       created_at,
-      messages,
-      feedback,
+      messages, 
+      feedbacks, 
       chatbots: { name },
       guests: { name: guestName, email },
     } = chatSession;
+
+    console.log("chatsession: ", chatSession)
 
     return (
       <div className="flex-1 p-10 pb-24">
@@ -53,7 +61,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
         </h2>
 
         {/* Pass fetched data to a client-side component */}
-        <MessagesContainer messages={messages} feedback={feedback} chatbotName={name} />
+        <MessagesContainer messages={messages} feedbacks={feedbacks} chatbotName={name} />
       </div>
     );
   } catch (error) {

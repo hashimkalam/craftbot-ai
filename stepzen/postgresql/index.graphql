@@ -8,8 +8,8 @@ type Chat_sessions {
   id: Int!
   messages: [Messages]
     @materializer(query: "messagesUsingMessages_chat_session_id_fkey")
-  feedbacks: [Feedback]
-    @materializer(query: "feedbackUsingFeedback_chat_session_id_fkey")
+  feedbacks: [Feedbacks]
+    @materializer(query: "feedbacksUsingFeedbacks_chat_session_id_fkey")
 }
 
 type Chatbot_characteristics {
@@ -53,14 +53,15 @@ type Messages {
   sender: String!
 }
 
-type Feedback {
+type Feedbacks {
   chat_session_id: Int
   chat_sessions: Chat_sessions
-    @materializer(query: "chat_sessionsUsingFeedback_chat_session_id_fkey")
+    @materializer(query: "chat_sessionsUsingFeedbacks_chat_session_id_fkey")
   content: String!
   sentiment: String!
   created_at: DateTime!
   id: Int!
+  sender: String!
 }
 
 
@@ -122,7 +123,7 @@ type Query {
       """
       configuration: "postgresql_config"
     )
-  chat_sessionsUsingFeedback_chat_session_id_fkey(
+  chat_sessionsUsingFeedbacks_chat_session_id_fkey(
     chat_session_id: Int!
   ): Chat_sessions
     @dbquery(
@@ -281,38 +282,38 @@ type Query {
       """
       configuration: "postgresql_config"
     )
-  "Queries for type 'Feedback' "
-  feedback(id: Int!): Feedback
+  "Queries for type 'Feedbacks' "
+  feedbacks(id: Int!): Feedbacks
     @dbquery(
       type: "postgresql"
       schema: "public"
-      table: "feedback"
+      table: "feedbacks"
       configuration: "postgresql_config"
     )
     
-  feedbackList: [Feedback]
+  feedbacksList: [Feedbacks]
     @dbquery(
       type: "postgresql"
       schema: "public"
-      table: "feedback"
+      table: "feedbacks"
       configuration: "postgresql_config"
     )
     
-  feedbackPaginatedList(first: Int, after: Int): [Feedback]
+  feedbacksPaginatedList(first: Int, after: Int): [Feedbacks]
     @dbquery(
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "chat_session_id", "content", "created_at", "id" FROM "feedback" ORDER BY "id" LIMIT $1 OFFSET $2
+      SELECT "chat_session_id", "content", "created_at", "id" FROM "feedbacks" ORDER BY "id" LIMIT $1 OFFSET $2
       """
       configuration: "postgresql_config"
     )
-  feedbackUsingFeedback_chat_session_id_fkey(id: Int!): [Feedback]
+  feedbacksUsingFeedbacks_chat_session_id_fkey(id: Int!): [Feedbacks]
     @dbquery(
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "chat_session_id", "content", "created_at", "id", "sentiment" FROM "feedback" WHERE "chat_session_id" = $1
+      SELECT "chat_session_id", "content", "created_at", "id", "sentiment" FROM "feedbacks" WHERE "chat_session_id" = $1
       """
       configuration: "postgresql_config"
     )
@@ -528,16 +529,17 @@ type Mutation {
       configuration: "postgresql_config"
     )
   # Insert a new feedback entry
-  insertFeedback(
+  insertFeedbacks(
     chat_session_id: Int!
     content: String!
+    sender: String!
     sentiment: String!
     created_at: DateTime!
-  ): Feedback
+  ): Feedbacks
     @dbquery(
       type: "postgresql"
       schema: "public"
-      table: "feedback"
+      table: "feedbacks"
       dml: INSERT
       configuration: "postgresql_config"
     )

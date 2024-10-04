@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  GET_FEEDBACK_BY_CHAT_SESSION_ID,
+  GET_FEEDBACKS_BY_CHAT_SESSION_ID,
   GET_MESSAGES_BY_CHAT_SESSION_ID,
 } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
@@ -34,7 +34,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import MessagesContainer from "@/components/MessagesContainer";
 import Messages from "@/components/Messages";
 
 const formSchema = z.object({
@@ -48,7 +47,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [chatId, setChatId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [sentiment, setSentiment] = useState<string | null>(null);
   const [mode, setMode] = useState(0);
 
@@ -85,7 +84,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     loading: loadingFeedback,
     error: errorFeedback,
     data: feedbackData,
-  } = useQuery(GET_FEEDBACK_BY_CHAT_SESSION_ID, {
+  } = useQuery(GET_FEEDBACKS_BY_CHAT_SESSION_ID, {
     variables: { chat_session_id: chatId },
     skip: !chatId,
   });
@@ -189,44 +188,52 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   async function onSubmitFeedback(values: z.infer<typeof formSchema>) {
     setLoading(true);
     const { message: formMessage } = values;
-
+  
     const feedback = formMessage;
     form.reset();
-
+  
     // Open form box if necessary data not taken - email and name
     if (!name || !email) {
       setIsOpen(true);
       setLoading(false);
       return;
     }
-
+  
     // Get sentiment before submitting feedback
     let sentiment;
-
+  
     // Call handleSentiment and wait for it to finish
     sentiment = await handleSentiment(feedback);
-
+  
     // Optimistically update UI with user's message
     const userFeedback: Feedback = {
       id: Date.now(),
       chat_session_id: chatId,
       content: feedback,
       sentiment: sentiment,
+      sender: "user",
       created_at: new Date().toISOString(),
     };
-
-    // showing loading state for ai response
-    const loadingMessage: Message = {
-      id: Date.now() + 1,
+  
+    // Set messages with the user feedback first
+    setFeedbacks((prevFeedback) => [...prevFeedback, userFeedback]);
+  
+    // Showing loading state for AI response
+    const loadingFeedback: Feedback = {
+      id: Date.now() + 1, // Ensure unique ID for loading message
       content: "AI Thinking...",
+      sentiment: "NEUTRAL",
       created_at: new Date().toISOString(),
       chat_session_id: chatId,
       sender: "ai",
     };
-
-    // Set messages
-    setFeedback((prevFeedback) => [...prevFeedback, userFeedback]);
-
+  
+    // Add the loading feedback immediately after user feedback
+    setFeedbacks((prevFeedback) => [
+      ...prevFeedback,
+      loadingFeedback,
+    ]);
+  
     try {
       // Proceed to submit feedback with sentiment
       const response = await fetch("/api/feedback", {
@@ -241,31 +248,72 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           chatbot_id: id,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-
+  
       const result = await response.json();
       console.log("AI result response: ", result);
-
-      // Updating loading message from AI with actual response
-      setFeedback((prevFeedback) =>
-        prevFeedback.map((feedback) =>
-          feedback.id === loadingMessage.id
-            ? { ...feedback, content: result.content, id: result.id }
-            : feedback
-        )
-      );
-
+  
+      // Now update feedback with AI response, replacing the loading feedback
+      setFeedbacks((prevFeedback) => {
+        // Find index of the loading feedback
+        const loadingIndex = prevFeedback.findIndex(f => f.content === "AI Thinking...");
+  
+        if (loadingIndex !== -1) {
+          // Replace loading feedback with the actual AI response
+          return [
+            ...prevFeedback.slice(0, loadingIndex), // Previous messages before loading
+            {
+              id: result.userFeedbackId || Date.now() + 2, // Use the result ID for the AI response
+              chat_session_id: chatId,
+              content: result.content,
+              sentiment: result.sentiment || "NEUTRAL", // Assuming result contains sentiment
+              sender: "ai",
+              created_at: new Date().toISOString(),
+            },
+            ...prevFeedback.slice(loadingIndex + 1), // Messages after loading
+          ];
+        }
+  
+        // If for some reason loading feedback not found, return original prevFeedback
+        return prevFeedback;
+      });
+  
       // Optionally handle any UI feedback on success
     } catch (error) {
       console.error("Error sending feedback: ", error);
       // Optionally handle UI error feedback
+      setFeedbacks((prevFeedback) => {
+        // Find index of the loading feedback
+        const loadingIndex = prevFeedback.findIndex(f => f.content === "AI Thinking...");
+  
+        if (loadingIndex !== -1) {
+          // Replace loading feedback with an error message
+          return [
+            ...prevFeedback.slice(0, loadingIndex),
+            {
+              id: Date.now() + 3, // Ensure unique ID for error message
+              chat_session_id: chatId,
+              content: "Sorry, there was an error getting the AI response. Please try again.",
+              sentiment: "NEUTRAL",
+              sender: "ai",
+              created_at: new Date().toISOString(),
+            },
+            ...prevFeedback.slice(loadingIndex + 1),
+          ];
+        }
+  
+        return prevFeedback;
+      });
     } finally {
       setLoading(false); // Ensure loading state is reset
     }
   }
+  
+  
+  
 
   // Modify handleSentiment to return the sentiment
   const handleSentiment = async (feedback: string) => {
@@ -374,7 +422,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
         <Messages
           messages={messages}
-          feedback={feedback}
+          feedbacks={feedbacks}
           chatbotName={name}
           mode={mode} // Use the mode to determine whether to show messages or feedback
         />

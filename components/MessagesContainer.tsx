@@ -7,23 +7,22 @@ import ReviewSessionMode from "./ReviewSessionMode";
 
 function MessagesContainer({
   messages,
-  feedback,
+  feedbacks,
   chatbotName,
 }: {
   messages: Message[];
-  feedback: Feedback[];
+  feedbacks: Feedback[];
   chatbotName: string;
 }) {
-  const [mode, setMode] = useState(0); // This state is client-side
-
+  const [mode, setMode] = useState(0); // state is client-side
+ 
   return (
     <div className="h-full">
       <ReviewSessionMode mode={mode} setMode={setMode} />
 
-      {/* Pass mode to Messages */}
       <Messages
         messages={messages}
-        feedback={feedback}
+        feedbacks={feedbacks}
         chatbotName={chatbotName}
         mode={mode} // Use the mode to determine whether to show messages or feedback
       />
