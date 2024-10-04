@@ -16,10 +16,9 @@ function MessagesContainer({
 }) {
   const [mode, setMode] = useState(0); // state is client-side
 
-  
-  console.log("messages(MessagesContainer): ", messages)
-  console.log("feedbacks(MessagesContainer): ", feedbacks)
- 
+  console.log("messages(MessagesContainer): ", messages);
+  console.log("feedbacks(MessagesContainer): ", feedbacks);
+
   return (
     <div className="h-full">
       <ReviewSessionMode mode={mode} setMode={setMode} />

@@ -4,7 +4,7 @@ import { serverClient } from "@/lib/server/serverClient";
 import {
   GetChatSessionMessagesResponse,
   GetChatSessionMessagesVariables,
-} from "@/types/types"; 
+} from "@/types/types";
 
 export const dynamic = "force-dynamic"; // no caching
 
@@ -12,7 +12,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
   try {
     // Parse and validate chat session ID
     const chatSessionId = parseInt(id);
-    console.log("chatSessionId(ReviewSession): ", chatSessionId)
+    console.log("chatSessionId(ReviewSession): ", chatSessionId);
     if (isNaN(chatSessionId)) {
       return <div>Invalid session ID.</div>;
     }
@@ -39,13 +39,13 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
     const chatSession = chat_sessions;
     const {
       created_at,
-      messages, 
-      feedbacks, 
+      messages,
+      feedbacks,
       chatbots: { name },
       guests: { name: guestName, email },
     } = chatSession;
 
-    console.log("chatsession: ", chatSession)
+    console.log("chatsession: ", chatSession);
 
     return (
       <div className="flex-1 p-10 pb-24">
@@ -62,12 +62,18 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
         </h2>
 
         {/* Pass fetched data to a client-side component */}
-        <MessagesContainer messages={messages} feedbacks={feedbacks} chatbotName={name} />
+        <MessagesContainer
+          messages={messages}
+          feedbacks={feedbacks}
+          chatbotName={name}
+        />
       </div>
     );
   } catch (error) {
     console.error("Error fetching chat session messages:", error);
-    return <div>Error fetching chat session messages. Please try again later.</div>;
+    return (
+      <div>Error fetching chat session messages. Please try again later.</div>
+    );
   }
 }
 

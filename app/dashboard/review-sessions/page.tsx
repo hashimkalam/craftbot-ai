@@ -39,7 +39,7 @@ async function ReviewSessions() {
 
   return (
     <div className="flex-1 px-10 ">
-      <h1 className="text-xl lg:text-3xl font-semibold mt-10">Chat Sessions</h1>
+      <h1 className="text-xl lg:text-3xl font-semibold mt-10">Chat Session</h1>
       <h2 className="mb-5">
         Review all the chat sessions the chat bots have and with your customers
       </h2>

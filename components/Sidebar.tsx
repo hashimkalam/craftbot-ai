@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Sidebar = () => {
   return (
-    <div className="bg-white dark:bg-primary-DARK text-white p-5 border-r-primary border-[1px]">
+    <div className="bg-white dark:bg-primary-DARK text-white p-5 border-r-primary dark:border-r-white border-[1px]">
       <ul className="gap-5 flex lg:flex-col">
         <li className="flex-1">
           <Link href="/dashboard/create-chatbot" className="sidebar-button">

@@ -11,7 +11,7 @@ import {
   GetUserChatbotsVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
-import Loading from "../../loading";
+import Loading from "@/app/dashboard/loading";
 
 async function ReviewSessions({
   params: { chatbotId },

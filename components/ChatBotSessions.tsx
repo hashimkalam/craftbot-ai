@@ -16,6 +16,8 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 
+import { ExternalLink } from "lucide-react";
+
 function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   const router = useRouter();
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
@@ -69,19 +71,10 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
           <>
             {" "}
             {sortedChatbots.map((chatbot) => {
-              const hasSessions = chatbot.chat_sessions.length > 0;
-
               return (
-                <AccordionItem
-                  key={chatbot.id}
-                  value={`item-${chatbot.id}`}
-                  onClick={() =>
-                    router.push(`/dashboard/analytics/${chatbot.id}`)
-                  }
-                  className="px-10 py-5"
-                >
+                <div key={chatbot.id} className="px-10 py-5">
                   <>
-                    <AccordionTrigger className="w-full">
+                    <div className="w-full">
                       <div className="flex text-left items-center w-full">
                         <Image
                           src={logo}
@@ -90,18 +83,20 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                         />
                         <div className="flex items-center justify-between w-full">
                           <p>{chatbot.name}</p>
-                          {hasSessions ? (
-                            <p className="pr-4 font-bold text-right hover:underline">
-                              {chatbot.chat_sessions.length} sessions
-                            </p>
-                          ) : (
-                            <p className="font-light">(No Sessions)</p>
-                          )}
+
+                          <ExternalLink
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/review-sessions/analytics/${chatbot.id}`
+                              )
+                            }
+                            className="cursor-pointer"
+                          />
                         </div>
                       </div>
-                    </AccordionTrigger>
+                    </div>
                   </>
-                </AccordionItem>
+                </div>
               );
             })}
           </>

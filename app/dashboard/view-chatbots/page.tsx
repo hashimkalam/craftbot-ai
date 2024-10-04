@@ -63,7 +63,7 @@ async function ViewChatbots() {
     return (
       <div className="flex-1 pb-20 p-10">
         <h1 className="text-xl lg:text-3xl font-semibold mb-5">
-          Active Chatbots
+          Active Chatbots ({filteredChatbots.length})
         </h1>
 
         <ul className="flex flex-col space-y-5">

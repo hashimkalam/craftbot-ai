@@ -6,7 +6,7 @@ import logo from "@/public/images/just_logo.png";
 import { UserCircle } from "lucide-react";
 import ReactMarkDown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 function Messages({
@@ -23,6 +23,8 @@ function Messages({
   const ref = useRef<HTMLDivElement>(null);
   const path = usePathname();
   const isReviewPage = path.includes("review-sessions");
+  const [summary, setSummary] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   console.log("Messages Data(Messages): ", messages);
   console.log("Feedback Data(Messages): ", feedbacks);
@@ -81,20 +83,57 @@ function Messages({
     }
   }, [messages, feedbacks]);
 
+  const summarizedFeedback = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/summarize-feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ feedbacks }),
+      });
+
+      const data = await response.json();
+      setSummary(data.content);
+    } catch (error) {
+      console.error("error summarizing feedback: ", error);
+      setSummary("Failed to summarize feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto space-y-10 py-10 px-5 bg-white dark:bg-primary-DARK">
+    <div className="flex-1 flex flex-col overflow-y-auto space-y-10 py-10 px-5 bg-white dark:bg-primary-DARK relative">
       {mode === 0 && messages.length === 0 && (
         <p className="text-gray-500 text-center">
           No messages yet. Start the conversation!
         </p>
       )}
 
-      {mode === 1 && feedbacks.length === 0 && (
-        <p className="text-gray-500 text-center">No feedback yet.</p>
-      )}
-
       {mode === 0 && messages.map((message) => renderItem(message, true))}
       {mode === 1 && feedbacks.map((feedback) => renderItem(feedback, false))}
+
+      {mode === 1 && isReviewPage && (
+        <>
+          <button
+            className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary duration-150 ease-in-out rounded-lg shadow-xl"
+            onClick={summarizedFeedback}
+            disabled={loading}
+          >
+            {loading ? "Summarizing..." : "Summarize"}
+          </button>
+
+          {/* Conditionally render the summary if it exists */}
+          {summary && (
+            <div className="mt-5 p-4 bg-gray-100 dark:bg-primary/50 rounded-lg text-sm">
+              {typeof summary === "string" ? summary : JSON.stringify(summary)}
+            </div>
+          )}
+        </>
+      )}
 
       <div ref={ref} />
     </div>
