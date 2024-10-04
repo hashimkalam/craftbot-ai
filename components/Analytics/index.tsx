@@ -6,9 +6,10 @@ import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
 import Loading from "@/app/dashboard/loading";
+import CountDisplayAnimation from "./CountDisplayAnimation";
 
 const PieChartComponent = lazy(() => import("./PieChartComponent"));
-const TotalTimeUsedPerDay = lazy(() => import("./TotalTImeUsedPerDay"));
+const TotalTimeUsedPerDay = lazy(() => import("./TotalTimeUsedPerDay"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
 const FeedbackSentimentCalc = lazy(() => import("./FeedbackSentimentCalc"));
 
@@ -23,6 +24,8 @@ function Index({
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
   const [totalMessages, setTotalMessages] = useState<number>(0);
   const [totalFeedback, setTotalFeedback] = useState<number>(0);
+  const [totalGuests, setTotalGuests] = useState<number>(0);
+  const [loadingCount, setLoadingCount] = useState<boolean>(false);
 
   // Sort according to the number of sessions available in each bot
   useEffect(() => {
@@ -36,18 +39,32 @@ function Index({
   // Filter sessions based on the chatbotId
   useEffect(() => {
     console.log("chatbotId: ", chatbotId);
-    if (chatbotId) {
-      const currentChatbot = sortedChatbots.find(
-        (chatbot) => Number(chatbot.id) === Number(chatbotId)
-      );
-      console.log("currentChatbot: ", currentChatbot);
-      if (currentChatbot) {
-        console.log("Chat Sessions: ", currentChatbot.chat_sessions);
-        setFilteredSessions(currentChatbot.chat_sessions);
-      } else {
-        console.log("No matching chatbot found.");
-        setFilteredSessions([]);
+    setLoadingCount(true); // Set loading state to true at the start
+
+    try {
+      if (chatbotId) {
+        const currentChatbot = sortedChatbots.find(
+          (chatbot) => Number(chatbot.id) === Number(chatbotId)
+        );
+        console.log("currentChatbot: ", currentChatbot);
+
+        if (currentChatbot) {
+          console.log("Chat Sessions: ", currentChatbot.chat_sessions);
+
+          // Update filteredSessions first
+          const newFilteredSessions = currentChatbot.chat_sessions;
+          setFilteredSessions(newFilteredSessions);
+
+          // Set totalGuests after filtering sessions
+          setTotalGuests(newFilteredSessions.length);
+        } else {
+          console.log("No matching chatbot found.");
+          setFilteredSessions([]);
+          setTotalGuests(0);
+        }
       }
+    } finally {
+      setLoadingCount(false); // Set loading state to false after completion
     }
   }, [chatbotId, sortedChatbots]);
 
@@ -94,14 +111,32 @@ function Index({
 
   return (
     <div className="min-h-screen">
-      <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-fit ml-auto -mt-12">
-        <Suspense fallback={<Loading />}>
-          <TotalTimeUsedPerDay
-            filteredSessions={filteredSessions}
-            handleTotalMessages={handleTotalMessages}
+      <div className="grid grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
+          <Suspense fallback={<Loading />}>
+            <TotalTimeUsedPerDay
+              filteredSessions={filteredSessions}
+              handleTotalMessages={handleTotalMessages}
+            />
+          </Suspense>
+        </div>
+        <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
+          <CountDisplayAnimation
+            text="Total Guest Count:"
+            count={totalGuests}
+            loadingCount={loadingCount}
           />
-        </Suspense>
+        </div>
+
+        <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
+          <CountDisplayAnimation
+            text="Total Feedback Count:"
+            count={totalFeedback}
+            loadingCount={loadingCount}
+          />
+        </div>
       </div>
+
       <div className="relative mt-4 flex flex-col lg:flex-row items-center space-x-0 lg:space-x-5">
         <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg p-1">
           <h1 className="text-xl font-bold underline ml-2">

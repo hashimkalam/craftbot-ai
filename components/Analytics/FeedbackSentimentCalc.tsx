@@ -104,10 +104,8 @@ function FeedbackSentimentCalc({
             NEGATIVE: totalNegative,
           }); // Log sentiment counts
 
-          const totalFeedbackCount = allFeedbacks.reduce(
-            (count, { feedback }) => count + feedback.length,
-            0
-          );
+          const totalFeedbackCount =
+            totalNeutral + totalNegative + totalPositive;
 
           console.log("Total Feedback Count: ", totalFeedbackCount); // Log total feedback count
           handleTotalFeedback(totalFeedbackCount);

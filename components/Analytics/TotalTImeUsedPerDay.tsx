@@ -10,6 +10,7 @@ import {
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import Loading from "@/app/dashboard/loading";
 
 interface TotalTimeUsedPerDayProps {
   filteredSessions: ChatSession[];
@@ -109,17 +110,21 @@ const TotalTimeUsedPerDay = ({
   const { totalMinutes, remainingSeconds } = getTotalTimeSpent();
 
   return (
-    <>
-      <h2>Total Time Spent:</h2>
+    <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-4 w-full flex flex-col items-center justify-center space-y-2">
+      <h2 className="text-md font-medium text-gray-600 dark:text-gray-300">
+        <h2>Total Time Spent:</h2>
+      </h2>
+
       {loadingMessages ? (
-        <p>Loading messages...</p>
+        <Loading />
       ) : (
-        <p>
-          {totalMinutes} minutes {remainingSeconds} seconds
+        <p className="text-5xl font-extrabold text-primary dark:text-white tracking-wider text-center">
+          {totalMinutes} min {remainingSeconds} secs
         </p>
       )}
+
       {errorMessages && <p>Error fetching messages: {errorMessages.message}</p>}
-    </>
+    </div>
   );
 };
 

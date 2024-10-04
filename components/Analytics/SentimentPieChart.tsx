@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import { useRouter } from "next/navigation";
 import {
   PieChart,
   Pie,
@@ -27,6 +28,8 @@ const SentimentPieChart: React.FC<SentimentPieChartProps> = ({
     { name: `Negative (${negative})`, value: negative },
   ];
 
+  const router = useRouter();
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
@@ -40,7 +43,11 @@ const SentimentPieChart: React.FC<SentimentPieChartProps> = ({
           dataKey="value"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[index % COLORS.length]}
+              onClick={() => router.push(`/dashboard/feedback/${index}`)}
+            />
           ))}
         </Pie>
         <Tooltip />
