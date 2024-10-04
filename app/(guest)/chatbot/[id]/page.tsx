@@ -20,7 +20,7 @@ import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { startNewChat } from "@/lib/server/startNewChat";
 import { Feedback, GetChatbotByIdResponse, Message } from "@/types/types";
 import { useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod"; // validation library for forms
@@ -34,7 +34,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Image from "next/image";
-import Messages from "@/components/Messages";
+import Loading from "@/app/dashboard/loading";
+
+const Messages = lazy(() => import("@/components/Messages"));
 
 const formSchema = z.object({
   message: z.string().min(2, "Your message is too short!!"),
@@ -419,12 +421,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
           </p>
         </div>
 
-        <Messages
-          messages={messages}
-          feedbacks={feedbacks}
-          chatbotName={name}
-          mode={mode} // Use the mode to determine whether to show messages or feedback
-        />
+        <Suspense fallback={<Loading />}>
+          <Messages
+            messages={messages}
+            feedbacks={feedbacks}
+            chatbotName={name}
+            mode={mode} // Use the mode to determine whether to show messages or feedback
+          />
+        </Suspense>
 
         <Form {...form}>
           <form

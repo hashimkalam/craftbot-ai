@@ -1,14 +1,16 @@
 "use client";
 
 import { Chatbot } from "@/types/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
-import PieChartComponent from "./PieChartComponent";
-import TotalTimeUsedPerDay from "./TotalTImeUsedPerDay";
-import ChatSessionTable from "./ChatSessionTable";
-import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
+import Loading from "@/app/dashboard/loading";
+
+const PieChartComponent = lazy(() => import("./PieChartComponent"));
+const TotalTimeUsedPerDay = lazy(() => import("./TotalTImeUsedPerDay"));
+const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
+const FeedbackSentimentCalc = lazy(() => import("./FeedbackSentimentCalc"));
 
 function Index({
   chatbots,
@@ -93,29 +95,38 @@ function Index({
   return (
     <div className="min-h-screen">
       <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-fit ml-auto -mt-12">
-        <TotalTimeUsedPerDay
-          filteredSessions={filteredSessions}
-          handleTotalMessages={handleTotalMessages}
-        />
+        <Suspense fallback={<Loading />}>
+          <TotalTimeUsedPerDay
+            filteredSessions={filteredSessions}
+            handleTotalMessages={handleTotalMessages}
+          />
+        </Suspense>
       </div>
       <div className="relative mt-4 flex flex-col lg:flex-row items-center space-x-0 lg:space-x-5">
         <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg p-1">
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
-          <PieChartComponent messageCount={totalMessages} maxLimit={100} />
+          <Suspense fallback={<Loading />}>
+            <PieChartComponent messageCount={totalMessages} maxLimit={100} />
+          </Suspense>
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
           <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
-          <FeedbackSentimentCalc
-            filteredSessions={filteredSessions}
-            handleTotalFeedback={handleTotalFeedback}
-          />
+
+          <Suspense fallback={<Loading />}>
+            <FeedbackSentimentCalc
+              filteredSessions={filteredSessions}
+              handleTotalFeedback={handleTotalFeedback}
+            />
+          </Suspense>
         </div>
       </div>
 
-      <ChatSessionTable filteredSessions={filteredSessions} />
+      <Suspense fallback={<Loading />}>
+        <ChatSessionTable filteredSessions={filteredSessions} />
+      </Suspense>
     </div>
   );
 }

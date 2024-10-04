@@ -47,7 +47,7 @@ const CreateChatBot = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center lg:flex-row md:space-x-10 bg-white dark:bg-primary-DARK p-10 rounded-md m-10">
+    <div className="flex flex-col items-center justify-center lg:flex-row md:space-x-10 bg-white dark:bg-primary-DARK shadow-lg p-10 rounded-md m-10">
       <Image src={logo} alt="Logo" className="w-16 lg:w-24" />
       <div>
         <h1 className="text-xl lg:text-3xl font-semibold">Create</h1>

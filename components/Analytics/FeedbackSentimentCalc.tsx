@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/dashboard/loading";
 import { GET_FEEDBACKS_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
@@ -8,8 +9,9 @@ import {
   FeedbacksByChatSessionIdVariables,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import SentimentPieChart from "./SentimentPieChart";
+import { useEffect, useState, Suspense, lazy } from "react";
+
+const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
 interface TotalTimeUsedPerDayProps {
   filteredSessions: ChatSession[];
@@ -79,9 +81,11 @@ function FeedbackSentimentCalc({
 
             // Count the number of feedbacks for each sentiment
             feedback.forEach((fb) => {
-              if (fb.sentiment === "NEUTRAL") totalNeutral++;
-              else if (fb.sentiment === "POSITIVE") totalPositive++;
-              else if (fb.sentiment === "NEGATIVE") totalNegative++;
+              if (fb.sender === "user") {
+                if (fb.sentiment === "NEUTRAL") totalNeutral++;
+                else if (fb.sentiment === "POSITIVE") totalPositive++;
+                else if (fb.sentiment === "NEGATIVE") totalNegative++;
+              }
             });
           });
 
@@ -151,11 +155,13 @@ function FeedbackSentimentCalc({
       </div>
       */}
 
-      <SentimentPieChart
-        neutral={sentimentCount.NEUTRAL}
-        negative={sentimentCount.NEGATIVE}
-        positive={sentimentCount.POSITIVE}
-      />
+      <Suspense fallback={<Loading />}>
+        <SentimentPieChart
+          neutral={sentimentCount.NEUTRAL}
+          negative={sentimentCount.NEGATIVE}
+          positive={sentimentCount.POSITIVE}
+        />
+      </Suspense>
     </div>
   );
 }

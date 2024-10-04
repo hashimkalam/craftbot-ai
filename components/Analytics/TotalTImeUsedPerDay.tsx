@@ -4,7 +4,6 @@ import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
   Message,
-  Feedback,
   MessageByChatSessionIdVariables,
   MessagesByChatSessionIdResponse,
 } from "@/types/types";

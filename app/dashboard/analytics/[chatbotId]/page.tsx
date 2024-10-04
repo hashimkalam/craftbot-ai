@@ -1,4 +1,8 @@
-import Index from "@/components/Analytics";
+import { Suspense, lazy } from "react";
+
+// Lazy load the Analytics component
+const Analytics = lazy(() => import("@/components/Analytics"));
+
 import { GET_USER_CHATBOTS } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
 import {
@@ -7,8 +11,13 @@ import {
   GetUserChatbotsVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
+import Loading from "../../loading";
 
-async function ReviewSessions({ params: { chatbotId } }: { params: { chatbotId: number } }) {
+async function ReviewSessions({
+  params: { chatbotId },
+}: {
+  params: { chatbotId: number };
+}) {
   const { userId } = await auth();
   if (!userId) return <div>User ID not found. Please log in.</div>;
 
@@ -36,12 +45,16 @@ async function ReviewSessions({ params: { chatbotId } }: { params: { chatbotId: 
 
   return (
     <div className="flex-1 px-10 min-h-screen">
-      <h1 className="text-xl lg:text-3xl font-semibold mt-10">Chat Sessions - ({chatbotId})</h1>
+      <h1 className="text-xl lg:text-3xl font-semibold mt-10">
+        Chat Sessions - ({chatbotId})
+      </h1>
       <h2 className="mb-5">
         Review all the chat sessions the chat bots have and with your customers
       </h2>
- 
-      <Index chatbots={filteredChatbots} chatbotId={chatbotId} />
+
+      <Suspense fallback={<Loading />}>
+        <Analytics chatbots={filteredChatbots} chatbotId={chatbotId} />
+      </Suspense>
     </div>
   );
 }

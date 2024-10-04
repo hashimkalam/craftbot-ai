@@ -3,7 +3,10 @@
 import Image from "next/image";
 import logo from "@/public/images/just_logo.png";
 
-import Characteristic from "@/components/Characteristic";
+import { FormEvent, useEffect, useState, lazy, Suspense } from "react";
+
+const Characteristic = lazy(() => import("@/components/Characteristic"));
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/ApolloClient";
@@ -19,12 +22,12 @@ import { formatISO } from "date-fns";
 import { Copy } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import type { StaticImageData } from "next/image";
+import Loading from "../../loading";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
@@ -275,7 +278,9 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
           <ul className="flex flex-wrap-reverse gap-5">
             {data?.chatbots?.chatbot_characteristics.map((charac) => (
-              <Characteristic key={charac.id} characteristic={charac} />
+              <Suspense fallback={<Loading />}>
+                <Characteristic key={charac.id} characteristic={charac} />
+              </Suspense>
             ))}
           </ul>
         </div>
