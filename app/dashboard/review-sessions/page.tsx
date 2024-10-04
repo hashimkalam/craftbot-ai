@@ -44,7 +44,6 @@ async function ReviewSessions() {
         Review all the chat sessions the chat bots have and with your customers
       </h2>
 
-
       <ChatBotSessions chatbots={filteredChatbots} />
     </div>
   );

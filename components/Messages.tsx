@@ -25,14 +25,20 @@ function Messages({
   const isReviewPage = path.includes("review-sessions");
 
   console.log("Messages Data(Messages): ", messages);
-  // Log feedback data for debugging
   console.log("Feedback Data(Messages): ", feedbacks);
 
   // Function to render individual message or feedback item
   const renderItem = (item: Message | Feedback, isMessage: boolean) => {
-    const isSender = item.sender !== "user";
+   
+    console.log("item(Messages): ", item)
+     // Check if item is null or undefined
+    if (!item) {
+      return null;
+    }
+  
+    const isSender = item?.sender !== "user";
     const content = isMessage ? (item as Message).content : (item as Feedback).content;
-
+  
     return (
       <div key={item.id} className={`chat ${isSender ? "chat-start" : "chat-end"} relative`}>
         {!isReviewPage && (
@@ -40,7 +46,7 @@ function Messages({
             Sent {new Date(item.created_at).toLocaleString()}
           </p>
         )}
-
+  
         <div className={`chat-image avatar w-10 ${!isSender && "-mr-4"}`}>
           {isSender ? (
             <Image src={logo} alt="Logo" className="h-12 w-12" />
@@ -48,7 +54,7 @@ function Messages({
             <UserCircle className="text-[#2991ee]" />
           )}
         </div>
-
+  
         <div
           className={`chat-bubble text-white ${
             isSender ? "chat-bubble-primary bg-[#4d7dfb]" : "chat-bubble-secondary bg-gray-200 text-gray-700"
@@ -61,7 +67,7 @@ function Messages({
       </div>
     );
   };
-
+  
   // Effect for scrolling to the bottom of the message list
   useEffect(() => {
     if (ref.current) {

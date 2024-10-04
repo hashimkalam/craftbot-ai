@@ -38,6 +38,12 @@ export const GET_CHATBOT_BY_ID = gql`
           content
           created_at
         }
+        feedbacks {
+          id
+          content  
+          sentiment
+          created_at
+        }
       }
     }
   }
@@ -62,6 +68,12 @@ export const GET_CHATBOT_BY_USER = gql`
         messages {
           id
           content
+          created_at
+        }
+        feedbacks {
+          id
+          content  
+          sentiment
           created_at
         }
       }

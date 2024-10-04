@@ -12,6 +12,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
   try {
     // Parse and validate chat session ID
     const chatSessionId = parseInt(id);
+    console.log("chatSessionId(ReviewSession): ", chatSessionId)
     if (isNaN(chatSessionId)) {
       return <div>Invalid session ID.</div>;
     }

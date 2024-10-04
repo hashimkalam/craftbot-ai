@@ -39,7 +39,7 @@ CREATE TABLE messages (
     sender VARCHAR(50) NOT NULL -- 'user' or 'ai'
 );
 
-CREATE TABLE feedback (
+CREATE TABLE feedbacks (
   id SERIAL PRIMARY KEY,
   chat_session_id INT REFERENCES chat_sessions(id) ON DELETE CASCADE,
   content TEXT NOT NULL,

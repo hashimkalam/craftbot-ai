@@ -1,6 +1,6 @@
 "use client";
 
-import { GET_FEEDBACK_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
+import { GET_FEEDBACKS_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
   Feedback,
@@ -36,7 +36,7 @@ function FeedbackSentimentCalc({
     useLazyQuery<
       FeedbackByChatSessionIdResponse,
       FeedbackByChatSessionIdVariables
-    >(GET_FEEDBACK_BY_CHAT_SESSION_ID);
+    >(GET_FEEDBACKS_BY_CHAT_SESSION_ID);
 
   useEffect(() => {
     const sessionIds: number[] = filteredSessions.map((session) => session.id);
