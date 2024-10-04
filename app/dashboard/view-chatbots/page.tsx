@@ -1,4 +1,4 @@
-import logo from "@/public/images/just_logo.png"
+import logo from "@/public/images/just_logo.png";
 import { Button } from "@/components/ui/button";
 import { GET_CHATBOT_BY_USER } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
@@ -68,11 +68,18 @@ async function ViewChatbots() {
 
         <ul className="flex flex-col space-y-5">
           {filteredChatbots.map((chatbot) => (
-            <Link href={`/dashboard/edit-chatbot/${chatbot.id}`} key={chatbot.id}>
-              <li className="relative p-10 border rounded-md max-w-3xl bg-white">
+            <Link
+              href={`/dashboard/edit-chatbot/${chatbot.id}`}
+              key={chatbot.id}
+            >
+              <li className="relative p-10 border rounded-md max-w-3xl bg-white dark:bg-primary-DARK">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-4">
-                  <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" />
+                    <Image
+                      src={logo}
+                      alt="Logo"
+                      className="w-16 lg:w-24 mr-2 lg:mr-4"
+                    />
                     <h2 className="text-xl font-bold">{chatbot.name}</h2>
                   </div>
                   <p className="absolute top-5 right-5 text-xs text-gray-400">

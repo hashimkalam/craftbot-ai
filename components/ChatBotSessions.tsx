@@ -7,12 +7,12 @@ import {
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
 import { useEffect, useState } from "react";
-import logo from "@/public/images/just_logo.png"; 
+import logo from "@/public/images/just_logo.png";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
-import { Button } from "./ui/button"; 
+import { Button } from "./ui/button";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -63,7 +63,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-primary-DARK">
       <Accordion type="single" collapsible>
         {sortedChatbots.length !== 0 ? (
           <>

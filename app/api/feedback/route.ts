@@ -1,16 +1,16 @@
-import { 
-  GET_FEEDBACKS_BY_CHAT_SESSION_ID, 
-  INSERT_FEEDBACK,  
-} from "@/graphql/mutation"; 
-import { GET_CHATBOT_BY_ID } from "@/graphql/query"; 
-import { serverClient } from "@/lib/server/serverClient"; 
-import { NextRequest, NextResponse } from "next/server"; 
-import { formatISO } from "date-fns"; 
-import { CohereClient } from "cohere-ai"; 
-import { 
-  FeedbackByChatSessionIdResponse, 
-  GetChatbotByIdResponse 
-} from "@/types/types"; 
+import {
+  GET_FEEDBACKS_BY_CHAT_SESSION_ID,
+  INSERT_FEEDBACK,
+} from "@/graphql/mutation";
+import { GET_CHATBOT_BY_ID } from "@/graphql/query";
+import { serverClient } from "@/lib/server/serverClient";
+import { NextRequest, NextResponse } from "next/server";
+import { formatISO } from "date-fns";
+import { CohereClient } from "cohere-ai";
+import {
+  FeedbackByChatSessionIdResponse,
+  GetChatbotByIdResponse,
+} from "@/types/types";
 
 const cohereApiKey = process.env.COHERE_API_KEY;
 
@@ -45,24 +45,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Chatbot not found" }, { status: 404 });
     }
 
-    console.log("data(feedback/route): ", data)
+    console.log("data(feedback/route): ", data);
     // Fetch user's previous feedback messages
-    const { data: feedbackData } = await serverClient.query<FeedbackByChatSessionIdResponse>({
-      query: GET_FEEDBACKS_BY_CHAT_SESSION_ID,
-      variables: { chat_session_id: Number(id) },
-      fetchPolicy: "no-cache",
-    });
+    const { data: feedbackData } =
+      await serverClient.query<FeedbackByChatSessionIdResponse>({
+        query: GET_FEEDBACKS_BY_CHAT_SESSION_ID,
+        variables: { chat_session_id: Number(id) },
+        fetchPolicy: "no-cache",
+      });
 
     console.log("Feedback Data: ", feedbackData);
 
     if (!feedbackData || !feedbackData?.chat_sessions) {
-      return NextResponse.json({ error: "No feedback data found." }, { status: 404 });
+      return NextResponse.json(
+        { error: "No feedback data found." },
+        { status: 404 }
+      );
     }
 
     const prevFeedback = feedbackData?.chat_sessions?.messages || []; // Ensure it's an array
 
     // Filter out any null feedbacks
-    const validFeedback = prevFeedback.filter(feedback => feedback !== null);
+    const validFeedback = prevFeedback.filter((feedback) => feedback !== null);
 
     // Format message for Cohere
     const formattedPrevFeedback = validFeedback.map((feedback) => ({
@@ -79,7 +83,7 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `You are a feedback assistant. You are only to receive feedback from people and not help them but be polite with what their feedback is. Here is the customer's feedback: ${systemPrompt}. Please acknowledge the feedback and be positive, helpful, and mention that we will get back with them. Appreciate their feedback.`,
+        content: `You are a feedback assistant. You are only to receive feedback from people and not help them but be polite with what their feedback is. Here is the customer's feedback: ${systemPrompt}. Please acknowledge the feedback and be positive, helpful, and mention that we will get back with them. Do all these in less than 50 characters. `,
       },
       ...formattedPrevFeedback,
       {
@@ -144,6 +148,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Error sending message: ", error);
-    return NextResponse.json({ error: error || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error || "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

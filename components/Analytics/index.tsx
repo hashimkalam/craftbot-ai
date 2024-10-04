@@ -92,26 +92,25 @@ function Index({
 
   return (
     <div className="min-h-screen">
-      <div className="relative mt-12">
-        <div className="bg-gray-200 h-[50vh] flex flex-col relative rounded-lg">
+      <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-fit ml-auto -mt-12">
+        <TotalTimeUsedPerDay
+          filteredSessions={filteredSessions}
+          handleTotalMessages={handleTotalMessages}
+        />
+      </div>
+      <div className="relative mt-4 flex flex-col lg:flex-row items-center space-x-0 lg:space-x-5">
+        <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg p-1">
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
           <PieChartComponent messageCount={totalMessages} maxLimit={100} />
         </div>
 
-        <div className="bg-gray-200 h-[50vh] flex flex-col relative rounded-lg mt-12">
+        <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
           <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
           <FeedbackSentimentCalc
             filteredSessions={filteredSessions}
             handleTotalFeedback={handleTotalFeedback}
-          />
-        </div>
-
-        <div className="bg-gray-300 absolute top-5 right-5 rounded-lg p-2">
-          <TotalTimeUsedPerDay
-            filteredSessions={filteredSessions}
-            handleTotalMessages={handleTotalMessages}
           />
         </div>
       </div>

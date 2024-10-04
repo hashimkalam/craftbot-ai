@@ -110,10 +110,8 @@ const TotalTimeUsedPerDay = ({
   const { totalMinutes, remainingSeconds } = getTotalTimeSpent();
 
   return (
-    <div>
-      <h2>
-        Total Time Spent: <br />
-      </h2>
+    <>
+      <h2>Total Time Spent:</h2>
       {loadingMessages ? (
         <p>Loading messages...</p>
       ) : (
@@ -122,7 +120,7 @@ const TotalTimeUsedPerDay = ({
         </p>
       )}
       {errorMessages && <p>Error fetching messages: {errorMessages.message}</p>}
-    </div>
+    </>
   );
 };
 

@@ -342,7 +342,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   };
 
   return (
-    <div className="w-full flex bg-gray-100">
+    <div className="w-full flex bg-gray-100 dark:bg-primary-DARK">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="w-full lg:max-w-[425px]">
           <form onSubmit={handleInfoSubmit}>
@@ -433,7 +433,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
                 ? form.handleSubmit(onSubmitMessage)
                 : form.handleSubmit(onSubmitFeedback)
             }
-            className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 rounded-md"
+            className="flex items-center sticky bottom-0 z-50 space-x-4 drop-shadow-lg p-4 bg-gray-100 dark:bg-primary-DARK/95 shadow-xl"
           >
             <FormField
               control={form.control}

@@ -100,7 +100,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         variables: {
           id,
           name: chatbotName,
-          image: currentImage
+          image: currentImage,
         },
       });
 
@@ -183,8 +183,8 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   };
 
   return (
-    <div className="px-0 md:p-10">
-      <div className="text-white text-sm md:sticky md:top-10 sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-[#2991ee] ">
+    <div className="px-0 md:p-10 bg-gray-300 shadow-xl dark:bg-primary-DARK">
+      <div className="text-white text-sm md:sticky md:top-10 sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary-DARK">
         <h2 className="font-bold">Link to chat</h2>
         <p className="text-sm italic text-white">
           Share the link to start conversations with your chatbot
@@ -192,7 +192,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
         <div className="text-black flex items-center space-x-2">
           <Link href={url} className="w-full pointer hover:opacity-50">
-            <Input value={url} readOnly className="pointer" />
+            <Input value={url} readOnly className="pointer dark:bg-white" />
           </Link>
           <Button
             size="sm"
@@ -208,7 +208,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </div>
       </div>
 
-      <section className="relative mt-5 bg-white p-5 md:p-10 rounded-lg">
+      <section className="relative mt-5 bg-white dark:bg-primary/20 p-5 md:p-10 rounded-lg">
         <Button
           variant="destructive"
           className="absolute top-2 right-2 h-8 w-2"
@@ -252,7 +252,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           in your conversation with your customers & users
         </p>
 
-        <div className="bg-gray-200 p-5 md:p-8 rounded-md mt-5">
+        <div className="bg-gray-200 dark:bg-primary-DARK p-5 md:p-8 rounded-md mt-5">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -285,7 +285,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="w-full lg:max-w-[425px]">
             <p>Are you sure you want to delete?</p>
-            <div className="space-x-4 flex">
+            <div className="space-x-4 flex ">
               <Button
                 onClick={() => handleDelete(id)}
                 className="bg-red-500 hover:bg-red-600 flex-1"

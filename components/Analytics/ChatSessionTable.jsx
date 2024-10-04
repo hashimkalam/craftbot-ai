@@ -26,7 +26,7 @@ const ChatSessionTable = ({ filteredSessions }) => {
         accessor: "id",
         Cell: ({ value }) => (
           <Button
-            className="bg-white hover:bg-gray-300 text-black cursor-pointer m-1"
+            className="bg-white dark:bg-primary/20 hover:bg-gray-300 text-black dark:text-white cursor-pointer m-1"
             onClick={() => router.push(`/dashboard/review-sessions/${value}`)}
           >
             <ExternalLink size={18} className="-m-1" />
@@ -64,12 +64,19 @@ const ChatSessionTable = ({ filteredSessions }) => {
     <div className="space-y-5 p-5 w-full rounded-md">
       {filteredSessions.length > 0 ? (
         <>
-          <table {...getTableProps()} className="w-full bg-white border border-gray-200">
+          <table
+            {...getTableProps()}
+            className="w-full bg-white dark:bg-primary/20 border border-gray-200"
+          >
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
-                    <th key={column.id} {...column.getHeaderProps()} className="px-4 py-2 border-b text-left text-gray-600">
+                    <th
+                      key={column.id}
+                      {...column.getHeaderProps()}
+                      className="px-4 py-2 border-b text-left text-gray-600 dark:text-white dark:bg-primary-DARK/50"
+                    >
                       {column.render("Header")}
                     </th>
                   ))}
@@ -80,9 +87,17 @@ const ChatSessionTable = ({ filteredSessions }) => {
               {page.map((row) => {
                 prepareRow(row);
                 return (
-                  <tr key={row.id} {...row.getRowProps()} className="hover:bg-gray-50">
+                  <tr
+                    key={row.id}
+                    {...row.getRowProps()}
+                    className="hover:bg-gray-50"
+                  >
                     {row.cells.map((cell) => (
-                      <td key={cell.id} {...cell.getCellProps()} className="px-4 py-2 border-b">
+                      <td
+                        key={cell.id}
+                        {...cell.getCellProps()}
+                        className="px-4 py-2 border-b"
+                      >
                         {cell.render("Cell")}
                       </td>
                     ))}
@@ -98,7 +113,8 @@ const ChatSessionTable = ({ filteredSessions }) => {
               <span>
                 Page{" "}
                 <strong>
-                  {pageIndex + 1} of {Math.ceil(filteredSessions.length / pageSize)}
+                  {pageIndex + 1} of{" "}
+                  {Math.ceil(filteredSessions.length / pageSize)}
                 </strong>
               </span>
             </div>
@@ -126,7 +142,9 @@ const ChatSessionTable = ({ filteredSessions }) => {
               </button>
               <button
                 className="bg-gray-300 hover:bg-gray-500 text-black px-2 py-1 rounded"
-                onClick={() => gotoPage(Math.ceil(filteredSessions.length / pageSize) - 1)} // Go to last page
+                onClick={() =>
+                  gotoPage(Math.ceil(filteredSessions.length / pageSize) - 1)
+                } // Go to last page
                 disabled={!canNextPage}
               >
                 {">>"}

@@ -6,9 +6,9 @@ import { useMutation } from "@apollo/client";
 import { OctagonX } from "lucide-react";
 import { toast } from "sonner";
 
-const Characteristic = ({ 
+const Characteristic = ({
   characteristic,
-}: { 
+}: {
   characteristic: ChatbotCharacteristic;
 }) => {
   const [removeCharacteristic] = useMutation(REMOVE_CHARACTERISTIC, {
@@ -24,12 +24,15 @@ const Characteristic = ({
       });
     } catch (error) {
       console.error(error);
-      throw error; // ensure the error is thrown so toast.promize can catch it 
+      throw error; // ensure the error is thrown so toast.promize can catch it
     }
   };
 
   return (
-    <li key={characteristic.id} className="relative p-10 bg-white border rounded-md">
+    <li
+      key={characteristic.id}
+      className="relative p-10 bg-white dark:bg-primary/10 dark:shadow-md border rounded-md"
+    >
       {characteristic.content}
       <OctagonX
         className="w-6 h-6 text-white fill-red-500 absolute top-1 right-1 pointer hover:opacity-50"
