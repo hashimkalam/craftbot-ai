@@ -275,10 +275,12 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           </form>
 
           <ul className="flex flex-wrap-reverse gap-5">
-            {data?.chatbots?.chatbot_characteristics.map((charac) => (
-              <Suspense fallback={<Loading />}>
-                <Characteristic key={charac.id} characteristic={charac} />
-              </Suspense>
+            {data?.chatbots?.chatbot_characteristics.map((charac, index) => (
+              <div key={index}>
+                <Suspense fallback={<Loading />}>
+                  <Characteristic key={charac.id} characteristic={charac} />
+                </Suspense>
+              </div>
             ))}
           </ul>
         </div>
