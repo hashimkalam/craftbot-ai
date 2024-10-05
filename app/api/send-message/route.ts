@@ -10,7 +10,7 @@ import {
 } from "@/types/types";
 import { formatISO } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
-import { CohereClient } from 'cohere-ai';
+import { CohereClient } from "cohere-ai";
 
 const cohereApiKey = process.env.COHERE_API_KEY;
 
@@ -75,8 +75,8 @@ export async function POST(req: NextRequest) {
       {
         role: "system",
         content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. 
-        Use Emojis where possible. Be funny - add a lot of humour. Be motivating and helpful. Here are some key info that you need to be aware of: ${systemPrompt}
-        Please make it concise and straight forward.`,
+        Use Emojis where possible. Be engaging but get straight to the point!. Be helpful. Here are some key info that you need to be aware of: ${systemPrompt}
+        Please make it concise and straight forward. Have proper formatting.`,
       },
       ...formattedPrevMessages,
       {
@@ -87,13 +87,13 @@ export async function POST(req: NextRequest) {
 
     // Generate response using Cohere
     const response = await cohere.generate({
-      model: 'command', // Ensure you use the correct model name
-      prompt: prompt.map(p => p.content).join("\n"), // Join prompt array as a string
-      maxTokens: 100, // Adjust token limit as needed
+      model: "command", // Ensure you use the correct model name
+      prompt: prompt.map((p) => p.content).join("\n"), // Join prompt array as a string
+      maxTokens: 200, // Adjust token limit as needed
     });
 
     // const aiResponse = response.body?.generations[0]?.text?.trim();
-    const aiResponse = response.generations[0].text.trim()
+    const aiResponse = response.generations[0].text.trim();
     console.log("aiResponse: ", aiResponse);
 
     if (!aiResponse) {
@@ -129,7 +129,6 @@ export async function POST(req: NextRequest) {
       id: aiMessageResult?.data?.insertMessages?.id,
       content: aiResponse,
     });
-
   } catch (error) {
     console.error("error sending msg: ", error);
     return NextResponse.json({ error }, { status: 500 });

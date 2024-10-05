@@ -10,6 +10,7 @@ import {
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
+import NotCreatedChatbot from "@/components/NotCreatedChatbot";
 
 export const dynamic = "force-dynamic"; // prevent caching - for updated content
 
@@ -32,23 +33,6 @@ async function ViewChatbots() {
     const { data } = response;
     console.log("data: ", data);
 
-    // Ensure data is properly fetched
-    if (!data || !data.chatbotsList || data.chatbotsList.length === 0) {
-      return (
-        <div>
-          <p>
-            You have not created any chatbots yet. Click on the button below to
-            create one!
-          </p>
-          <Link href="/dashboard/create-chatbot">
-            <Button className="bg-primary/95 hover:bg-primary text-white p-3 rounded-md mt-5">
-              Create Chatbot
-            </Button>
-          </Link>
-        </div>
-      );
-    }
-
     // sorting chatbots by created_at date
     const sortedChatbotsByUser: Chatbot[] = [...data.chatbotsList].sort(
       (a, b) =>
@@ -66,6 +50,9 @@ async function ViewChatbots() {
           Active Chatbots ({filteredChatbots.length})
         </h1>
 
+        {!data ||
+          !data.chatbotsList ||
+          (data.chatbotsList.length === 0 && <NotCreatedChatbot />)}
         <ul className="flex flex-col space-y-5">
           {filteredChatbots.map((chatbot) => (
             <Link

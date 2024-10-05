@@ -1,5 +1,3 @@
-"use client";
-
 import { Feedback, Message } from "@/types/types";
 import { usePathname } from "next/navigation";
 import logo from "@/public/images/just_logo.png";
@@ -8,6 +6,15 @@ import ReactMarkDown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 function Messages({
   messages = [],
@@ -25,6 +32,7 @@ function Messages({
   const isReviewPage = path.includes("review-sessions");
   const [summary, setSummary] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   console.log("Messages Data(Messages): ", messages);
   console.log("Feedback Data(Messages): ", feedbacks);
@@ -83,6 +91,13 @@ function Messages({
     }
   }, [messages, feedbacks]);
 
+  // Effect to automatically open the dialog when the summary is generated
+  useEffect(() => {
+    if (summary) {
+      setIsOpen(true); // Open the dialog when a new summary is generated
+    }
+  }, [summary]);
+
   const summarizedFeedback = async () => {
     setLoading(true);
 
@@ -119,7 +134,7 @@ function Messages({
       {mode === 1 && isReviewPage && (
         <>
           <button
-            className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary duration-150 ease-in-out rounded-lg shadow-xl"
+            className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
             onClick={summarizedFeedback}
             disabled={loading}
           >
@@ -128,8 +143,15 @@ function Messages({
 
           {/* Conditionally render the summary if it exists */}
           {summary && (
-            <div className="mt-5 p-4 bg-gray-100 dark:bg-primary/50 rounded-lg text-sm">
-              {typeof summary === "string" ? summary : JSON.stringify(summary)}
+            <div className="bg-gray-100 dark:bg-primary/50 rounded-lg text-sm">
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Summarized Feedback</DialogTitle>
+                    <DialogDescription>{summary}</DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
             </div>
           )}
         </>

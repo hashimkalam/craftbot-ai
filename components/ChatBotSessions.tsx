@@ -17,6 +17,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { ExternalLink } from "lucide-react";
+import NotCreatedChatbot from "./NotCreatedChatbot";
 
 function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   const router = useRouter();
@@ -68,8 +69,7 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
     <div className="bg-white dark:bg-primary-DARK">
       <Accordion type="single" collapsible>
         {sortedChatbots.length !== 0 ? (
-          <>
-            {" "}
+          <div className="p-2 shadow-md rounded-md">
             {sortedChatbots.map((chatbot) => {
               return (
                 <div key={chatbot.id} className="px-10 py-5">
@@ -99,19 +99,9 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                 </div>
               );
             })}
-          </>
-        ) : (
-          <div className="bg-gray-100">
-            <p>
-              You have not created any chatbots yet to even have sessions. Click
-              on the button below to create one!
-            </p>
-            <Link href="/dashboard/create-chatbot">
-              <Button className="bg-primary/95 hover:bg-primary text-white p-3 rounded-md mt-5">
-                Create Chatbot
-              </Button>
-            </Link>
           </div>
+        ) : (
+          <NotCreatedChatbot />
         )}
       </Accordion>
     </div>
