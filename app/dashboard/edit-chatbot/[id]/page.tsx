@@ -29,6 +29,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { StaticImageData } from "next/image";
 import Loading from "../../loading";
 
+import mammoth from "mammoth";
+
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
 
@@ -139,7 +141,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   if (loading)
     return (
       <div className="mx-auto animate-spin p-10">
-        <Image src={currentImage} alt="Logo" className="w-24 lg:w-32" />
+        <Loading />
       </div>
     );
 
@@ -183,9 +185,38 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     input.click();
   };
 
+  // Type the event parameter to include the target file input
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]; // Use optional chaining to safely access the first file
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const arrayBuffer = e.target?.result; // Use optional chaining here as well
+
+        // Use mammoth to extract text from the DOCX file
+        try {
+          if (arrayBuffer instanceof ArrayBuffer) {
+            const { value } = await mammoth.extractRawText({ arrayBuffer });
+            setNewCharacteristic(value);
+          } else {
+            console.error(
+              "Error: arrayBuffer is not an instance of ArrayBuffer"
+            );
+          }
+        } catch (error) {
+          console.error("Error extracting text from DOCX:", error);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
   return (
     <div className="px-0 md:p-10 bg-gray-300 shadow-xl dark:bg-primary-DARK">
-      <div className="text-white text-sm md:sticky md:top-10 sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary-DARK">
+      <div className="text-white text-sm  sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary/20">
         <h2 className="font-bold">Link to chat</h2>
         <p className="text-sm italic text-white">
           Share the link to start conversations with your chatbot
@@ -264,12 +295,23 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           >
             <Input
               type="text"
-              placeholder="Example: If customers asks for proces, provide pricing page: www.example.com/pricing"
+              placeholder="Example: If customers asks for process, provide pricing page: www.example.com/pricing"
               value={newCharacteristic}
               onChange={(e) => setNewCharacteristic(e.target.value)}
+              className="flex-grow"
+            />
+            <Input
+              type="file"
+              accept=".docx"
+              onChange={handleFileChange}
+              className="flex-none w-52"
             />
 
-            <Button type="submit" disabled={!newCharacteristic}>
+            <Button
+              type="submit"
+              disabled={!newCharacteristic}
+              className="flex-none"
+            >
               Add
             </Button>
           </form>
