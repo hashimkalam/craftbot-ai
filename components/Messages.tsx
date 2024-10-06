@@ -133,13 +133,20 @@ function Messages({
 
       {mode === 1 && isReviewPage && (
         <>
-          <button
-            className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
-            onClick={summarizedFeedback}
-            disabled={loading}
-          >
-            {loading ? "Summarizing..." : "Summarize"}
-          </button>
+          {feedbacks.length === 0 ? (
+            <p className="font-semibold">No Feedback. Nothing To Summarize</p>
+          ) : (
+            <>
+              {" "}
+              <button
+                className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
+                onClick={summarizedFeedback}
+                disabled={loading}
+              >
+                {loading ? "Summarizing..." : "Summarize"}
+              </button>
+            </>
+          )}
 
           {/* Conditionally render the summary if it exists */}
           {summary && (

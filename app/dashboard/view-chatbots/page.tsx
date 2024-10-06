@@ -51,8 +51,8 @@ async function ViewChatbots() {
         </h1>
 
         {!data ||
-          !data.chatbotsList ||
-          (data.chatbotsList.length === 0 && <NotCreatedChatbot />)}
+          !filteredChatbots ||
+          (filteredChatbots.length === 0 && <NotCreatedChatbot />)}
         <ul className="flex flex-col space-y-5">
           {filteredChatbots.map((chatbot) => (
             <Link
