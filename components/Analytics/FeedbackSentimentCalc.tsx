@@ -12,7 +12,7 @@ import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { Button } from "../ui/button";
 
-import { CiExport } from "react-icons/ci";
+// import { CiExport } from "react-icons/ci";
 
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
@@ -170,7 +170,8 @@ function FeedbackSentimentCalc({
           onClick={handleExport}
           className="mb-4 bg-blue-500 text-white mx-4 my-2 rounded absolute top-0 right-0"
         >
-          <CiExport size={24} />
+          {/*<CiExport size={24} />*/}
+          EXPORT
         </Button>
       </div>
       <Suspense fallback={<Loading />}>
