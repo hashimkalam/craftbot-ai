@@ -148,8 +148,6 @@ function Index({
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
-          <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
-
           <Suspense fallback={<Loading />}>
             <FeedbackSentimentCalc
               filteredSessions={filteredSessions}

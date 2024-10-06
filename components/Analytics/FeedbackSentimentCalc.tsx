@@ -10,6 +10,9 @@ import {
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState, Suspense, lazy } from "react";
+import { Button } from "../ui/button";
+
+import { CiExport } from "react-icons/ci";
 
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
@@ -118,41 +121,58 @@ function FeedbackSentimentCalc({
     fetchAllData();
   }, [ids, fetchFeedback, handleTotalFeedback]);
 
+  const handleExport = () => {
+    // Prepare the feedback data for export
+    const exportData: {
+      sessionId: string;
+      content: string;
+      sentiment: string;
+      createdAt: string;
+    }[] = [];
+    Object.entries(feedbackBySession).forEach(([sessionId, feedbacks]) => {
+      feedbacks.forEach((feedback) => {
+        feedback.sender === "user" &&
+          exportData.push({
+            sessionId,
+            content: feedback.content,
+            sentiment: feedback.sentiment,
+            createdAt: new Date(feedback.created_at).toLocaleString(),
+          });
+      });
+    });
+
+    // Convert to CSV format
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [
+        "Session ID,Content,Sentiment,Created At",
+        ...exportData.map(
+          (row) =>
+            `${row.sessionId},"${row.content}","${row.sentiment}","${row.createdAt}"`
+        ),
+      ].join("\n");
+
+    // Create a download link and click it
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "feedback_data.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div>
-      {/* Render Feedback */}
-      {/* <div>
-        {Object.entries(feedbackBySession).map(([sessionId, feedbacks]) => (
-          <div key={sessionId}>
-            <h4>Chat Session ID: {sessionId}</h4>
-            {feedbacks.length > 0 ? (
-              feedbacks.map((feedback) => (
-                <div key={feedback.id}>
-                  <p>
-                    <strong>Content:</strong> {feedback.content}
-                  </p>
-                  <p>
-                    <strong>Sentiment:</strong> {feedback.sentiment}
-                  </p>
-                  <p>
-                    <strong>Created at:</strong>{" "}
-                    {new Date(feedback.created_at).toLocaleString()}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p>No feedback available for this session.</p>
-            )}
-
-            {loadingFeedback && <p>Loading feedback...</p>}
-            {errorFeedback && (
-              <p>Error fetching feedback: {errorFeedback.message}</p>
-            )}
-          </div>
-        ))}
+    <>
+      <div className="relative">
+        <h1 className="text-xl font-bold underline ml-2">Feedback</h1>
+        <Button
+          onClick={handleExport}
+          className="mb-4 bg-blue-500 text-white mx-4 my-2 rounded absolute top-0 right-0"
+        >
+          <CiExport size={24} />
+        </Button>
       </div>
-      */}
-
       <Suspense fallback={<Loading />}>
         <SentimentPieChart
           neutral={sentimentCount.NEUTRAL}
@@ -160,7 +180,7 @@ function FeedbackSentimentCalc({
           positive={sentimentCount.POSITIVE}
         />
       </Suspense>
-    </div>
+    </>
   );
 }
 

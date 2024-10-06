@@ -1,6 +1,5 @@
 import { Suspense, lazy } from "react";
 
-// Lazy load the Analytics component
 const Analytics = lazy(() => import("@/components/Analytics"));
 
 import { GET_USER_CHATBOTS } from "@/graphql/query";

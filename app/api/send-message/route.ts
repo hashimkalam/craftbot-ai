@@ -70,13 +70,15 @@ export async function POST(req: NextRequest) {
       .join(" + ");
     console.log("systemPrompt: ", systemPrompt);
 
+    console.log("formattedPrevMessages: ", formattedPrevMessages);
+
     // Construct the prompt
     const prompt = [
       {
         role: "system",
         content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. 
         Use Emojis where possible. Be engaging but get straight to the point!. Be helpful. Here are some key info that you need to be aware of: ${systemPrompt}
-        Please make it concise and straight forward. Have proper formatting.`,
+        Please make it concise and straight forward. Have proper formatting. These are the previous messages so adjust your response: ${formattedPrevMessages}. DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN`,
       },
       ...formattedPrevMessages,
       {
