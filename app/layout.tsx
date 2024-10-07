@@ -20,6 +20,12 @@ export default function RootLayout({
     <ApolloProviderWrapper>
       <ClerkProvider>
         <html lang="en">
+          <head>
+            <link
+              href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
+              rel="stylesheet"
+            />
+          </head>
           <body className="min-h-screen flex">
             <ThemeProvider
               attribute="class"

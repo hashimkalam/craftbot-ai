@@ -15,7 +15,7 @@ const Logo = () => {
         alt="Logo"
         className="w-12 lg:w-16 mr-2 lg:mr-4 transition-all duration-300 ease-in-out"
       />
-      <div className="hidden group-hover:inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out transform group-hover:translate-x-2 space-y-1 dark:text-white">
+      <div className="hidden group-hover:inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out transform group-hover:translate-x-2 space-y-1 text-black dark:text-white">
         <h1>CraftBot</h1>
         <p className="text-sm">Your customizable AI chat bot</p>
       </div>
@@ -58,7 +58,9 @@ const SignInToggle = () => {
         <SignInButton />
       </SignedOut>
 
-      <ModeToggle />
+      <div className="text-black dark:text-white">
+        <ModeToggle />
+      </div>
     </div>
   );
 };

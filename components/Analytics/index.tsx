@@ -6,8 +6,8 @@ import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
 import Loading from "@/app/dashboard/loading";
-import CountDisplayAnimation from "./CountDisplayAnimation";
 
+const CountDisplayAnimation = lazy(() => import("./CountDisplayAnimation"));
 const PieChartComponent = lazy(() => import("./PieChartComponent"));
 const TotalTimeInteracted = lazy(() => import("./TotalTimeInteracted"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
@@ -121,19 +121,24 @@ function Index({
           </Suspense>
         </div>
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
-          <CountDisplayAnimation
-            text="Total Guest Count:"
-            count={totalGuests}
-            loadingCount={loadingCount}
-          />
+          <Suspense fallback={<Loading />}>
+            <CountDisplayAnimation
+              text="Total Guest Count:"
+              count={totalGuests}
+              loadingCount={loadingCount}
+            />
+          </Suspense>
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
-          <CountDisplayAnimation
-            text="Total Feedback Count:"
-            count={totalFeedback}
-            loadingCount={loadingCount}
-          />
+          <Suspense fallback={<Loading />}>
+            {" "}
+            <CountDisplayAnimation
+              text="Total Feedback Count:"
+              count={totalFeedback}
+              loadingCount={loadingCount}
+            />
+          </Suspense>
         </div>
       </div>
 
