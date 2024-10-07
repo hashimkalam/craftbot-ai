@@ -7,7 +7,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 // import image1 from "@/public/images/image1.png";
-// import image2 from "@/public/images/image2.png";
+// \\import image2 from "@/public/images/image2.png";
 import FlickeringGrid from "@/components/ui/flickering-grid";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 
