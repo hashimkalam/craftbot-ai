@@ -30,6 +30,7 @@ import type { StaticImageData } from "next/image";
 import Loading from "../../loading";
 
 import mammoth from "mammoth";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
@@ -41,6 +42,20 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+
+  const [copied, setCopied] = useState(false);
+  const embedCode = `
+  <!-- Chatbot Embed Code -->
+  <div id="chatbot-container"></div>
+  <script>
+    (function(d, w, id) {
+      var js = d.createElement('script');
+      js.src = '${url}'; // Replace with your embed URL
+      js.async = true;
+      d.getElementById('chatbot-container').appendChild(js);
+    })(document, window, '${id}'); // Pass the chatbot ID
+  </script>
+  `;
 
   // delete chatbot mutation
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
@@ -240,6 +255,16 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </div>
       </div>
 
+      <CopyToClipboard
+        text={embedCode}
+        onCopy={() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
+        }}
+      >
+        <Button>{copied ? "Copied!" : "Copy To Embed"}</Button>
+      </CopyToClipboard>
+
       <section className="relative mt-5 bg-white dark:bg-primary/20 p-5 md:p-10 rounded-lg">
         <Button
           variant="destructive"
@@ -328,7 +353,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </div>
       </section>
 
-      <div>
+      <>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="w-full lg:max-w-[425px]">
             <p>Are you sure you want to delete?</p>
@@ -348,7 +373,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     </div>
   );
 };
