@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `Please summarize the following user feedback. Remove any unnecessary spam messages and focus on summarizing valid feedback concisely:`,
+        content: `Please summarize the following user feedback as short and simple as possible. Ignore any spam messages and focus on summarizing valid feedback concisely:`,
       },
       ...userFeedback.map((feedback: any) => ({
         role: "user",

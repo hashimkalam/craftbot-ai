@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Check for neutral sentiment based on the score
-    if (sentimentScore >= 0.1 && sentimentScore <= 0.9) {
+    if (sentimentScore >= 0.25 && sentimentScore <= 0.85) {
       sentimentLabel = 'NEUTRAL';
       sentimentScore = 0; // Set score to 0 for neutral sentiment
     }
