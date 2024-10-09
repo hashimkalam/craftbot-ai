@@ -5,11 +5,13 @@ export const CREATE_CHATBOT = gql`
     $clerk_user_id: String!
     $name: String!
     $created_at: DateTime!
+    $personality: String!
   ) {
     insertChatbots(
       clerk_user_id: $clerk_user_id
       name: $name
       created_at: $created_at
+      personality: $personality
     ) {
       id
       name
@@ -59,11 +61,12 @@ export const ADD_CHARACTERISTIC = gql`
 `;
 
 export const UPDATE_CHATBOT = gql`
-  mutation UpdateChatbot($id: Int!, $name: String!) {
-    updateChatbots(id: $id, name: $name) {
+  mutation UpdateChatbot($id: Int!, $name: String!, $personality: String!) {
+    updateChatbots(id: $id, name: $name, personality: $personality) {
       id
       name
       created_at
+      personality
     }
   }
 `;

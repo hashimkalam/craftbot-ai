@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CREATE_CHATBOT } from "@/graphql/mutation";
 import { useMutation } from "@apollo/client";
 import { useUser } from "@clerk/nextjs";
@@ -10,23 +9,39 @@ import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/public/images/just_logo.png";
+import { PERSONALITIES } from "@/data/data";
+import { CheckSquare, Square } from "lucide-react";
+
+export const Personalities = ({ selectedPersonality, setSelectedPersonality }: { selectedPersonality: any, setSelectedPersonality:any }) => (
+  <div className="flex flex-wrap justify-start mt-2">
+    {PERSONALITIES.map(({ id, label }) => (
+      <button
+        key={id}
+        onClick={(e) => {
+          e.preventDefault(); // Prevent form submission on button click
+          setSelectedPersonality(id); // Set the selected personality
+        }}
+        className="flex items-center p-2 rounded border m-1 bg-gray-100 dark:bg-primary-DARK border-transparent"
+      >
+        {selectedPersonality === id ? (
+          <CheckSquare className="mr-2 text-blue-500" />
+        ) : (
+          <Square className="mr-2 text-gray-500" />
+        )}
+        {label}
+      </button>
+    ))}
+  </div>
+);
 
 const CreateChatBot = () => {
-  const { user } = useUser();
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null); // State for error message
   const router = useRouter();
+  const { user } = useUser();
+  const [name, setName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(null);
 
-  const [createChatbot, { data, loading, error: mutationError }] = useMutation(
-    CREATE_CHATBOT,
-    {
-      variables: {
-        clerk_user_id: user?.id,
-        name,
-        created_at: formatISO(new Date()), // Provide current date/time
-      },
-    }
-  );
+  const [createChatbot, { loading }] = useMutation(CREATE_CHATBOT);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,25 +52,36 @@ const CreateChatBot = () => {
     }
 
     try {
-      const data = await createChatbot();
+      const { data } = await createChatbot({
+        variables: {
+          clerk_user_id: user?.id,
+          name,
+          created_at: formatISO(new Date()),
+          personality: selectedPersonality,
+        },
+      });
+
+      // Reset form fields
       setName("");
-      setError(""); // Clear error message on successful creation
+      setSelectedPersonality(null);
+      setError(null); // Clear error message on successful creation
       console.log("Bot created successfully:", data);
 
-      // Redirect to edit page or handle success message
-      router.push(`/dashboard/edit-chatbot/${data.data.insertChatbots.id}`);
+      router.push(`/dashboard/edit-chatbot/${data.insertChatbots.id}`);
     } catch (err) {
-      console.error(err);
+      console.error("Error creating chatbot:", err);
+      setError("An error occurred while creating the chatbot."); // Set generic error message
     }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    // Update name state and error message
     if (value.length <= 20) {
       setError(null);
-    } else setError("Chatbot name cannot exceed 20 characters.");
+    } else {
+      setError("Chatbot name cannot exceed 20 characters.");
+    }
 
     setName(value);
   };
@@ -65,29 +91,39 @@ const CreateChatBot = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center lg:flex-row md:space-x-10 bg-white dark:bg-primary-DARK shadow-lg p-10 rounded-md m-10 w-[80%]">
-      <Image src={logo} alt="Logo" className="w-16 lg:w-24 flex-0" />
+    <div className="flex flex-col lg:flex-row items-center justify-center bg-white dark:bg-primary-DARK shadow-lg p-10 rounded-md m-10 w-[90%] md:w-[80%]">
+      <Image src={logo} alt="Logo" className="w-16 lg:w-24 flex-0 mb-4 lg:mb-0" />
       <div className="flex-1">
         <h1 className="text-xl lg:text-3xl font-semibold">Create</h1>
         <h2 className="font-light">
-          Create a new chatbot to assist you in your conversations with your
-          customers
+          Create a new chatbot to assist you in your conversations with your customers.
         </h2>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col md:flex-row justify-between mt-6 border border-black p-1 rounded-md"
+          className="flex flex-col mt-6 border border-black p-2 rounded-md"
         >
-          <input
-            type="text"
-            value={name}
-            onChange={handleNameChange} // Handle name change
-            placeholder="Chatbot Name..."
-            className="max-w-lg mb-2 md:mb-0 border-none w-full outline-none outline-0 px-2"
-            required
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={name}
+              onChange={handleNameChange}
+              placeholder="Chatbot Name..."
+              className="max-w-lg w-full border-none outline-none px-2 py-2 mt-2.5 rounded-l-xl"
+              required
+            />
+            <Button
+              type="submit"
+              disabled={loading || !name || error !== null || !selectedPersonality}
+              className="mt-2 w-fit"
+            >
+              {loading ? "Creating Chatbot" : "Create Chatbot"}
+            </Button>
+          </div>
+
+          <Personalities
+            selectedPersonality={selectedPersonality}
+            setSelectedPersonality={setSelectedPersonality}
           />
-          <Button type="submit" disabled={loading || !name || error !== null}>
-            {loading ? "Creating Chatbot" : "Create Chatbot"}
-          </Button>
         </form>
 
         {error && <p className="text-red-500 mt-2">{error}</p>}

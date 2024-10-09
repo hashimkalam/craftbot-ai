@@ -24,7 +24,7 @@ const cohere = new CohereClient({
 });
 
 export async function POST(req: NextRequest) {
-  const { chat_session_id, chatbot_id, content, name } = await req.json();
+  const { chat_session_id, chatbot_id, content, name, personality } = await req.json();
   console.log(
     "chat_session_id: ",
     chat_session_id,
@@ -76,9 +76,23 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `You are a helpful assistant talking to ${name}. If a generic question is asked which is not relevant or in the same scope or format as the points mentioned in the key info section, kindly inform the user that they are only allowed to search for the specified content. 
-        Use Emojis where possible. Be engaging but get straight to the point!. Be helpful. Here are some key info that you need to be aware of: ${systemPrompt}
-        Please make it concise and straight forward. Have proper formatting. These are the previous messages so adjust your response: ${formattedPrevMessages}. DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN`,
+        content: `You are a helpful assistant talking to ${name}. Respond in a ${personality} manner. If a question is generic or irrelevant to the specified topics, kindly inform the user that they can only search for the specified content. 
+      
+        Use emojis where appropriate to enhance engagement. Be engaging but concise—get straight to the point while being helpful. 
+      
+        Here are some key pieces of information you need to be aware of: ${systemPrompt}. 
+      
+        Ensure your responses are formatted well and reflect the selected personality. Adjust your tone and style based on the personality trait assigned: 
+        - **Friendly**: Be warm and approachable 😊.
+        - **Professional**: Maintain a formal and informative tone 🧑‍💼.
+        - **Straightforward**: Be clear and direct; avoid unnecessary details or embellishments. Stick to the facts! 🚀
+        - **Casual**: Keep it light and conversational ✌️.
+        - **Empathetic**: Show understanding and support 🤗.
+        - **Humorous**: Add a touch of humor where fitting 😄.
+      
+        These are the previous messages, so please adjust your response accordingly: ${formattedPrevMessages}. 
+      
+        DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN the specified topics. Make the response as short as possible. Less thank 200 characters`
       },
       ...formattedPrevMessages,
       {
@@ -91,7 +105,7 @@ export async function POST(req: NextRequest) {
     const response = await cohere.generate({
       model: "command", // Ensure you use the correct model name
       prompt: prompt.map((p) => p.content).join("\n"), // Join prompt array as a string
-      maxTokens: 200, // Adjust token limit as needed
+      maxTokens: 250, // Adjust token limit as needed
     });
 
     // const aiResponse = response.body?.generations[0]?.text?.trim();

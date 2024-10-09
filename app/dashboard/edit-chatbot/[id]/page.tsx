@@ -31,30 +31,30 @@ import Loading from "../../loading";
 
 import mammoth from "mammoth";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Personalities } from "../../create-chatbot/page";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
 
   const [chatbotName, setChatbotName] = useState("");
-  const [currentImage, setCurrentImage] = useState<StaticImageData | string>(
-    logo
-  );
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
-
   const [copied, setCopied] = useState(false);
+  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
+    null
+  );
+
   const embedCode = `
-  <!-- Chatbot Embed Code -->
-  <div id="chatbot-container"></div>
-  <script>
-    (function(d, w, id) {
-      var js = d.createElement('script');
-      js.src = '${url}'; // Replace with your embed URL
-      js.async = true;
-      d.getElementById('chatbot-container').appendChild(js);
-    })(document, window, '${id}'); // Pass the chatbot ID
-  </script>
+  <!-- Chatbot IFrame Code -->
+  <iframe 
+    id="chatbot-iframe" 
+    src="${url}"  <!-- Replace with your embed URL -->
+    width="500px" 
+    height="500px" 
+    style="border: none; overflow: hidden;"
+    allowfullscreen>
+  </iframe>
   `;
 
   // delete chatbot mutation
@@ -118,7 +118,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         variables: {
           id,
           name: chatbotName,
-          image: currentImage,
+          personality: selectedPersonality,
         },
       });
 
@@ -169,37 +169,6 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     data?.chatbots?.chatbot_characteristics
   );
 
-  const updateIcon = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*"; // Accept only image files
-
-    input.onchange = (event: Event) => {
-      const target = event.target as HTMLInputElement; // Type casting to handle null check
-
-      if (target && target.files && target.files[0]) {
-        const file = target.files[0];
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          if (typeof reader.result === "string") {
-            // Only set the image if reader.result is a string (base64)
-            setCurrentImage(reader.result);
-          }
-        };
-
-        reader.readAsDataURL(file); // Read file as Data URL to display image
-        console.log("reader.readAsDataURL(file): ", file);
-      } else {
-        // If no file is selected, reset to default logo
-        setCurrentImage(logo);
-      }
-    };
-
-    // Trigger the file input dialog
-    input.click();
-  };
-
   // Type the event parameter to include the target file input
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -231,19 +200,30 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
   return (
     <div className="px-0 md:p-10 bg-gray-300 shadow-xl dark:bg-primary-DARK">
-      <div className="text-white text-sm  sm:max-w-sm ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary/20">
+      <div className="text-white text-sm  sm:max-w-lg ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary/20">
         <h2 className="font-bold">Link to chat</h2>
         <p className="text-sm italic text-white">
           Share the link to start conversations with your chatbot
         </p>
 
         <div className="text-black flex items-center space-x-2">
+          <CopyToClipboard
+            text={embedCode}
+            onCopy={() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
+            }}
+          >
+            <Button className="text-white">
+              {copied ? "Copied!" : "Copy IFrame"}
+            </Button>
+          </CopyToClipboard>
           <Link href={url} className="w-full pointer hover:opacity-50">
             <Input value={url} readOnly className="pointer dark:bg-white" />
           </Link>
           <Button
             size="sm"
-            className="px-2"
+            className="px-2 text-white"
             onClick={() => {
               navigator.clipboard.writeText(url);
               toast.success("Copied to clipboard");
@@ -255,16 +235,6 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </div>
       </div>
 
-      <CopyToClipboard
-        text={embedCode}
-        onCopy={() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
-        }}
-      >
-        <Button>{copied ? "Copied!" : "Copy To Embed"}</Button>
-      </CopyToClipboard>
-
       <section className="relative mt-5 bg-white dark:bg-primary/20 p-5 md:p-10 rounded-lg">
         <Button
           variant="destructive"
@@ -275,29 +245,28 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </Button>
 
         <div className="flex space-x-4">
-          {/*<div onClick={updateIcon}>
-            Use the `Image` component for static logo
-            {typeof currentImage === "string" &&
-            currentImage.startsWith("data:image") ? (
-              // If it's a base64 image, use a normal <img> tag
-              <img src={currentImage} alt="Logo" className="w-16 lg:w-24" />
-            ) : (
-              // If it's the default static image, use Next.js's Image component
-              <Image src={currentImage} alt="Logo" className="w-16 lg:w-24" />
-            )}
-          </div>*/}
-          <Image src={currentImage} alt="Logo" className="w-16 lg:w-24" />
+          <Image src={logo} alt="Logo" className="w-16 lg:w-24 " />
           <form
             onSubmit={handleUpdateChatbot}
             className="flex flex-1 space-2-x items-center"
           >
-            <Input
-              value={chatbotName}
-              onChange={(e) => setChatbotName(e.target.value)}
-              placeholder={chatbotName}
-              className="w-full border-none bg-transparent text-xl font-bold"
-            />
-            <Button type="submit" disabled={!chatbotName}>
+            <div>
+              <Input
+                value={chatbotName}
+                onChange={(e) => setChatbotName(e.target.value)}
+                placeholder={chatbotName}
+                className="w-full border-none bg-transparent text-xl font-bold"
+              />
+              <Personalities
+                selectedPersonality={selectedPersonality}
+                setSelectedPersonality={setSelectedPersonality}
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={!chatbotName}
+              className="text-white"
+            >
               Update
             </Button>
           </form>
@@ -335,7 +304,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
             <Button
               type="submit"
               disabled={!newCharacteristic}
-              className="flex-none"
+              className="flex-none text-white"
             >
               Add
             </Button>

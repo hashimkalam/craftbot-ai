@@ -58,3 +58,12 @@ export const SIDEBAR_OPTIONS = [
     subtitle: "Sessions",
   },
 ];
+
+export const PERSONALITIES = [
+  { id: 'friendly', label: 'Friendly' },
+  { id: 'straightforward', label: 'Straightforward' },
+  { id: 'professional', label: 'Professional' },
+  { id: 'casual', label: 'Casual' },
+  { id: 'empathetic', label: 'Empathetic' },
+  { id: 'humorous', label: 'Humorous' },
+];
