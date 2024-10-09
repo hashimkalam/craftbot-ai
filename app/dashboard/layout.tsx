@@ -12,7 +12,7 @@ async function AdminLayout({
   const { userId } = await auth();
 
   if (!userId) {
-    return redirect("/login");
+    return redirect("/sign-in");
   }
 
   return (
