@@ -10,6 +10,7 @@ import {
 } from "recharts";
 
 const COLORS = ["#FF9900", "#00FF00", "#FF0000"]; // Colors for Neutral, Positive, and Negative
+const GRAY_COLOR = "#A9A9A9"; // Gray color for no data
 
 interface SentimentPieChartProps {
   neutral: number;
@@ -22,13 +23,22 @@ const SentimentPieChart: React.FC<SentimentPieChartProps> = ({
   positive,
   negative,
 }) => {
-  const data = [
-    { name: `Neutral (${neutral})`, value: neutral },
-    { name: `Positive (${positive})`, value: positive },
-    { name: `Negative (${negative})`, value: negative },
-  ];
-
   const router = useRouter();
+
+  // Check if all sentiment counts are zero
+  const isEmpty = neutral === 0 && positive === 0 && negative === 0;
+
+  const data = isEmpty
+    ? [{ name: "No Feedback", value: 1 }]
+    : [
+        { name: `Neutral (${neutral})`, value: neutral },
+        { name: `Positive (${positive})`, value: positive },
+        { name: `Negative (${negative})`, value: negative },
+      ];
+
+  const fillColors = isEmpty
+    ? [GRAY_COLOR] // Use gray color for the "No Feedback" state
+    : COLORS;
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -45,8 +55,12 @@ const SentimentPieChart: React.FC<SentimentPieChartProps> = ({
           {data.map((entry, index) => (
             <Cell
               key={`cell-${index}`}
-              fill={COLORS[index % COLORS.length]}
-              onClick={() => router.push(`/dashboard/feedback/${index}`)}
+              fill={fillColors[index % fillColors.length]}
+              onClick={
+                !isEmpty
+                  ? () => router.push(`/dashboard/feedback/${index}`)
+                  : undefined
+              }
             />
           ))}
         </Pie>

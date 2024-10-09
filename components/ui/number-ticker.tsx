@@ -27,16 +27,18 @@ export default function NumberTicker({
   const isInView = useInView(ref, { once: true, margin: "0px" });
 
   useEffect(() => {
-    isInView &&
+    if (isInView) {
       setTimeout(() => {
         motionValue.set(direction === "down" ? 0 : value);
       }, delay * 1000);
+    }
   }, [motionValue, isInView, delay, value, direction]);
 
   useEffect(
     () =>
       springValue.on("change", (latest) => {
         if (ref.current) {
+          // Handle the display of 0 properly by formatting and updating text content
           ref.current.textContent = Intl.NumberFormat("en-US", {
             minimumFractionDigits: decimalPlaces,
             maximumFractionDigits: decimalPlaces,
@@ -45,6 +47,13 @@ export default function NumberTicker({
       }),
     [springValue, decimalPlaces],
   );
+
+  // Ensures that `0` is shown when value is explicitly 0
+  useEffect(() => {
+    if (value === 0 && ref.current) {
+      ref.current.textContent = "0";
+    }
+  }, [value]);
 
   return (
     <span
