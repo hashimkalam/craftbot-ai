@@ -9,30 +9,8 @@ import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/public/images/just_logo.png";
-import { PERSONALITIES } from "@/data/data";
-import { CheckSquare, Square } from "lucide-react";
+import Personalities from "@/components/Personalities";
 
-export const Personalities = ({ selectedPersonality, setSelectedPersonality }: { selectedPersonality: any, setSelectedPersonality:any }) => (
-  <div className="flex flex-wrap justify-start mt-2">
-    {PERSONALITIES.map(({ id, label }) => (
-      <button
-        key={id}
-        onClick={(e) => {
-          e.preventDefault(); // Prevent form submission on button click
-          setSelectedPersonality(id); // Set the selected personality
-        }}
-        className="flex items-center p-2 rounded border m-1 bg-gray-100 dark:bg-primary-DARK border-transparent"
-      >
-        {selectedPersonality === id ? (
-          <CheckSquare className="mr-2 text-blue-500" />
-        ) : (
-          <Square className="mr-2 text-gray-500" />
-        )}
-        {label}
-      </button>
-    ))}
-  </div>
-);
 
 const CreateChatBot = () => {
   const router = useRouter();

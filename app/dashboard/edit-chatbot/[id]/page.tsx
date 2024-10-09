@@ -25,13 +25,12 @@ import { redirect } from "next/navigation";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-
-import type { StaticImageData } from "next/image";
+ 
 import Loading from "../../loading";
 
 import mammoth from "mammoth";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import { Personalities } from "../../create-chatbot/page";
+import { CopyToClipboard } from "react-copy-to-clipboard"; 
+import Personalities from "@/components/Personalities";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   console.log("id ->", id);
