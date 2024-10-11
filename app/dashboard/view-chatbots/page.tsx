@@ -1,4 +1,4 @@
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 import { Button } from "@/components/ui/button";
 import { GET_CHATBOT_BY_USER } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";

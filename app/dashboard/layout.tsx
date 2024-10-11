@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -8,7 +7,6 @@ async function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // get user id
   const { userId } = await auth();
 
   if (!userId) {
@@ -21,6 +19,7 @@ async function AdminLayout({
         <Sidebar />
         <div className="flex-1 flex justify-center lg:justify-start items-start max-w-5xl mx-auto w-full lg:my-[2%]">
           {children}
+          
         </div>
       </div>
     </div>

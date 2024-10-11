@@ -1,6 +1,6 @@
 import { Feedback, Message } from "@/types/types";
 import { usePathname } from "next/navigation";
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 import { UserCircle } from "lucide-react";
 import ReactMarkDown from "react-markdown";
 import remarkGfm from "remark-gfm";

@@ -1,6 +1,6 @@
 import { SignUp } from "@clerk/nextjs";
 import { Appearance } from "@clerk/types";
-import logo from "@/public/images/logo.png"; // Import your logo image
+import logo from "@/public/images/logo.webp"; // Import your logo image
 import Link from "next/link";
 import { ModeToggle } from "@/components/ModeToggle";
 

@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@radix-ui/react-accordion";
 import { useEffect, useState } from "react";
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";

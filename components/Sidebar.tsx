@@ -1,23 +1,25 @@
 "use client";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { 
+  SignOutButton,
+  SignedIn, 
+  UserButton,
+} from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 import { ModeToggle } from "./ModeToggle";
 import { SIDEBAR_OPTIONS } from "@/data/data";
 
 const Logo = () => {
   return (
-    <Link href="/" className="flex items-center text-4xl font-thin">
-      <Image
-        src={logo}
-        alt="Logo"
-        className="w-12 lg:w-16 mr-2 lg:mr-4 transition-all duration-300 ease-in-out"
-      />
+    <Link
+      href="/"
+      className="flex items-center text-4xl font-thin justify-center group-hover:justify-start"
+    >
+      <Image src={logo} alt="Logo" className="w-12 lg:w-16" />
       <div className="hidden group-hover:inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out transform group-hover:translate-x-2 space-y-1 text-black dark:text-white">
         <h1>CraftBot</h1>
-        <p className="text-sm">Your customizable AI chat bot</p>
       </div>
     </Link>
   );
@@ -26,20 +28,38 @@ const Logo = () => {
 const NavigationLinks = () => {
   return (
     <ul className="gap-5 flex lg:flex-col mt-4">
-      {SIDEBAR_OPTIONS.map((link, index) => {
+      {SIDEBAR_OPTIONS.map((link: any, index) => {
         const Icon = link.icon;
+
         return (
           <li className="flex-1" key={index}>
-            <Link
-              href={link.href}
-              className="sidebar-button justify-center group-hover:justify-start flex items-center"
-            >
-              <Icon className="h-6 w-6 lg:h-8 lg:w-8" />
-              <div className="hidden group-hover:inline-block">
-                <p className="text-xl">{link.title}</p>
-                <p className="text-sm font-extralight">{link.subtitle}</p>
-              </div>
-            </Link>
+            {link?.href ? (
+              <Link
+                href={link.href}
+                className="sidebar-button justify-center group-hover:justify-start flex items-center"
+              >
+                <Icon className="h-6 w-6 lg:h-8 lg:w-8" />
+                <div className="relative overflow-hidden flex flex-col">
+                  <p className="hidden group-hover:inline-block transition-transform duration-300 ease-in-out transform translate-x-full group-hover:translate-x-0 text-xl">
+                    {link.title}
+                  </p>
+                  <p className="hidden group-hover:inline-block transition-transform duration-300 ease-in-out transform translate-x-full group-hover:translate-x-0 text-sm font-extralight">
+                    {link.subtitle}
+                  </p>
+                </div>
+              </Link>
+            ) : (
+              <SignOutButton>
+                <div className="sidebar-button justify-center group-hover:justify-start flex items-center cursor-pointer h-full">
+                  <div className="relative overflow-hidden flex space-x-2 ">
+                    <Icon className="h-6 w-6 lg:h-8 lg:w-8" />
+                    <p className="hidden group-hover:inline-block transition-transform duration-300 ease-in-out transform translate-x-full group-hover:translate-x-0 text-xl">
+                      {link.title}
+                    </p>
+                  </div>
+                </div>
+              </SignOutButton>
+            )}
           </li>
         );
       })}
@@ -54,9 +74,6 @@ const SignInToggle = () => {
         <UserButton />
       </SignedIn>
 
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
 
       <div className="text-black dark:text-white">
         <ModeToggle />

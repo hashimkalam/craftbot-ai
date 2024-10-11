@@ -3,6 +3,7 @@ import {
   GlobeIcon,
   PencilLine,
   SearchIcon,
+  LogOutIcon
 } from "lucide-react";
 
 export const FEATURES = [
@@ -56,6 +57,10 @@ export const SIDEBAR_OPTIONS = [
     icon: SearchIcon,
     title: "View",
     subtitle: "Sessions",
+  }, 
+  {
+    icon: LogOutIcon,
+    title: "Log Out",
   },
 ];
 

@@ -8,7 +8,7 @@ import { FormEvent, useState } from "react";
 import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 import Personalities from "@/components/Personalities";
 
 

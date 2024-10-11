@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import logo from "@/public/images/just_logo.png";
+import logo from "@/public/images/just_logo.webp";
 
 import { FormEvent, useEffect, useState, lazy, Suspense } from "react";
 

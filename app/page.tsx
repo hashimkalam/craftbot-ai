@@ -6,8 +6,8 @@ import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-// import image1 from "@/public/images/image1.png";
-// \\import image2 from "@/public/images/image2.png";
+// import image1 from "@/public/images/image1.webp";
+// \\import image2 from "@/public/images/image2.webp";
 import FlickeringGrid from "@/components/ui/flickering-grid";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 
@@ -98,14 +98,14 @@ export default async function Home() {
             className="dark:hidden block"
             animationStyle="top-in-bottom-out"
             videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
-            thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
+            thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.webp"
             thumbnailAlt="Hero Video"
           />
           <HeroVideoDialog
             className="hidden dark:block"
             animationStyle="top-in-bottom-out"
             videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
-            thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
+            thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.webp"
             thumbnailAlt="Hero Video"
           />
         </div>
