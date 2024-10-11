@@ -38,7 +38,7 @@ function Index({
 
   // Filter sessions based on the chatbotId
   useEffect(() => {
-    console.log("chatbotId: ", chatbotId);
+    // console.log("chatbotId: ", chatbotId);
     setLoadingCount(true); // Set loading state to true at the start
 
     try {
@@ -46,10 +46,10 @@ function Index({
         const currentChatbot = sortedChatbots.find(
           (chatbot) => Number(chatbot.id) === Number(chatbotId)
         );
-        console.log("currentChatbot: ", currentChatbot);
+        // console.log("currentChatbot: ", currentChatbot);
 
         if (currentChatbot) {
-          console.log("Chat Sessions: ", currentChatbot.chat_sessions);
+          // console.log("Chat Sessions: ", currentChatbot.chat_sessions);
 
           // Update filteredSessions first
           const newFilteredSessions = currentChatbot.chat_sessions;
@@ -58,7 +58,7 @@ function Index({
           // Set totalGuests after filtering sessions
           setTotalGuests(newFilteredSessions.length);
         } else {
-          console.log("No matching chatbot found.");
+          // console.log("No matching chatbot found.");
           setFilteredSessions([]);
           setTotalGuests(0);
         }
@@ -68,8 +68,8 @@ function Index({
     }
   }, [chatbotId, sortedChatbots]);
 
-  console.log("sortedChatbots: ", sortedChatbots);
-  console.log("filteredSessions: ", filteredSessions);
+  // console.log("sortedChatbots: ", sortedChatbots);
+  // console.log("filteredSessions: ", filteredSessions);
 
   const [deleteChatSession] = useMutation(DELETE_CHATSESSION, {
     refetchQueries: ["GetChatbotById"],
@@ -107,7 +107,7 @@ function Index({
     setTotalFeedback(feedbackCount);
   };
 
-  console.log("totalMessages: ", totalMessages);
+  // console.log("totalMessages: ", totalMessages);
 
   return (
     <div className="min-h-screen">

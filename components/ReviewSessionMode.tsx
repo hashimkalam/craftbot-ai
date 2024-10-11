@@ -7,7 +7,7 @@ function ReviewSessionMode({
   mode: number;
   setMode: (mode: number) => void;
 }) {
-  console.log("mode: ", mode);
+  // ("mode: ", mode);
   return (
     <div className="flex justify-evenly text-center text-white mt-8">
       <button

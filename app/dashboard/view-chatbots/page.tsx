@@ -31,7 +31,7 @@ async function ViewChatbots() {
     });
 
     const { data } = response;
-    console.log("data: ", data);
+    // console.log("data: ", data);
 
     // sorting chatbots by created_at date
     const sortedChatbotsByUser: Chatbot[] = [...data.chatbotsList].sort(
@@ -42,7 +42,7 @@ async function ViewChatbots() {
     const filteredChatbots: Chatbot[] = sortedChatbotsByUser.filter(
       (chatbot) => chatbot.clerk_user_id === userId
     );
-    console.log("filteredChatbots: ", filteredChatbots);
+    // console.log("filteredChatbots: ", filteredChatbots);
 
     return (
       <div className="flex-1 pb-20 p-10">

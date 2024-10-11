@@ -69,7 +69,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     }
   );
 
-  console.log("chatbotData: ", chatbotData);
+  // console.log("chatbotData: ", chatbotData);
 
   // Fetch Messages
   const {
@@ -97,14 +97,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       setMessages(messagesData?.chat_sessions?.messages);
     }
   }, [messagesData]);
-  console.log("messages: ", messages);
+  // console.log("messages: ", messages);
 
   const handleInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     const chatId = await startNewChat(name, email, Number(id));
-    console.log("chatId: ", chatId);
+    // console.log("chatId: ", chatId);
 
     setChatId(chatId);
     setLoading(false);
@@ -172,7 +172,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       });
 
       const result = await response.json();
-      console.log("ai result response: ", result);
+      // console.log("ai result response: ", result);
 
       // updatin loading msg from ai with actual response
       setMessages((prevMessages) =>
@@ -253,7 +253,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       }
 
       const result = await response.json();
-      console.log("AI result response: ", result);
+      // console.log("AI result response: ", result);
 
       // Now update feedback with AI response, replacing the loading feedback
       setFeedbacks((prevFeedback) => {
@@ -333,7 +333,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
       const data = await response.json();
       // Assuming the response contains 'sentiment' and 'score'
-      console.log(data);
+      // console.log(data);
       setSentiment(data.sentiment); // 'positive', 'negative', or 'neutral'
 
       return data.sentiment; // Return the sentiment

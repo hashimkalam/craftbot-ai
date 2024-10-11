@@ -46,23 +46,20 @@ function FeedbackSentimentCalc({
   useEffect(() => {
     const sessionIds: number[] = filteredSessions.map((session) => session.id);
     setIds(sessionIds);
-    console.log("Filtered Session IDs: ", sessionIds); // Log session IDs
+    // console.log("Filtered Session IDs: ", sessionIds); // Log session IDs
   }, [filteredSessions]);
 
   useEffect(() => {
     const fetchAllData = async () => {
       if (ids.length > 0) {
-        console.log("Fetching feedbacks for IDs: ", ids); // Log IDs before fetching data
+        // console.log("Fetching feedbacks for IDs: ", ids); // Log IDs before fetching data
         try {
           const allFeedbacks = await Promise.all(
             ids.map(async (chatId) => {
               const { data: feedbackData } = await fetchFeedback({
                 variables: { chat_session_id: chatId },
               });
-              console.log(
-                `Feedback Data for Chat ID ${chatId}: `,
-                feedbackData
-              ); // Log feedback data for each ID
+              // console.log( `Feedback Data for Chat ID ${chatId}: `, feedbackData); // Log feedback data for each ID
 
               return {
                 chatId,
@@ -80,7 +77,7 @@ function FeedbackSentimentCalc({
             feedbackMap[chatId] = feedback;
 
             // Log feedbacks collected for each session
-            console.log(`Collected Feedback for Chat ID ${chatId}: `, feedback);
+            // console.log(`Collected Feedback for Chat ID ${chatId}: `, feedback);
 
             // Count the number of feedbacks for each sentiment
             feedback.forEach((fb) => {
@@ -93,7 +90,7 @@ function FeedbackSentimentCalc({
           });
 
           setFeedbackBySession(feedbackMap);
-          console.log("Feedback by Session: ", feedbackMap); // Log feedbacks mapped by session ID
+          // console.log("Feedback by Session: ", feedbackMap); // Log feedbacks mapped by session ID
 
           // Update the state with the total count for each sentiment
           setSentimentCount({
@@ -101,16 +98,11 @@ function FeedbackSentimentCalc({
             POSITIVE: totalPositive,
             NEGATIVE: totalNegative,
           });
-          console.log("Sentiment Count: ", {
-            NEUTRAL: totalNeutral,
-            POSITIVE: totalPositive,
-            NEGATIVE: totalNegative,
-          }); // Log sentiment counts
-
+     
           const totalFeedbackCount =
             totalNeutral + totalNegative + totalPositive;
 
-          console.log("Total Feedback Count: ", totalFeedbackCount); // Log total feedback count
+          // console.log("Total Feedback Count: ", totalFeedbackCount); // Log total feedback count
           handleTotalFeedback(totalFeedbackCount);
         } catch (error) {
           console.error("Error fetching data: ", error);
@@ -161,6 +153,11 @@ function FeedbackSentimentCalc({
     link.click();
     document.body.removeChild(link);
   };
+
+
+  if (loadingFeedback) return <div><Loading /></div>;
+  if (errorFeedback) return <div>Error fetching feedbacks: {errorFeedback.message}</div>;
+
 
   return (
     <>

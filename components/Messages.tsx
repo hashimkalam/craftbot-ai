@@ -34,12 +34,12 @@ function Messages({
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log("Messages Data(Messages): ", messages);
-  console.log("Feedback Data(Messages): ", feedbacks);
+  // console.log("Messages Data(Messages): ", messages);
+  // console.log("Feedback Data(Messages): ", feedbacks);
 
   // Function to render individual message or feedback item
   const renderItem = (item: Message | Feedback, isMessage: boolean) => {
-    console.log("item(Messages): ", item);
+    // console.log("item(Messages): ", item);
     // Check if item is null or undefined
     if (!item) {
       return null;

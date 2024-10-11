@@ -43,7 +43,7 @@ const CreateChatBot = () => {
       setName("");
       setSelectedPersonality(null);
       setError(null); // Clear error message on successful creation
-      console.log("Bot created successfully:", data);
+      // console.log("Bot created successfully:", data);
 
       router.push(`/dashboard/edit-chatbot/${data.insertChatbots.id}`);
     } catch (err) {

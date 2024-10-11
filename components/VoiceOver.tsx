@@ -54,7 +54,7 @@ function AudioTranscriber() {
 
   // Transcribing audio
   const transcribeAudio = async (audioBlob: Blob) => {
-    console.log("Transcribing...");
+    // console.log("Transcribing...");
     setTranscribing(true);
 
     const formData = new FormData();
@@ -71,7 +71,7 @@ function AudioTranscriber() {
       }
 
       const data = await response.json();
-      console.log("Transcription received from server (clientSide): ", data.transcription);
+      // console.log("Transcription received from server (clientSide): ", data.transcription);
       setTranscription(data.transcription);
     } catch (error) {
       console.error("Error in transcribing audio recording: ", error);

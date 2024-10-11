@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
   // Extract query and variables from JSON body
   const { query, variables } = await request.json();
 
-  console.log("Received query: ", query);
-  console.log("Received variables: ", variables);
+  // console.log("Received query: ", query);
+  // console.log("Received variables: ", variables);
 
   try {
     let result;
@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log("result: ", result)
+    // console.log("result: ", result)
     const data = result.data;
-    console.log("Query result: ", data);
+    // console.log("Query result: ", data);
 
     return NextResponse.json({ data }, { headers: corsHeaders });
   } catch (error) {

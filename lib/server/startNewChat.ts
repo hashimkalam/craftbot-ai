@@ -12,10 +12,10 @@ export async function startNewChat(
   chatbotId: number
 ) {
   try {
-    console.log("startNewChat creation started");
-    console.log("guestName: ", guestName);
-    console.log("guestEmail: ", guestEmail);
-    console.log("chatbotId: ", chatbotId);
+    // console.log("startNewChat creation started");
+    // console.log("guestName: ", guestName);
+    // console.log("guestEmail: ", guestEmail);
+    // console.log("chatbotId: ", chatbotId);
 
     // create new guest entry
     const guestResult = await client.mutate({
@@ -27,7 +27,7 @@ export async function startNewChat(
       },
     });
     const guestId = guestResult?.data?.insertGuests?.id;
-    console.log("guestResult: ", guestResult);
+    // console.log("guestResult: ", guestResult);
 
     // initialize new chat session
     const chatSessionResult = await client.mutate({
@@ -39,7 +39,7 @@ export async function startNewChat(
       },
     });
     const chatSessionId = chatSessionResult?.data?.insertChat_sessions?.id;
-    console.log("chatSessionResult: ", chatSessionResult);
+    // console.log("chatSessionResult: ", chatSessionResult);
 
     // insert initial message
     const messageResult = await client.mutate({
@@ -51,9 +51,9 @@ export async function startNewChat(
         created_at: formatISO(new Date()),
       },
     });
-    console.log("messageResult: ", messageResult);
+    // console.log("messageResult: ", messageResult);
 
-    console.log("New Chat Successfully Created!! :>>>> ");
+    // console.log("New Chat Successfully Created!! :>>>> ");
     return chatSessionId;
   } catch (error) {
     console.error(

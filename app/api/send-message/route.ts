@@ -25,16 +25,7 @@ const cohere = new CohereClient({
 
 export async function POST(req: NextRequest) {
   const { chat_session_id, chatbot_id, content, name, personality } = await req.json();
-  console.log(
-    "chat_session_id: ",
-    chat_session_id,
-    " content: ",
-    content,
-    " chatbot_id: ",
-    chatbot_id,
-    " name: ",
-    name
-  );
+  // console.log( "chat_session_id: ", chat_session_id, " content: ", content, " chatbot_id: ", chatbot_id, " name: ", name);
 
   try {
     // Fetch chatbot characteristics
@@ -68,9 +59,9 @@ export async function POST(req: NextRequest) {
     const systemPrompt = chatbot.chatbot_characteristics
       .map((char) => char.content)
       .join(" + ");
-    console.log("systemPrompt: ", systemPrompt);
+    // console.log("systemPrompt: ", systemPrompt);
 
-    console.log("formattedPrevMessages: ", formattedPrevMessages);
+    // console.log("formattedPrevMessages: ", formattedPrevMessages);
 
     // Construct the prompt
     const prompt = [
@@ -110,7 +101,7 @@ export async function POST(req: NextRequest) {
 
     // const aiResponse = response.body?.generations[0]?.text?.trim();
     const aiResponse = response.generations[0].text.trim();
-    console.log("aiResponse: ", aiResponse);
+    // console.log("aiResponse: ", aiResponse);
 
     if (!aiResponse) {
       return NextResponse.json({

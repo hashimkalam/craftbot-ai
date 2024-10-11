@@ -48,7 +48,7 @@ const TotalTimeInteracted = ({
                 const { data: messageData } = await fetchMessages({
                   variables: { chat_session_id: chatId },
                 });
-                console.log("messageData: ", messageData); // Log message data
+                // console.log("messageData: ", messageData); // Log message data
 
                 return {
                   chatId,

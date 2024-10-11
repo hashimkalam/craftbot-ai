@@ -33,7 +33,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import Personalities from "@/components/Personalities";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
-  console.log("id ->", id);
+  // console.log("id ->", id);
 
   const [chatbotName, setChatbotName] = useState("");
   const [url, setUrl] = useState<string>("");
@@ -72,7 +72,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     refetchQueries: ["GetChatbotById"],
   });
 
-  console.log("characteristics: ", Characteristic);
+  // console.log("characteristics: ", Characteristic);
 
   // extract id of chatbot
   const { data, loading, error } = useQuery<
@@ -163,10 +163,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
   if (!data?.chatbots) return redirect("/dashboard/view-chatbots");
 
-  console.log(
-    "data?.chatbots?.chatbot_characteristics:-",
-    data?.chatbots?.chatbot_characteristics
-  );
+  // console.log( "data?.chatbots?.chatbot_characteristics:-",    data?.chatbots?.chatbot_characteristics);
 
   // Type the event parameter to include the target file input
   const handleFileChange = async (

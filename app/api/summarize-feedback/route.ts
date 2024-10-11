@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     const aiResponse = cohereResponse.generations[0].text.trim();
 
-    console.log("summary ai response: ", aiResponse);
+   //  console.log("summary ai response: ", aiResponse);
 
     // Return AI-generated response
     return NextResponse.json({

@@ -26,7 +26,7 @@ const cohere = new CohereClient({
 export async function POST(req: NextRequest) {
   // Destructure the incoming request
   const { id, content, sentiment, chatbot_id } = await req.json();
-  console.log("Feedback submission received:", { id, content, sentiment, chatbot_id });
+  // console.log("Feedback submission received:", { id, content, sentiment, chatbot_id });
 
   try {
     // Step 1: Get the chatbot's details
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Sorry, we couldn't find that chatbot." }, { status: 404 });
     }
 
-    console.log("Chatbot data:", data);
+    // console.log("Chatbot data:", data);
 
     // Step 2: Retrieve previous feedback messages
     const { data: feedbackData } =
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
         fetchPolicy: "no-cache",
       });
 
-    console.log("Previous Feedback Data:", feedbackData);
+    // console.log("Previous Feedback Data:", feedbackData);
 
     if (!feedbackData || !feedbackData?.chat_sessions) {
       return NextResponse.json(
@@ -70,13 +70,13 @@ export async function POST(req: NextRequest) {
       role: feedback?.sender === "ai" ? "system" : "user",
       content: feedback?.content,
     }));
-    console.log("formattedPrevFeedback:", formattedPrevFeedback);
+    // console.log("formattedPrevFeedback:", formattedPrevFeedback);
 
     // Create a system prompt using chatbot characteristics
     const systemPrompt = chatbot?.chatbot_characteristics
       .map((char) => char?.content)
       .join(" + ");
-    console.log("System prompt created:", systemPrompt);
+    // console.log("System prompt created:", systemPrompt);
 
     const prompt = [
       {
@@ -97,10 +97,10 @@ export async function POST(req: NextRequest) {
       maxTokens: 100,
     });
 
-    console.log("Generated prompt:", prompt.map((p) => p.content).join("\n"));
+    // console.log("Generated prompt:", prompt.map((p) => p.content).join("\n"));
 
     const aiResponse = response.generations[0].text.trim();
-    console.log("AI response:", aiResponse);
+    // console.log("AI response:", aiResponse);
 
     if (!aiResponse) {
       return NextResponse.json({

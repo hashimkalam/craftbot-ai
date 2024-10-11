@@ -5,7 +5,7 @@ const API_KEY = process.env.ASSEMBLY_AI;
 
 // Handle POST requests
 export async function POST(req: NextRequest) {
-  console.log("Entered server side");
+  // console.log("Entered server side");
   try {
     const formData = await req.formData();
     const file = formData.get('file');

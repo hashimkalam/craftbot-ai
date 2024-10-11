@@ -22,7 +22,7 @@ async function ReviewSessions() {
     },
   });
 
-  console.log("review session response: ", response);
+  // console.log("review session response: ", response);
 
   const { data } = response;
 
@@ -35,7 +35,7 @@ async function ReviewSessions() {
   const filteredChatbots: Chatbot[] = sortedChatbotsByUser.filter(
     (chatbot) => chatbot.clerk_user_id === userId
   );
-  console.log("filteredChatbots: ", filteredChatbots);
+  // console.log("filteredChatbots: ", filteredChatbots);
 
   return (
     <div className="flex-1 px-10">

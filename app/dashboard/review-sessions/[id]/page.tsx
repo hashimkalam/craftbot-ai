@@ -12,7 +12,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
   try {
     // Parse and validate chat session ID
     const chatSessionId = parseInt(id);
-    console.log("chatSessionId(ReviewSession): ", chatSessionId);
+    // console.log("chatSessionId(ReviewSession): ", chatSessionId);
     if (isNaN(chatSessionId)) {
       return <div>Invalid session ID.</div>;
     }
@@ -25,7 +25,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
       variables: { id: chatSessionId },
     });
 
-    console.log("id: ", id);
+    // console.log("id: ", id);
 
     // destructure the response
     const {
@@ -45,7 +45,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
       guests: { name: guestName, email },
     } = chatSession;
 
-    console.log("chatsession: ", chatSession);
+    // console.log("chatsession: ", chatSession);
 
     return (
       <div className="flex-1 p-10 pb-24">

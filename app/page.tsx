@@ -13,7 +13,7 @@ import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 
 export default async function Home() {
   const { userId } = await auth();
-  console.log("userId: ", userId);
+  // console.log("userId: ", userId);
 
   if (userId) redirect("/dashboard");
 
