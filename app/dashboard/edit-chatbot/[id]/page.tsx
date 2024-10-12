@@ -31,6 +31,7 @@ import Loading from "../../loading";
 import mammoth from "mammoth";
 import { CopyToClipboard } from "react-copy-to-clipboard"; 
 import Personalities from "@/components/Personalities";
+import Form from "@/components/Form";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   // console.log("id ->", id);
@@ -257,6 +258,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
                 selectedPersonality={selectedPersonality}
                 setSelectedPersonality={setSelectedPersonality}
               />
+         
             </div>
             <Button
               type="submit"
@@ -267,6 +269,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
             </Button>
           </form>
         </div>
+
 
         <h2 className="text-xl font-bold mt-10">Heres what your AI knows</h2>
         <p>
@@ -296,6 +299,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
               onChange={handleFileChange}
               className="flex-none w-52"
             />
+            
 
             <Button
               type="submit"
@@ -305,6 +309,8 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
               Add
             </Button>
           </form>
+          
+        <Form id={id} />
 
           <ul className="flex flex-wrap-reverse gap-5">
             {data?.chatbots?.chatbot_characteristics.map((charac, index) => (
