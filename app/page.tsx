@@ -12,8 +12,7 @@ import FlickeringGrid from "@/components/ui/flickering-grid";
 import HeroVideoDialog from "@/components/ui/hero-video-dialog";
 
 export default async function Home() {
-  const { userId } = await auth();
-  // console.log("userId: ", userId);
+  const { userId } = await auth(); 
 
   if (userId) redirect("/dashboard");
 

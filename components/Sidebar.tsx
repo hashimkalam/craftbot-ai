@@ -50,7 +50,7 @@ const NavigationLinks = () => {
               </Link>
             ) : (
               <SignOutButton>
-                <div className="sidebar-button justify-center group-hover:justify-start flex items-center cursor-pointer h-full">
+                <div className="flex flex-col text-center lg:text-left lg:flex-row items-center gap-2 p-4 rounded-md bg-red-500/95 dark:bg-red-800/75 hover:bg-red-500 dark:hover:bg-red-800 justify-center group-hover:justify-start cursor-pointer h-full">
                   <div className="relative overflow-hidden flex space-x-2 ">
                     <Icon className="h-6 w-6 lg:h-8 lg:w-8" />
                     <p className="hidden group-hover:inline-block transition-transform duration-300 ease-in-out transform translate-x-full group-hover:translate-x-0 text-xl">

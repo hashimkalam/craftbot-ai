@@ -21,7 +21,6 @@ async function ReviewSessions() {
       userId,
     },
   });
-
   // console.log("review session response: ", response);
 
   const { data } = response;

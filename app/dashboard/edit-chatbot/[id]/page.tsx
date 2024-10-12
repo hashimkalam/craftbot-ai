@@ -25,11 +25,11 @@ import { redirect } from "next/navigation";
 import { toast } from "sonner";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
- 
+
 import Loading from "../../loading";
 
 import mammoth from "mammoth";
-import { CopyToClipboard } from "react-copy-to-clipboard"; 
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import Personalities from "@/components/Personalities";
 import Form from "@/components/Form";
 
@@ -40,10 +40,12 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
     null
   );
+  const [edit, setEdit] = useState<boolean>(false);
 
   const embedCode = `
   <!-- Chatbot IFrame Code -->
@@ -110,6 +112,12 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     }
   };
 
+  const handleEdit = async (id: string) => {
+    setIsEditOpen(true);
+    setEdit(true);
+    console.log("edit? ", edit);
+  };
+
   const handleUpdateChatbot = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -127,6 +135,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         success: "chatbot name successfully updated",
         error: "failed to update chatbot name",
       });
+      setIsEditOpen(false);
     } catch (err) {
       console.error("Failed to update chatbot: ", err);
     }
@@ -242,34 +251,61 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </Button>
 
         <div className="flex space-x-4">
-          <Image src={logo} alt="Logo" className="w-16 lg:w-24 " />
-          <form
-            onSubmit={handleUpdateChatbot}
-            className="flex flex-1 space-2-x items-center"
-          >
-            <div>
-              <Input
-                value={chatbotName}
-                onChange={(e) => setChatbotName(e.target.value)}
-                placeholder={chatbotName}
-                className="w-full border-none bg-transparent text-xl font-bold"
-              />
-              <Personalities
-                selectedPersonality={selectedPersonality}
-                setSelectedPersonality={setSelectedPersonality}
-              />
-         
-            </div>
-            <Button
-              type="submit"
-              disabled={!chatbotName}
-              className="text-white"
-            >
-              Update
-            </Button>
-          </form>
-        </div>
+          <div className="flex items-center justify-between w-full space-x-2 lg:space-x-4 mt-4">
+            <Image
+              src={logo}
+              alt="Logo"
+              className="w-16 lg:w-24 flex-shrink-0"
+            />
 
+            <div className="flex-grow">
+              <p className="w-full border-none bg-transparent text-lg md:text-xl lg:text-2xl font-bold">
+                {chatbotName}
+              </p>
+
+              <p className="w-full border-none bg-transparent text-xs md:text-sm lg:text-sm">
+                {data.chatbots?.personality}
+              </p>
+            </div>
+
+            <Button
+              className="text-white hover:bg-green-700 flex-shrink-0"
+              onClick={() => handleEdit(id)}
+            >
+              Edit
+            </Button>
+          </div>
+
+          {edit && (
+            <Dialog
+              open={isEditOpen}
+              onOpenChange={(open) => setIsEditOpen(open)}
+            >
+              <DialogContent className="w-[80%] lg:max-w-[425px] py-10">
+                <form onSubmit={handleUpdateChatbot} className="space-y-4">
+                  <div>
+                    <Input
+                      value={chatbotName}
+                      onChange={(e) => setChatbotName(e.target.value)}
+                      placeholder={chatbotName}
+                      className="w-full border-none bg-gray-200 dark:bg-primary-DARK/50 text-xl font-bold"
+                    />
+                    <Personalities
+                      selectedPersonality={selectedPersonality}
+                      setSelectedPersonality={setSelectedPersonality}
+                    />
+                  </div>
+                  <Button
+                    className="text-white hover:bg-green-700 w-full"
+                    onClick={() => handleEdit(id)}
+                  >
+                    Save
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
 
         <h2 className="text-xl font-bold mt-10">Heres what your AI knows</h2>
         <p>
@@ -299,7 +335,6 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
               onChange={handleFileChange}
               className="flex-none w-52"
             />
-            
 
             <Button
               type="submit"
@@ -309,8 +344,8 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
               Add
             </Button>
           </form>
-          
-        <Form id={id} />
+
+          <Form id={id} />
 
           <ul className="flex flex-wrap-reverse gap-5">
             {data?.chatbots?.chatbot_characteristics.map((charac, index) => (
@@ -326,7 +361,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
       <>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="w-full lg:max-w-[425px]">
+          <DialogContent className="w-[80%]  lg:max-w-[425px]">
             <p>Are you sure you want to delete?</p>
             <div className="space-x-4 flex ">
               <Button

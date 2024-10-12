@@ -18,8 +18,8 @@ const SignInPage: React.FC = () => {
       footer: "hidden",
       socialButtons: "dark:text-white",
       socialButton: "dark:text-white hover:underline",
-      formFieldLabel: "dark:text-white",
-      formFieldError: "text-red-500",
+      formFieldLabel: "dark:text-white text-[10px] md:text-[12px] lg:text-[14px]",
+      formFieldError: "text-red-500 text-[10px] md:text-[12px] lg:text-[14px]",
       button:
         "bg-primary hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white",
     },
@@ -30,12 +30,12 @@ const SignInPage: React.FC = () => {
       <div className="absolute top-8 right-8 z-50">
         <ModeToggle />
       </div>
-      <div className="flex flex-col items-center mb-4 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl">
+      <div className="flex flex-col items-center mb-4 bg-white dark:bg-gray-800 p-4 lg:p-8 rounded-xl shadow-xl">
         <Image src={logo} alt="Logo" className="mb-4 w-32" priority />
-        <h1 className="text-3xl font-semibold text-center mb-2 text-primary dark:text-white">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-center mb-2 text-primary dark:text-white">
           Welcome Back!
         </h1>
-        <h2 className="text-lg text-center text-gray-600 dark:text-white mb-4">
+        <h2 className="text-sm md:text-[16px] lg:text-lg text-center text-gray-600 dark:text-white mb-4">
           Please sign in to continue
         </h2>
         <SignIn
@@ -43,7 +43,7 @@ const SignInPage: React.FC = () => {
           fallbackRedirectUrl="/"
           appearance={appearance}
         />
-        <div className="flex items-center space-x-2 mt-6">
+        <div className="flex items-center space-x-2 mt-6 text-xs md:text-sm lg:text-[16px]">
           <h1 className="text-gray-500 dark:text-white">
             Don&apos;t have an account?
           </h1>

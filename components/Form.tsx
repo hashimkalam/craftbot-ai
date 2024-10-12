@@ -17,6 +17,7 @@ import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import Loading from "@/app/dashboard/loading";
 import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 function Form({ id }: { id: string }) {
   const [url, setUrl] = useState<string>("");
@@ -94,6 +95,7 @@ function Form({ id }: { id: string }) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
+      setUrl("")
     }
   };
 
@@ -125,7 +127,7 @@ function Form({ id }: { id: string }) {
   };
 
   return (
-    <div>
+    <>
       <form
         onSubmit={handleSubmit}
         className="mb-6 flex items-center space-x-2"
@@ -137,16 +139,15 @@ function Form({ id }: { id: string }) {
           placeholder="Enter website URL"
           required
         />
-        <button
+        <Button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          disabled={loading}
+          className="flex-none text-white"
+          disabled={loading || !url}
         >
           {loading ? "Scraping..." : "Scrape"}
-        </button>
+        </Button>
       </form>
-
-      {loading && <Loading />}
+ 
 
       {/* Dialog for Scraped Data Summary */}
       {scrapedData?.scrapedDataSummary && (
@@ -197,7 +198,7 @@ function Form({ id }: { id: string }) {
           </DialogContent>
         </Dialog>
       )}
-    </div>
+    </>
   );
 }
 

@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button";
+import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+  const user = await currentUser()
+ 
+
+
+
+
   return (
     <main className="p-10 bg-white dark:bg-primary-DARK m-10 rounded-lg w-full">
       <h1 className="text-4xl font-light">
-        Welcome to <span className="text-primary font-semibold">CraftBot</span>
+        Hi {user?.firstName} - Welcome to <span className="text-primary font-semibold">CraftBot</span> 
       </h1>
 
       <h2 className="mt-2 mb-10 dark:text-white">
@@ -15,7 +22,7 @@ export default function Home() {
 
       <Link href="/dashboard/create-chatbot">
         <Button className="bg-primary/95 hover:bg-primary text-white">
-          Lets get started by creating your first chatbot
+          Get started by creating your first chatbot
         </Button>
       </Link>
     </main>

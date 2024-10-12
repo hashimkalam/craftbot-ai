@@ -73,29 +73,23 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
             {sortedChatbots.map((chatbot) => {
               return (
                 <div key={chatbot.id} className="px-10 py-5">
-                  <>
-                    <div className="w-full">
-                      <div className="flex text-left items-center w-full">
-                        <Image
-                          src={logo}
-                          alt="Logo"
-                          className="h-10 w-10 mr-4"
-                        />
-                        <div className="flex items-center justify-between w-full">
-                          <p>{chatbot.name}</p>
+                  <div className="w-full">
+                    <div className="flex text-left items-center w-full">
+                      <Image src={logo} alt="Logo" className="h-10 w-10 mr-4" />
+                      <div className="flex items-center justify-between w-full">
+                        <p>{chatbot.name}</p>
 
-                          <ExternalLink
-                            onClick={() =>
-                              router.push(
-                                `/dashboard/review-sessions/analytics/${chatbot.id}`
-                              )
-                            }
-                            className="cursor-pointer"
-                          />
-                        </div>
+                        <ExternalLink
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/review-sessions/analytics/${chatbot.id}`
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
                       </div>
                     </div>
-                  </>
+                  </div>
                 </div>
               );
             })}

@@ -24,8 +24,8 @@ const CreateChatBot = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (name.length > 20) {
-      setError("Chatbot name cannot exceed 20 characters.");
+    if (name.length > 26) {
+      setError("Chatbot name cannot exceed 26 characters.");
       return;
     }
 
@@ -55,7 +55,7 @@ const CreateChatBot = () => {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
 
-    if (value.length <= 20) {
+    if (value.length <= 26) {
       setError(null);
     } else {
       setError("Chatbot name cannot exceed 20 characters.");

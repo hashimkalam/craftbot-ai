@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
     const promptText = `${title}\n\nHeadings:\n${headings.join(
       "\n"
     )}\n\nParagraphs:\n${paragraphs.join("\n")}`; 
-    const prompt = `Please summarize the following scraped data as concisely as possible while retaining all crucial details. Ignore stuffs like "Topics", "Headings", "Paragraphs" - i need only the summarized version. Here are the details - :\n\n${promptText}`;
+    const prompt = `Summarize the following data concisely, retaining only the crucial details. \n${promptText}`;
 
     const cohereResponse = await cohere.generate({
       model: "command",
