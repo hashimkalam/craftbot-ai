@@ -64,51 +64,53 @@ const ChatSessionTable = ({ filteredSessions }) => {
     <div className="space-y-5 p-5 w-full rounded-md">
       {filteredSessions.length > 0 ? (
         <>
-          <table
-            {...getTableProps()}
-            className="w-full bg-white dark:bg-primary/20 border border-gray-200"
-          >
-            <thead>
-              {headerGroups.map((headerGroup) => (
-                <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    <th
-                      key={column.id}
-                      {...column.getHeaderProps()}
-                      className="px-4 py-2 border-b text-left text-gray-600 dark:text-white dark:bg-primary-DARK/50"
-                    >
-                      {column.render("Header")}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {page.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    key={row.id}
-                    {...row.getRowProps()}
-                    className="hover:bg-gray-50"
-                  >
-                    {row.cells.map((cell) => (
-                      <td
-                        key={cell.id}
-                        {...cell.getCellProps()}
-                        className="px-4 py-2 border-b"
+          <div className="overflow-x-auto">
+            <table
+              {...getTableProps()}
+              className="w-full bg-white dark:bg-primary/20 border border-gray-200"
+            >
+              <thead>
+                {headerGroups.map((headerGroup) => (
+                  <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <th
+                        key={column.id}
+                        {...column.getHeaderProps()}
+                        className="px-2 sm:px-4 py-2 border-b text-left text-gray-600 dark:text-white dark:bg-primary-DARK/50"
                       >
-                        {cell.render("Cell")}
-                      </td>
+                        {column.render("Header")}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody {...getTableBodyProps()}>
+                {page.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <tr
+                      key={row.id}
+                      {...row.getRowProps()}
+                      className="hover:bg-gray-50"
+                    >
+                      {row.cells.map((cell) => (
+                        <td
+                          key={cell.id}
+                          {...cell.getCellProps()}
+                          className="px-2 sm:px-4 py-2 border-b text-sm sm:text-base"
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination Controls */}
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4">
             <div>
               <span>
                 Page{" "}
@@ -118,23 +120,23 @@ const ChatSessionTable = ({ filteredSessions }) => {
                 </strong>
               </span>
             </div>
-            <div>
+            <div className="flex items-center space-x-2 mt-2 sm:mt-0">
               <button
-                className="bg-gray-300 text-black px-2 py-1 mr-2 rounded"
+                className="bg-gray-300 text-black px-2 py-1 rounded"
                 onClick={() => gotoPage(0)} // Go to first page
                 disabled={!canPreviousPage}
               >
                 {"<<"}
               </button>
               <button
-                className="bg-gray-300 text-black px-2 py-1 mr-2 rounded"
+                className="bg-gray-300 text-black px-2 py-1 rounded"
                 onClick={() => previousPage()}
                 disabled={!canPreviousPage}
               >
                 {"<"}
               </button>
               <button
-                className="bg-gray-300 text-black px-2 py-1 mr-2 rounded"
+                className="bg-gray-300 text-black px-2 py-1 rounded"
                 onClick={() => nextPage()}
                 disabled={!canNextPage}
               >
@@ -150,7 +152,7 @@ const ChatSessionTable = ({ filteredSessions }) => {
                 {">>"}
               </button>
             </div>
-            <div>
+            <div className="mt-2 sm:mt-0">
               <select
                 value={pageSize}
                 onChange={(e) => {

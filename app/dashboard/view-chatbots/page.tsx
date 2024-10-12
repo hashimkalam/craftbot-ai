@@ -59,9 +59,14 @@ async function ViewChatbots() {
               href={`/dashboard/edit-chatbot/${chatbot.id}`}
               key={chatbot.id}
             >
-              <li className="relative p-10 border rounded-md max-w-3xl bg-white dark:bg-primary-DARK">
+              <li className="relative p-4 md:p-7 lg:p-10 border rounded-md max-w-3xl bg-white dark:bg-primary-DARK">
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-4">
+                 
+                  <p className="absolute top-5 right-5 text-[10px] md:text-xs text-gray-400">
+                    Created: {new Date(chatbot.created_at).toLocaleString()}
+                  </p>
+
+                  <div className="flex items-center space-x-2 lg:space-x-4 mt-6 lg:mt-0">
                     <Image
                       src={logo}
                       alt="Logo"
@@ -69,14 +74,11 @@ async function ViewChatbots() {
                     />
                     <h2 className="text-xl font-bold">{chatbot.name}</h2>
                   </div>
-                  <p className="absolute top-5 right-5 text-xs text-gray-400">
-                    Created: {new Date(chatbot.created_at).toLocaleString()}
-                  </p>
                 </div>
 
                 <hr className="mt-2" />
 
-                <div className="grid grid-cols-2 gap-10 md:gap-5 p-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-5 p-5">
                   <h3 className="italic">Characteristics</h3>
                   <ul className="text-xs">
                     {chatbot.chatbot_characteristics.length === 0 ? (

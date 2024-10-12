@@ -111,7 +111,7 @@ function Index({
 
   return (
     <div className="min-h-screen">
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
           <Suspense fallback={<Loading />}>
             <TotalTimeInteracted

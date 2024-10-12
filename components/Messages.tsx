@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Feedback, Message } from "@/types/types";
 import { usePathname } from "next/navigation";
 import logo from "@/public/images/just_logo.webp";
@@ -63,10 +63,10 @@ function Messages({
           sentimentColor = "text-red-500";
           break;
         case "neutral":
-          sentimentColor = "text-gray-500"; 
+          sentimentColor = "text-gray-500";
           break;
         default:
-          sentimentColor = "text-gray-500"; 
+          sentimentColor = "text-gray-500";
       }
     }
 
@@ -83,17 +83,25 @@ function Messages({
 
         <div className={`chat-image avatar w-10 ${!isSender && "-mr-4"}`}>
           {isSender ? (
-            <Image src={logo} alt="Logo" className="h-12 w-12" />
+            <Image src={logo} alt="Logo" className="h-10 lg:h-12 w-10 lg:w-12" />
           ) : (
-            <UserCircle className="text-primary" />
+            <UserCircle className="text-primary " />
           )}
         </div>
 
         {/* Render sentiment text for feedbacks */}
-        {!isMessage && <p className={`${sentimentColor} font-semibold`}>{(item as Feedback).sentiment}</p>}
+        {!isSender && (
+          <>
+            {!isMessage && (
+              <p className={`${sentimentColor} font-semibold`}>
+                {(item as Feedback).sentiment}
+              </p>
+            )}
+          </>
+        )}
 
         <div
-          className={`chat-bubble text-white ${
+          className={`chat-bubble text-white text-xs sm:text-sm md:text-[16px] lg:text-lg ${
             isSender
               ? "chat-bubble-primary bg-primary"
               : "chat-bubble-secondary bg-primary/60 text-gray-700"
@@ -152,7 +160,8 @@ function Messages({
       )}
 
       {mode === 0 && sortedMessages.map((message) => renderItem(message, true))}
-      {mode === 1 && sortedFeedbacks.map((feedback) => renderItem(feedback, false))}
+      {mode === 1 &&
+        sortedFeedbacks.map((feedback) => renderItem(feedback, false))}
 
       {mode === 1 && isReviewPage && (
         <>
