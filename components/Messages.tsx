@@ -1,3 +1,4 @@
+"use client"
 import { Feedback, Message } from "@/types/types";
 import { usePathname } from "next/navigation";
 import logo from "@/public/images/just_logo.webp";
@@ -20,7 +21,7 @@ function Messages({
   messages = [],
   feedbacks = [],
   chatbotName,
-  mode = 0, // Default to message mode
+  mode = 0,
 }: {
   messages?: Message[];
   feedbacks?: Feedback[];
@@ -34,12 +35,12 @@ function Messages({
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  // console.log("Messages Data(Messages): ", messages);
-  // console.log("Feedback Data(Messages): ", feedbacks);
+  // Sort messages and feedbacks by id in ascending order
+  const sortedMessages = [...messages].sort((a, b) => a.id - b.id);
+  const sortedFeedbacks = [...feedbacks].sort((a, b) => a.id - b.id);
 
   // Function to render individual message or feedback item
   const renderItem = (item: Message | Feedback, isMessage: boolean) => {
-    // console.log("item(Messages): ", item);
     // Check if item is null or undefined
     if (!item) {
       return null;
@@ -49,6 +50,25 @@ function Messages({
     const content = isMessage
       ? (item as Message).content
       : (item as Feedback).content;
+
+    // Determine sentiment color based on feedback sentiment
+    let sentimentColor;
+    if (!isMessage) {
+      const feedback = item as Feedback;
+      switch (feedback.sentiment.toLowerCase()) {
+        case "positive":
+          sentimentColor = "text-green-500";
+          break;
+        case "negative":
+          sentimentColor = "text-red-500";
+          break;
+        case "neutral":
+          sentimentColor = "text-gray-500"; 
+          break;
+        default:
+          sentimentColor = "text-gray-500"; 
+      }
+    }
 
     return (
       <div
@@ -68,6 +88,9 @@ function Messages({
             <UserCircle className="text-primary" />
           )}
         </div>
+
+        {/* Render sentiment text for feedbacks */}
+        {!isMessage && <p className={`${sentimentColor} font-semibold`}>{(item as Feedback).sentiment}</p>}
 
         <div
           className={`chat-bubble text-white ${
@@ -122,22 +145,21 @@ function Messages({
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto space-y-10 py-10 px-5 bg-white dark:bg-primary-DARK relative">
-      {mode === 0 && messages.length === 0 && (
+      {mode === 0 && sortedMessages.length === 0 && (
         <p className="text-gray-500 text-center">
           No messages yet. Start the conversation!
         </p>
       )}
 
-      {mode === 0 && messages.map((message) => renderItem(message, true))}
-      {mode === 1 && feedbacks.map((feedback) => renderItem(feedback, false))}
+      {mode === 0 && sortedMessages.map((message) => renderItem(message, true))}
+      {mode === 1 && sortedFeedbacks.map((feedback) => renderItem(feedback, false))}
 
       {mode === 1 && isReviewPage && (
         <>
-          {feedbacks.length === 0 ? (
+          {sortedFeedbacks.length === 0 ? (
             <p className="font-semibold">No Feedback. Nothing To Summarize</p>
           ) : (
             <>
-              {" "}
               <button
                 className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
                 onClick={summarizedFeedback}
