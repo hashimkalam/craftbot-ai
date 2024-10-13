@@ -22,11 +22,18 @@ export default function RootLayout({
         <html lang="en">
           <head>
             <link
+              rel="preload"
+              href="/public/Montserrat/static/Montserrat-Regular.woff2"
+              as="font"
+              type="font/woff2"
+              crossOrigin="anonymous"
+            />
+            <link
               href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
               rel="stylesheet"
             />
           </head>
-          <body className="min-h-screen flex">
+          <body className="min-h-screen flex overflow-y-scroll overflow-x-hidden">
             <ThemeProvider
               attribute="class"
               defaultTheme="system"

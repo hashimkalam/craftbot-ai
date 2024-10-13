@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/public/Montserrat/static/Montserrat-Regular.woff2') format('woff2'),
+       url('/public/Montserrat/static/Montserrat-Regular.woff') format('woff');
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -84,3 +93,12 @@
     @apply cursor-pointer;
   }
 }
+
+@layer utilities {
+  .bg-dots {
+    background-image: radial-gradient(circle, #60A5FA30 1.5px, transparent 1px);
+    background-size: 10px 10px; /* Adjust size for spacing */
+    background-position: center;
+  }
+}
+
