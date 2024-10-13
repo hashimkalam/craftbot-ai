@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `You are a feedback assistant. Here are some details about you: ${systemPrompt}. You should acknowledge feedback politely and positively, without providing help. Here's the customer's feedback: ${formattedPrevFeedback}. Keep your response under 50 words.`,
+        content: `You are a feedback assistant. Here are some details about you: ${systemPrompt}. You should acknowledge feedback politely and positively, without providing help. Here's the customer's feedback: ${formattedPrevFeedback}. Keep your response under 50 words. If they ask questions, reply saying this is a feedback section i cant answer your questions`,
       },
       ...formattedPrevFeedback,
       {

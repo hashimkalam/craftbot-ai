@@ -36,8 +36,8 @@ function Messages({
   const [isOpen, setIsOpen] = useState(false);
 
   // Sort messages and feedbacks by id in ascending order
-  const sortedMessages = [...messages].sort((a, b) => a.id - b.id);
-  const sortedFeedbacks = [...feedbacks].sort((a, b) => a.id - b.id);
+  // const sortedMessages = [...messages].sort((a, b) => a.id - b.id);
+  // const sortedFeedbacks = [...feedbacks].sort((a, b) => a.id - b.id);
 
   // Function to render individual message or feedback item
   const renderItem = (item: Message | Feedback, isMessage: boolean) => {
@@ -153,19 +153,19 @@ function Messages({
 
   return (
     <div className="flex-1 flex flex-col overflow-y-auto space-y-10 py-10 px-5 bg-white dark:bg-primary-DARK relative">
-      {mode === 0 && sortedMessages.length === 0 && (
+      {mode === 0 && messages.length === 0 && (
         <p className="text-gray-500 text-center">
           No messages yet. Start the conversation!
         </p>
       )}
 
-      {mode === 0 && sortedMessages.map((message) => renderItem(message, true))}
+      {mode === 0 && messages.map((message) => renderItem(message, true))}
       {mode === 1 &&
-        sortedFeedbacks.map((feedback) => renderItem(feedback, false))}
+        feedbacks.map((feedback) => renderItem(feedback, false))}
 
       {mode === 1 && isReviewPage && (
         <>
-          {sortedFeedbacks.length === 0 ? (
+          {feedbacks.length === 0 ? (
             <p className="font-semibold">No Feedback. Nothing To Summarize</p>
           ) : (
             <>
