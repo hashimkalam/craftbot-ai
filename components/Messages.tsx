@@ -36,8 +36,10 @@ function Messages({
   const [isOpen, setIsOpen] = useState(false);
 
   // Sort messages and feedbacks by id in ascending order
-  // const sortedMessages = [...messages].sort((a, b) => a.id - b.id);
-  // const sortedFeedbacks = [...feedbacks].sort((a, b) => a.id - b.id);
+  if (isReviewPage) {
+    messages = [...messages].sort((a, b) => a.id - b.id);
+    feedbacks = [...feedbacks].sort((a, b) => a.id - b.id);
+  }
 
   // Function to render individual message or feedback item
   const renderItem = (item: Message | Feedback, isMessage: boolean) => {
