@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const HUGGING_FACE_API_URL = 'https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english';
+const HUGGING_FACE_API_URL = 'https://api-inference.huggingface.co/models/cardiffnlp/twitter-roberta-base-sentiment-latest';
 const HUGGING_FACE_API_TOKEN = process.env.HUGGING_FACE_API_TOKEN; // Store your token in .env.local
 
 // Named export for the POST method
@@ -22,30 +22,18 @@ export async function POST(request: NextRequest) {
     }
 
     const sentimentData = await response.json();
-
-    // Extract the sentiments
-    const sentiments = sentimentData[0]; // Get the first item (the array of sentiments)
+    // console.log("sentimentData - ", sentimentData);
     
-    // Initialize variables to hold the sentiment results
-    let sentimentLabel = 'NEUTRAL'; // Default to neutral
-    let sentimentScore = 0;
-
-    // Loop through sentiments to determine the strongest sentiment
-    sentiments.forEach((sentiment: { label: string; score: number }) => {
-      if (sentiment.label === 'POSITIVE' && sentiment.score > sentimentScore) {
-        sentimentLabel = 'POSITIVE';
-        sentimentScore = sentiment.score;
-      } else if (sentiment.label === 'NEGATIVE' && sentiment.score > sentimentScore) {
-        sentimentLabel = 'NEGATIVE';
-        sentimentScore = sentiment.score;
-      }
+    // Extract the sentiment scores
+    const scores = sentimentData[0];
+    
+    // Determine the sentiment with the highest score
+    const highestSentiment = scores.reduce((prev: any, current: any) => {
+      return (prev.score > current.score) ? prev : current;
     });
 
-    // Check for neutral sentiment based on the score
-    if (sentimentScore >= 0.25 && sentimentScore <= 0.85) {
-      sentimentLabel = 'NEUTRAL';
-      sentimentScore = 0; // Set score to 0 for neutral sentiment
-    }
+    const sentimentLabel = highestSentiment.label.toUpperCase(); // Convert to uppercase
+    const sentimentScore = highestSentiment.score;
 
     return NextResponse.json({ sentiment: sentimentLabel, score: sentimentScore });
   } catch (error) {
