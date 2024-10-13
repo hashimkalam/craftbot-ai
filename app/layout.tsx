@@ -22,13 +22,6 @@ export default function RootLayout({
         <html lang="en">
           <head>
             <link
-              rel="preload"
-              href="/public/Montserrat/static/Montserrat-Regular.woff2"
-              as="font"
-              type="font/woff2"
-              crossOrigin="anonymous"
-            />
-            <link
               href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
               rel="stylesheet"
             />
