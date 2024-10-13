@@ -148,7 +148,7 @@ function Index({
             Total Messages Usage
           </h1>
           <Suspense fallback={<Loading />}>
-            <PieChartComponent messageCount={totalMessages} maxLimit={100} />
+            <PieChartComponent messageCount={totalMessages} maxLimit={500} />
           </Suspense>
         </div>
 

@@ -88,13 +88,13 @@ const CreateChatBot = () => {
           onSubmit={handleSubmit}
           className="flex flex-col mt-6 border border-black p-2 rounded-md"
         >
-          <div className="flex items-center">
+          <div className="flex items-center bg-gray-100 dark:bg-primary/10 p-1 rounded-lg">
             <input
               type="text"
               value={name}
               onChange={handleNameChange}
               placeholder="Chatbot Name..."
-              className="max-w-lg w-full border-none outline-none px-2 py-2 mt-2.5 rounded-l-xl"
+              className="max-w-lg w-full border-none outline-none px-2 py-2 rounded-l-xl bg-gray-100 dark:bg-primary/0"
               required
             />
             <Button
@@ -102,7 +102,7 @@ const CreateChatBot = () => {
               disabled={
                 loading || !name || error !== null || !selectedPersonality
               }
-              className="mt-2 w-fit"
+              className="w-fit text-white"
             >
               {loading ? "Creating Chatbot" : "Create Chatbot"}
             </Button>

@@ -4,7 +4,6 @@ import Image from "next/image";
 import logo from "@/public/images/just_logo.webp";
 
 import { FormEvent, useEffect, useState, lazy, Suspense } from "react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/ApolloClient";
@@ -22,30 +21,39 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog";
 
 import Loading from "../../loading";
 
 import mammoth from "mammoth";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 const Characteristic = lazy(() => import("@/components/Characteristic"));
 const Personalities = lazy(() => import("@/components/Personalities"));
 const Form = lazy(() => import("@/components/Form"));
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
-  // console.log("id ->", id);
-
   const [chatbotName, setChatbotName] = useState("");
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
+  const [docData, setDocData] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isDocOpen, setIsDocOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
     null
   );
   const [edit, setEdit] = useState<boolean>(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [editedDocData, setEditedDocData] = useState<string>("");
 
   const embedCode = `
   <!-- Chatbot IFrame Code -->
@@ -189,7 +197,9 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         try {
           if (arrayBuffer instanceof ArrayBuffer) {
             const { value } = await mammoth.extractRawText({ arrayBuffer });
-            setNewCharacteristic(value);
+            setDocData(value);
+            setIsDocOpen(true);
+            // setNewCharacteristic(value);
           } else {
             console.error(
               "Error: arrayBuffer is not an instance of ArrayBuffer"
@@ -202,6 +212,25 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
 
       reader.readAsArrayBuffer(file);
     }
+  };
+
+  const handleEditClick = () => {
+    setEditedDocData(docData); // Populate the textarea with current docData
+    setEditMode(true); // Enable edit mode
+  };
+
+  const handleSaveClick = () => {
+    if (editedDocData) {
+      // Check if there is edited data
+      setDocData(editedDocData); // Update docData with editedDocData
+    }
+    setEditMode(false); // Disable edit mode
+  };
+
+  const handleSubmitDoc = async () => {
+    await handleAddCharacteristic(docData); // Submit the updated docData
+    setIsDocOpen(false); // Close the dialog
+    setEditMode(false); // Disable edit mode
   };
 
   return (
@@ -364,27 +393,74 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
         </div>
       </section>
 
-      <>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="w-[80%]  lg:max-w-[425px]">
-            <p>Are you sure you want to delete?</p>
-            <div className="space-x-4 flex ">
-              <Button
-                onClick={() => handleDelete(id)}
-                className="bg-red-500 hover:bg-red-600 flex-1"
+
+      {/* Pop Up For Doc Data */}
+      <Dialog open={isDocOpen} onOpenChange={setIsDocOpen}>
+        <DialogContent className="h-[80%] flex flex-col">
+          <DialogTitle>Doc Data</DialogTitle>
+
+          <DialogHeader className="flex-grow overflow-y-scroll">
+            <DialogDescription className="flex-grow h-full">
+              {editMode ? (
+                <textarea
+                  value={editedDocData}
+                  onChange={(e) => setEditedDocData(e.target.value)}
+                  className="border p-2 w-full h-full resize-none"
+                  rows={5}
+                />
+              ) : (
+                <p>{docData}</p>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="flex justify-end space-x-2">
+            {editMode ? (
+              <button
+                onClick={handleSaveClick}
+                className="bg-green-500 text-white px-4 py-2 rounded"
               >
-                Yes
-              </Button>
-              <Button
-                onClick={() => setIsOpen(false)}
-                className="bg-[#4d7dfb] hover:bg-[#3068f5] flex-1"
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={handleEditClick}
+                className="bg-yellow-500 text-white px-4 py-2 rounded"
               >
-                No
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
+                Edit
+              </button>
+            )}
+
+            <button
+              onClick={handleSubmitDoc}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Submit
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pop Up For Deleting The Bot */}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="w-[80%]  lg:max-w-[425px]">
+          <DialogTitle>Are you sure you want to delete?</DialogTitle>
+          <div className="space-x-4 flex">
+            <Button
+              onClick={() => handleDelete(id)}
+              className="bg-red-500 hover:bg-red-600 flex-1"
+            >
+              Yes
+            </Button>
+            <Button
+              onClick={() => setIsOpen(false)}
+              className="bg-[#4d7dfb] hover:bg-[#3068f5] flex-1"
+            >
+              No
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

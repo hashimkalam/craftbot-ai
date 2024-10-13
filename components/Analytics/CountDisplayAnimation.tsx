@@ -20,13 +20,10 @@ const CountDisplayAnimation: React.FC<TotalGuestsProps> = ({
       </h2>
 
       {loadingCount ? (
-        <>
-          <Loading />
-          hi
-        </>
+        <Loading />
       ) : (
-        <p className="text-5xl font-extrabold text-primary dark:text-white tracking-wider">
-          <NumberTicker value={count} decimalPlaces={0} />
+        <p className="text-5xl font-extrabold">
+          <NumberTicker value={count} decimalPlaces={0} className="text-primary" />
         </p>
       )}
     </div>

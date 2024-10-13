@@ -8,7 +8,7 @@ import {
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
-import Link from "next/link"; 
+import Link from "next/link";
 
 import { lazy, Suspense } from "react";
 import Loading from "../loading";
@@ -85,20 +85,12 @@ async function ViewChatbots() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-5 p-5">
                   <h3 className="italic">Characteristics</h3>
-                  <ul className="text-xs">
-                    {chatbot.chatbot_characteristics.length === 0 ? (
-                      <p>No Characteristics Added Yet</p>
-                    ) : (
-                      chatbot.chatbot_characteristics.map((characteristic) => (
-                        <li
-                          className="list-disc break-words"
-                          key={characteristic.id}
-                        >
-                          {characteristic.content}
-                        </li>
-                      ))
-                    )}
-                  </ul>
+
+                  {chatbot.chatbot_characteristics.length === 0 ? (
+                    <p>No Characteristics Added Yet</p>
+                  ) : (
+                    <p>{chatbot.chatbot_characteristics.length}</p>
+                  )}
 
                   <h3 className="italic">No of Sessions: </h3>
                   <p>{chatbot.chat_sessions.length}</p>

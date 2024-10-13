@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Dialog,
@@ -14,8 +14,7 @@ import { ADD_CHARACTERISTIC } from "@/graphql/mutation";
 import { formatISO } from "date-fns";
 import { toast } from "sonner";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
-import { GET_CHATBOT_BY_ID } from "@/graphql/query";
-import Loading from "@/app/dashboard/loading";
+import { GET_CHATBOT_BY_ID } from "@/graphql/query"; 
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
@@ -147,17 +146,14 @@ function Form({ id }: { id: string }) {
           {loading ? "Scraping..." : "Scrape"}
         </Button>
       </form>
- 
+      <p className="text-red-700">{error}</p>
 
       {/* Dialog for Scraped Data Summary */}
       {scrapedData?.scrapedDataSummary && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="h-[80%] flex flex-col">
-            {" "}
-            {/* Ensures content takes up 80% of the screen height */}
+          <DialogContent className="h-[80%] flex flex-col"> 
             <DialogTitle>Scraped Data Summary</DialogTitle>
             <DialogHeader className="flex-grow overflow-y-scroll">
-              {" "}
               {/* Adjust height and scroll */}
               <DialogDescription className="flex-grow h-full">
                 {editMode ? (

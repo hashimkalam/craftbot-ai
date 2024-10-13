@@ -55,14 +55,14 @@ function Messages({
     let sentimentColor;
     if (!isMessage) {
       const feedback = item as Feedback;
-      switch (feedback.sentiment.toLowerCase()) {
-        case "positive":
+      switch (feedback.sentiment) {
+        case "POSITIVE":
           sentimentColor = "text-green-500";
           break;
-        case "negative":
+        case "NEGATIVE":
           sentimentColor = "text-red-500";
           break;
-        case "neutral":
+        case "NEUTRAL":
           sentimentColor = "text-gray-500";
           break;
         default:
@@ -83,7 +83,11 @@ function Messages({
 
         <div className={`chat-image avatar w-10 ${!isSender && "-mr-4"}`}>
           {isSender ? (
-            <Image src={logo} alt="Logo" className="h-10 lg:h-12 w-10 lg:w-12" />
+            <Image
+              src={logo}
+              alt="Logo"
+              className="h-10 lg:h-12 w-10 lg:w-12"
+            />
           ) : (
             <UserCircle className="text-primary " />
           )}
@@ -101,7 +105,7 @@ function Messages({
         )}
 
         <div
-          className={`chat-bubble text-white text-xs sm:text-sm md:text-[16px] lg:text-lg ${
+          className={`chat-bubble text-white text-xs sm:text-sm md:text-[1px] lg:text-lg ${
             isSender
               ? "chat-bubble-primary bg-primary"
               : "chat-bubble-secondary bg-primary/60 text-gray-700"
@@ -160,23 +164,20 @@ function Messages({
       )}
 
       {mode === 0 && messages.map((message) => renderItem(message, true))}
-      {mode === 1 &&
-        feedbacks.map((feedback) => renderItem(feedback, false))}
+      {mode === 1 && feedbacks.map((feedback) => renderItem(feedback, false))}
 
       {mode === 1 && isReviewPage && (
         <>
           {feedbacks.length === 0 ? (
             <p className="font-semibold">No Feedback. Nothing To Summarize</p>
           ) : (
-            <>
-              <button
-                className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
-                onClick={summarizedFeedback}
-                disabled={loading}
-              >
-                {loading ? "Summarizing..." : "Summarize"}
-              </button>
-            </>
+            <button
+              className="absolute -top-5 p-2 bg-primary/50 hover:bg-primary text-white duration-150 ease-in-out rounded-lg shadow-xl"
+              onClick={summarizedFeedback}
+              disabled={loading}
+            >
+              {loading ? "Summarizing..." : "Summarize"}
+            </button>
           )}
 
           {/* Conditionally render the summary if it exists */}
