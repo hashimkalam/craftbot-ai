@@ -1,5 +1,4 @@
 import logo from "@/public/images/just_logo.webp";
-import { Button } from "@/components/ui/button";
 import { GET_CHATBOT_BY_USER } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
 import {
@@ -9,8 +8,11 @@ import {
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
-import Link from "next/link";
-import NotCreatedChatbot from "@/components/NotCreatedChatbot";
+import Link from "next/link"; 
+
+import { lazy, Suspense } from "react";
+import Loading from "../loading";
+const NotCreatedChatbot = lazy(() => import("@/components/NotCreatedChatbot"));
 
 export const dynamic = "force-dynamic"; // prevent caching - for updated content
 
@@ -52,7 +54,11 @@ async function ViewChatbots() {
 
         {!data ||
           !filteredChatbots ||
-          (filteredChatbots.length === 0 && <NotCreatedChatbot />)}
+          (filteredChatbots.length === 0 && (
+            <Suspense fallback={<Loading />}>
+              <NotCreatedChatbot />
+            </Suspense>
+          ))}
         <ul className="flex flex-col space-y-5">
           {filteredChatbots.map((chatbot) => (
             <Link
@@ -61,7 +67,6 @@ async function ViewChatbots() {
             >
               <li className="relative p-4 md:p-7 lg:p-10 border rounded-md max-w-3xl bg-white dark:bg-primary-DARK">
                 <div className="flex justify-between items-center">
-                 
                   <p className="absolute top-5 right-5 text-[10px] md:text-xs text-gray-400">
                     Created: {new Date(chatbot.created_at).toLocaleString()}
                   </p>

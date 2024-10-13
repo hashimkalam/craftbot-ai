@@ -1,19 +1,13 @@
 "use client";
 
 import { Chatbot } from "@/types/types";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-} from "@radix-ui/react-accordion";
+import { Accordion } from "@radix-ui/react-accordion";
 import { useEffect, useState } from "react";
 import logo from "@/public/images/just_logo.webp";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import Link from "next/link";
 import Image from "next/image";
 
 import { ExternalLink } from "lucide-react";

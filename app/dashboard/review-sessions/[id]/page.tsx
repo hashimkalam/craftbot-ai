@@ -1,10 +1,13 @@
-import MessagesContainer from "@/components/MessagesContainer";
+import { lazy, Suspense } from "react";
 import { GET_CHAT_SESSION_MESSAGES } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
 import {
   GetChatSessionMessagesResponse,
   GetChatSessionMessagesVariables,
 } from "@/types/types";
+import Loading from "../../loading";
+
+const MessagesContainer = lazy(() => import("@/components/MessagesContainer"));
 
 export const dynamic = "force-dynamic"; // no caching
 
@@ -61,12 +64,14 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
           </span>
         </h2>
 
-        {/* Pass fetched data to a client-side component */}
-        <MessagesContainer
-          messages={messages}
-          feedbacks={feedbacks}
-          chatbotName={name}
-        />
+        <Suspense fallback={<Loading />}>
+          {/* Pass fetched data to a client-side component */}
+          <MessagesContainer
+            messages={messages}
+            feedbacks={feedbacks}
+            chatbotName={name}
+          />
+        </Suspense>
       </div>
     );
   } catch (error) {

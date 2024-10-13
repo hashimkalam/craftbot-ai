@@ -5,8 +5,6 @@ import logo from "@/public/images/just_logo.webp";
 
 import { FormEvent, useEffect, useState, lazy, Suspense } from "react";
 
-const Characteristic = lazy(() => import("@/components/Characteristic"));
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/ApolloClient";
@@ -30,8 +28,10 @@ import Loading from "../../loading";
 
 import mammoth from "mammoth";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import Personalities from "@/components/Personalities";
-import Form from "@/components/Form";
+
+const Characteristic = lazy(() => import("@/components/Characteristic"));
+const Personalities = lazy(() => import("@/components/Personalities"));
+const Form = lazy(() => import("@/components/Form"));
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   // console.log("id ->", id);
@@ -290,10 +290,13 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
                       placeholder={chatbotName}
                       className="w-full border-none bg-gray-200 dark:bg-primary-DARK/50 text-xl font-bold"
                     />
-                    <Personalities
-                      selectedPersonality={selectedPersonality}
-                      setSelectedPersonality={setSelectedPersonality}
-                    />
+
+                    <Suspense fallback={<Loading />}>
+                      <Personalities
+                        selectedPersonality={selectedPersonality}
+                        setSelectedPersonality={setSelectedPersonality}
+                      />
+                    </Suspense>
                   </div>
                   <Button
                     className="text-white hover:bg-green-700 w-full"
@@ -345,7 +348,9 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
             </Button>
           </form>
 
-          <Form id={id} />
+          <Suspense fallback={<Loading />}>
+            <Form id={id} />
+          </Suspense>
 
           <ul className="flex flex-wrap-reverse gap-5">
             {data?.chatbots?.chatbot_characteristics.map((charac, index) => (

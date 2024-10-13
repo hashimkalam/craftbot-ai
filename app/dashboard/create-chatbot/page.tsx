@@ -4,20 +4,23 @@ import { Button } from "@/components/ui/button";
 import { CREATE_CHATBOT } from "@/graphql/mutation";
 import { useMutation } from "@apollo/client";
 import { useUser } from "@clerk/nextjs";
-import { FormEvent, useState } from "react";
+import { FormEvent, lazy, Suspense, useState } from "react";
 import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/public/images/just_logo.webp";
-import Personalities from "@/components/Personalities";
+import Loading from "../loading";
 
+const Personalities = lazy(() => import("@/components/Personalities"));
 
 const CreateChatBot = () => {
   const router = useRouter();
   const { user } = useUser();
   const [name, setName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(null);
+  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
+    null
+  );
 
   const [createChatbot, { loading }] = useMutation(CREATE_CHATBOT);
 
@@ -70,11 +73,16 @@ const CreateChatBot = () => {
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center bg-white dark:bg-primary-DARK shadow-lg p-10 rounded-md m-10 w-[90%] md:w-[80%]">
-      <Image src={logo} alt="Logo" className="w-16 lg:w-24 flex-0 mb-4 lg:mb-0" />
+      <Image
+        src={logo}
+        alt="Logo"
+        className="w-16 lg:w-24 flex-0 mb-4 lg:mb-0"
+      />
       <div className="flex-1">
         <h1 className="text-xl lg:text-3xl font-semibold">Create</h1>
         <h2 className="font-light">
-          Create a new chatbot to assist you in your conversations with your customers.
+          Create a new chatbot to assist you in your conversations with your
+          customers.
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -91,17 +99,21 @@ const CreateChatBot = () => {
             />
             <Button
               type="submit"
-              disabled={loading || !name || error !== null || !selectedPersonality}
+              disabled={
+                loading || !name || error !== null || !selectedPersonality
+              }
               className="mt-2 w-fit"
             >
               {loading ? "Creating Chatbot" : "Create Chatbot"}
             </Button>
           </div>
 
-          <Personalities
-            selectedPersonality={selectedPersonality}
-            setSelectedPersonality={setSelectedPersonality}
-          />
+          <Suspense fallback={<Loading />}>
+            <Personalities
+              selectedPersonality={selectedPersonality}
+              setSelectedPersonality={setSelectedPersonality}
+            />
+          </Suspense>
         </form>
 
         {error && <p className="text-red-500 mt-2">{error}</p>}

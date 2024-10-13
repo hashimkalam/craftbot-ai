@@ -5,10 +5,6 @@ import Link from "next/link";
 export default async function Home() {
   const user = await currentUser()
  
-
-
-
-
   return (
     <main className="p-10 bg-white dark:bg-primary-DARK m-10 rounded-lg w-full">
       <h1 className="text-4xl font-light">

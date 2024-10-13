@@ -1,4 +1,3 @@
-import ChatBotSessions from "@/components/ChatBotSessions";
 import { GET_USER_CHATBOTS } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
 import {
@@ -7,6 +6,10 @@ import {
   GetUserChatbotsVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
+import { lazy, Suspense } from "react";
+import Loading from "../loading";
+
+const ChatBotSessions = lazy(() => import("@/components/ChatBotSessions"));
 
 async function ReviewSessions() {
   const { userId } = await auth();
@@ -43,7 +46,9 @@ async function ReviewSessions() {
         Review all the chat sessions the chat bots have and with your customers
       </h2>
 
-      <ChatBotSessions chatbots={filteredChatbots} />
+      <Suspense fallback={<Loading />}>
+        <ChatBotSessions chatbots={filteredChatbots} />
+      </Suspense>
     </div>
   );
 }
