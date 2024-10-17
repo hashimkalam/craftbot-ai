@@ -6,6 +6,7 @@ import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
 import Loading from "@/app/dashboard/loading";
+import CommonFeedback from "./CommonFeedback";
 
 const CountDisplayAnimation = lazy(() => import("./CountDisplayAnimation"));
 const PieChartComponent = lazy(() => import("./PieChartComponent"));
@@ -143,7 +144,7 @@ function Index({
       </div>
 
       <div className="relative mt-4 flex flex-col lg:flex-row items-center space-x-0 lg:space-x-5">
-        <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg p-1">
+        <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg p-1">
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
@@ -152,7 +153,7 @@ function Index({
           </Suspense>
         </div>
 
-        <div className="bg-white dark:bg-primary/20 shadow-lg h-[50vh] w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
+        <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
           <Suspense fallback={<Loading />}>
             <FeedbackSentimentCalc
               filteredSessions={filteredSessions}
@@ -162,6 +163,7 @@ function Index({
         </div>
       </div>
 
+      <CommonFeedback />
       <Suspense fallback={<Loading />}>
         <ChatSessionTable filteredSessions={filteredSessions} />
       </Suspense>

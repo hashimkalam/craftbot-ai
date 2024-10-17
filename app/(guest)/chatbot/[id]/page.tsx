@@ -396,7 +396,12 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
       <div className="flex flex-col w-full max-w-3xl mx-auto bg-white md:rounded-t-lg shadow-2xl md:mt-10">
         <div className="pb-4 border-b sticky top-0 z-50 bg-primary py-5 px-10 text-white md:rounded-t-lg flex items-center space-x-4">
-          <Image src={logo} alt="Logo" className="w-16 lg:w-24 mr-2 lg:mr-4" priority />
+          <Image
+            src={logo}
+            alt="Logo"
+            className="w-16 lg:w-24 mr-2 lg:mr-4"
+            priority
+          />
           <div>
             <h1 className="truncate text-lg">{chatbotData?.chatbots.name}</h1>
             <p className="text-sm text-gray-300">Typically replies instantly</p>

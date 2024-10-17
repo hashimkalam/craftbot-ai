@@ -69,10 +69,10 @@ export async function POST(req: NextRequest) {
     );
 
     // Generate summary from Cohere
-    const promptText = `${title}\n\nHeadings:\n${headings.join(
+    const promptText = `${title}\n${headings.join("\n")}\n${paragraphs.join(
       "\n"
-    )}\n\nParagraphs:\n${paragraphs.join("\n")}`; 
-    const prompt = `Summarize the following data concisely, retaining only the crucial details. \n${promptText}`;
+    )}`;
+    const prompt = `Summarize the following data concisely, retaining only the crucial details. \n${promptText}. Only just directly give me the summarized version.`;
 
     const cohereResponse = await cohere.generate({
       model: "command",
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
       title,
       headings,
       paragraphs,
-      scrapedDataSummary
+      scrapedDataSummary,
     });
   } catch (error) {
     console.error("Error scraping website:", error);
