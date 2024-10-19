@@ -140,12 +140,18 @@ function CommonFeedback({
     setError(null);
 
     try {
+      // Sort feedback array before sending
+      const sortedFeedbackArray = feedbackArray.sort((a, b) => {
+        // Example: Sort by length of feedback (ascending)
+        return a.length - b.length; // Change this logic based on your sorting requirement
+      });
+
       const response = await fetch("/api/clustering", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ feedbacks: feedbackArray }),
+        body: JSON.stringify({ feedbacks: sortedFeedbackArray }),
       });
 
       if (!response.ok) {
@@ -209,7 +215,7 @@ function CommonFeedback({
                 ))}
               </ul>
             ) : (
-              <p>Not Enough Feedbacks (atleast thrice)</p>
+              <p>Not Enough Feedbacks (atleast 3)</p>
             )}
           </div>
           <div className="bg-white dark:bg-primary/20 p-4 shadow-lg rounded-xl h-fit w-full ">
@@ -229,7 +235,7 @@ function CommonFeedback({
                 ))}
               </ul>
             ) : (
-              <p>Not Enough Feedbacks (atleast thrice)</p>
+              <p>Not Enough Feedbacks (atleast 3)</p>
             )}
           </div>
         </div>
