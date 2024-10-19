@@ -1,4 +1,5 @@
 "use client";
+import { SentimentPieChartProps } from "@/types/types";
 import { useRouter } from "next/navigation";
 import {
   PieChart,
@@ -11,12 +12,6 @@ import {
 
 const COLORS = ["#FF9900", "#00FF00", "#FF0000"]; // Colors for Neutral, Positive, and Negative
 const GRAY_COLOR = "#A9A9A9"; // Gray color for no data
-
-interface SentimentPieChartProps {
-  neutral: number;
-  positive: number;
-  negative: number;
-}
 
 const SentimentPieChart: React.FC<SentimentPieChartProps> = ({
   neutral,

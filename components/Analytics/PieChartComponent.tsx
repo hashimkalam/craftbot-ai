@@ -1,3 +1,4 @@
+import { PieChartProps } from "@/types/types";
 import React from "react";
 import {
   PieChart,
@@ -10,16 +11,11 @@ import {
 
 const COLORS = ["#FF0000", "#007FFF"]; // Colors for the pie segments
 
-interface PieChartProps {
-  messageCount: number; // Current number of sessions
-  maxLimit: number; // Maximum sessions allowed
-}
-
 const PieChartComponent: React.FC<PieChartProps> = ({
   messageCount,
   maxLimit,
 }) => {
-  const remainingCount = maxLimit - messageCount
+  const remainingCount = maxLimit - messageCount;
   const data = [
     { name: `Used (${messageCount})`, value: messageCount },
     { name: `Remaining (${remainingCount})`, value: remainingCount },

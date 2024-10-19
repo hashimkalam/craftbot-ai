@@ -69,7 +69,12 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
                 <div key={chatbot.id} className="px-10 py-5">
                   <div className="w-full">
                     <div className="flex text-left items-center w-full">
-                      <Image src={logo} alt="Logo" className="h-10 w-10 mr-4" />
+                      <Image
+                        src={logo}
+                        alt="Logo"
+                        className="h-10 w-10 mr-4"
+                        loading="lazy"
+                      />
                       <div className="flex items-center justify-between w-full">
                         <p>{chatbot.name}</p>
 

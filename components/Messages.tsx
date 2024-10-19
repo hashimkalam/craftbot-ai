@@ -89,6 +89,7 @@ function Messages({
               src={logo}
               alt="Logo"
               className="h-10 lg:h-12 w-10 lg:w-12"
+              loading="lazy"
             />
           ) : (
             <UserCircle className="text-primary " />

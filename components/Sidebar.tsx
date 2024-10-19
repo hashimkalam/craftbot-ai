@@ -1,9 +1,5 @@
 "use client";
-import { 
-  SignOutButton,
-  SignedIn, 
-  UserButton,
-} from "@clerk/nextjs";
+import { SignOutButton, SignedIn, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,7 +13,7 @@ const Logo = () => {
       href="/"
       className="flex items-center text-4xl font-thin justify-center group-hover:justify-start"
     >
-      <Image src={logo} alt="Logo" className="w-12 lg:w-16" />
+      <Image src={logo} alt="Logo" className="w-12 lg:w-16" loading="lazy" />
       <div className="hidden group-hover:inline-block opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out transform group-hover:translate-x-2 space-y-1 text-black dark:text-white">
         <h1>CraftBot</h1>
       </div>
@@ -73,7 +69,6 @@ const SignInToggle = () => {
       <SignedIn>
         <UserButton />
       </SignedIn>
-
 
       <div className="text-black dark:text-white">
         <ModeToggle />

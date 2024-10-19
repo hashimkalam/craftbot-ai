@@ -1,9 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import logo from "@/public/images/just_logo.webp";
-
-import { FormEvent, useEffect, useState, lazy, Suspense } from "react";
+import { useCallback, useEffect, useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/ApolloClient";
@@ -16,76 +13,46 @@ import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
 import { formatISO } from "date-fns";
-import { Copy } from "lucide-react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
-
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
-
 import Loading from "../../loading";
-
 import mammoth from "mammoth";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import ChatbotDetails from "@/components/editchatbot/ChatbotDetails";
 
 const Characteristic = lazy(() => import("@/components/Characteristic"));
-const Personalities = lazy(() => import("@/components/Personalities"));
 const Form = lazy(() => import("@/components/Form"));
+const LinkToChat = lazy(() => import("@/components/editchatbot/LinkToChat"));
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
-  const [chatbotName, setChatbotName] = useState("");
   const [url, setUrl] = useState<string>("");
   const [newCharacteristic, setNewCharacteristic] = useState<string>("");
-  const [docData, setDocData] = useState<string>("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [isDocOpen, setIsDocOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
-    null
-  );
-  const [edit, setEdit] = useState<boolean>(false);
+  const [docState, setDocState] = useState({
+    data: "",
+    isOpen: false,
+    editMode: false,
+    editedData: "",
+  });
+  const [dialogState, setDialogState] = useState({
+    isOpen: false,
+    isEditOpen: false,
+  });
 
-  const [editMode, setEditMode] = useState(false);
-  const [editedDocData, setEditedDocData] = useState<string>("");
-
-  const embedCode = `
-  <!-- Chatbot IFrame Code -->
-  <iframe 
-    id="chatbot-iframe" 
-    src="${url}"  <!-- Replace with your embed URL -->
-    width="500px" 
-    height="500px" 
-    style="border: none; overflow: hidden;"
-    allowfullscreen>
-  </iframe>
-  `;
-
-  // delete chatbot mutation
   const [deleteChatbot] = useMutation(DELETE_CHATBOT, {
-    refetchQueries: ["GetChatbotById"], // refresh chatbots after deletion
+    refetchQueries: ["GetChatbotById"],
     awaitRefetchQueries: true,
   });
 
-  // add characteristic mutation
   const [addCharacteristic] = useMutation(ADD_CHARACTERISTIC, {
     refetchQueries: ["GetChatbotById"],
   });
 
-  // update chatbot mutation
-  const [updateChatbot] = useMutation(UPDATE_CHATBOT, {
-    refetchQueries: ["GetChatbotById"],
-  });
-
-  // console.log("characteristics: ", Characteristic);
-
-  // extract id of chatbot
   const { data, loading, error } = useQuery<
     GetChatbotByIdResponse,
     GetChatbotByIdVariables
@@ -94,252 +61,108 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   });
 
   useEffect(() => {
-    if (data) {
-      setChatbotName(data.chatbots?.name);
-    }
-  }, [data]);
-
-  // updates url according to id changes
-  useEffect(() => {
-    const url = `${BASE_URL}/chatbot/${id}`;
-    setUrl(url);
+    setUrl(`${BASE_URL}/chatbot/${id}`);
   }, [id]);
 
-  // funtcion to delete chatbot
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async () => {
     try {
-      const promise = deleteChatbot({ variables: { id } }); // calls mutation function with chatbot id
+      const promise = deleteChatbot({ variables: { id } });
       toast.promise(promise, {
         loading: "Deleting",
-        success: "Successfully deleted CHatbot",
+        success: "Successfully deleted Chatbot",
         error: "Failed to delete Chatbot",
       });
     } catch (error) {
       console.error("Error deleting chatbot: ", error);
       toast.error("Failed to delete chatbot");
     }
-  };
+  }, [deleteChatbot, id]);
 
-  const handleEdit = async (id: string) => {
-    setIsEditOpen(true);
-    setEdit(true);
-    console.log("edit? ", edit);
-  };
+  const handleAddCharacteristic = useCallback(
+    async (content: string) => {
+      try {
+        const promise = addCharacteristic({
+          variables: {
+            chatbotId: Number(id),
+            content,
+            created_at: formatISO(new Date()),
+          },
+        });
+        toast.promise(promise, {
+          loading: "Adding...",
+          success: "Info added",
+          error: "Failed to add",
+        });
+      } catch (error) {
+        console.error("Failed to add characteristics: ", error);
+      }
+    },
+    [addCharacteristic, id]
+  );
 
-  const handleUpdateChatbot = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const promise = updateChatbot({
-        variables: {
-          id,
-          name: chatbotName,
-          personality: selectedPersonality,
-        },
-      });
-
-      toast.promise(promise, {
-        loading: "updating...",
-        success: "chatbot name successfully updated",
-        error: "failed to update chatbot name",
-      });
-      setIsEditOpen(false);
-    } catch (err) {
-      console.error("Failed to update chatbot: ", err);
-    }
-  };
-
-  // add characteristic function
-  const handleAddCharacteristic = async (content: string) => {
-    try {
-      const promise = addCharacteristic({
-        variables: {
-          chatbotId: Number(id),
-          content,
-          created_at: formatISO(new Date()),
-        },
-      });
-
-      toast.promise(promise, {
-        loading: "Adding...",
-        success: "Info added",
-        error: "Failed to add",
-      });
-    } catch (error) {
-      console.error("Failed to add characteristics: ", error);
-    }
-  };
-
-  if (loading)
-    return (
-      <div className="mx-auto animate-spin p-10">
-        <Loading />
-      </div>
-    );
-
-  if (error) return <p>Error: {error.message}</p>;
-
-  if (!data?.chatbots) return redirect("/dashboard/view-chatbots");
-
-  // console.log( "data?.chatbots?.chatbot_characteristics:-",    data?.chatbots?.chatbot_characteristics);
-
-  // Type the event parameter to include the target file input
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0]; // Use optional chaining to safely access the first file
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const arrayBuffer = e.target?.result; // Use optional chaining here as well
-
-        // Use mammoth to extract text from the DOCX file
-        try {
-          if (arrayBuffer instanceof ArrayBuffer) {
-            const { value } = await mammoth.extractRawText({ arrayBuffer });
-            setDocData(value);
-            setIsDocOpen(true);
-            // setNewCharacteristic(value);
-          } else {
-            console.error(
-              "Error: arrayBuffer is not an instance of ArrayBuffer"
-            );
+  const handleFileChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const arrayBuffer = e.target?.result;
+          try {
+            if (arrayBuffer instanceof ArrayBuffer) {
+              const { value } = await mammoth.extractRawText({ arrayBuffer });
+              setDocState((prev) => ({ ...prev, data: value, isOpen: true }));
+            } else {
+              console.error(
+                "Error: arrayBuffer is not an instance of ArrayBuffer"
+              );
+            }
+          } catch (error) {
+            console.error("Error extracting text from DOCX:", error);
           }
-        } catch (error) {
-          console.error("Error extracting text from DOCX:", error);
-        }
-      };
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    },
+    []
+  );
 
-      reader.readAsArrayBuffer(file);
-    }
-  };
+  const toggleEditMode = useCallback(() => {
+    setDocState((prev) => ({
+      ...prev,
+      editMode: !prev.editMode,
+      editedData: prev.editMode ? prev.data : prev.editedData,
+    }));
+  }, []);
 
-  const handleEditClick = () => {
-    setEditedDocData(docData); // Populate the textarea with current docData
-    setEditMode(true); // Enable edit mode
-  };
+  const handleSubmitDoc = useCallback(async () => {
+    await handleAddCharacteristic(docState.data);
+    setDocState((prev) => ({ ...prev, isOpen: false, editMode: false }));
+  }, [handleAddCharacteristic, docState.data]);
 
-  const handleSaveClick = () => {
-    if (editedDocData) {
-      // Check if there is edited data
-      setDocData(editedDocData); // Update docData with editedDocData
-    }
-    setEditMode(false); // Disable edit mode
-  };
-
-  const handleSubmitDoc = async () => {
-    await handleAddCharacteristic(docData); // Submit the updated docData
-    setIsDocOpen(false); // Close the dialog
-    setEditMode(false); // Disable edit mode
-  };
+  if (loading) return <Loading />;
+  if (error) return <p>Error: {error.message}</p>;
+  if (!data?.chatbots) return redirect("/dashboard/view-chatbots");
 
   return (
     <div className="px-0 md:p-10 bg-gray-300 shadow-xl dark:bg-primary-DARK">
-      <div className="text-white text-sm  sm:max-w-lg ml-auto space-y-2 md:border p-5 rounded-b-lg md:rounded-lg bg-primary dark:bg-primary/20">
-        <h2 className="font-bold">Link to chat</h2>
-        <p className="text-sm italic text-white">
-          Share the link to start conversations with your chatbot
-        </p>
-
-        <div className="text-black flex items-center space-x-2">
-          <CopyToClipboard
-            text={embedCode}
-            onCopy={() => {
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000); // Reset copied state after 2 seconds
-            }}
-          >
-            <Button className="text-white">
-              {copied ? "Copied!" : "Copy IFrame"}
-            </Button>
-          </CopyToClipboard>
-          <Link href={url} className="w-full pointer hover:opacity-50">
-            <Input value={url} readOnly className="pointer dark:bg-white" />
-          </Link>
-          <Button
-            size="sm"
-            className="px-2 text-white"
-            onClick={() => {
-              navigator.clipboard.writeText(url);
-              toast.success("Copied to clipboard");
-            }}
-          >
-            <span className="sr-only">Copy</span>
-            <Copy className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <Suspense fallback={<Loading />}>
+        <LinkToChat url={url} />
+      </Suspense>
 
       <section className="relative mt-5 bg-white dark:bg-primary/20 p-5 md:p-10 rounded-lg">
         <Button
           variant="destructive"
           className="absolute top-2 right-2 h-8 w-2"
-          onClick={() => setIsOpen(true)}
+          onClick={() => setDialogState((prev) => ({ ...prev, isOpen: true }))}
         >
           X
         </Button>
 
-        <div className="flex space-x-4">
-          <div className="flex items-center justify-between w-full space-x-2 lg:space-x-4 mt-4">
-            <Image
-              src={logo}
-              alt="Logo"
-              className="w-16 lg:w-24 flex-shrink-0"
-            />
+        <Suspense fallback={<Loading />}>
+          <ChatbotDetails id={id} />
+        </Suspense>
 
-            <div className="flex-grow">
-              <p className="w-full border-none bg-transparent text-lg md:text-xl lg:text-2xl font-bold">
-                {chatbotName}
-              </p>
-
-              <p className="w-full border-none bg-transparent text-xs md:text-sm lg:text-sm">
-                {data.chatbots?.personality}
-              </p>
-            </div>
-
-            <Button
-              className="text-white hover:bg-green-700 flex-shrink-0"
-              onClick={() => handleEdit(id)}
-            >
-              Edit
-            </Button>
-          </div>
-
-          {edit && (
-            <Dialog
-              open={isEditOpen}
-              onOpenChange={(open) => setIsEditOpen(open)}
-            >
-              <DialogContent className="w-[80%] lg:max-w-[425px] py-10">
-                <form onSubmit={handleUpdateChatbot} className="space-y-4">
-                  <div>
-                    <Input
-                      value={chatbotName}
-                      onChange={(e) => setChatbotName(e.target.value)}
-                      placeholder={chatbotName}
-                      className="w-full border-none bg-gray-200 dark:bg-primary-DARK/50 text-xl font-bold"
-                    />
-
-                    <Suspense fallback={<Loading />}>
-                      <Personalities
-                        selectedPersonality={selectedPersonality}
-                        setSelectedPersonality={setSelectedPersonality}
-                      />
-                    </Suspense>
-                  </div>
-                  <Button
-                    className="text-white hover:bg-green-700 w-full"
-                    onClick={() => handleEdit(id)}
-                  >
-                    Save
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
-
-        <h2 className="text-xl font-bold mt-10">Heres what your AI knows</h2>
+        <h2 className="text-xl font-bold mt-10">Here's what your AI knows</h2>
         <p>
           Your chatbot is equipped with the following information to assist you
           in your conversation with your customers & users
@@ -382,78 +205,74 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           </Suspense>
 
           <ul className="flex flex-wrap-reverse gap-5">
-            {data?.chatbots?.chatbot_characteristics.map((charac, index) => (
-              <div key={index}>
-                <Suspense fallback={<Loading />}>
-                  <Characteristic key={charac.id} characteristic={charac} />
-                </Suspense>
-              </div>
+            {data?.chatbots?.chatbot_characteristics.map((charac) => (
+              <Suspense key={charac.id} fallback={<Loading />}>
+                <Characteristic characteristic={charac} />
+              </Suspense>
             ))}
           </ul>
         </div>
       </section>
 
-
-      {/* Pop Up For Doc Data */}
-      <Dialog open={isDocOpen} onOpenChange={setIsDocOpen}>
+      <Dialog
+        open={docState.isOpen}
+        onOpenChange={(open) =>
+          setDocState((prev) => ({ ...prev, isOpen: open }))
+        }
+      >
         <DialogContent className="h-[80%] flex flex-col">
           <DialogTitle>Doc Data</DialogTitle>
 
           <DialogHeader className="flex-grow overflow-y-scroll">
             <DialogDescription className="flex-grow h-full">
-              {editMode ? (
+              {docState.editMode ? (
                 <textarea
-                  value={editedDocData}
-                  onChange={(e) => setEditedDocData(e.target.value)}
+                  value={docState.editedData}
+                  onChange={(e) =>
+                    setDocState((prev) => ({
+                      ...prev,
+                      editedData: e.target.value,
+                    }))
+                  }
                   className="border p-2 w-full h-full resize-none"
                   rows={5}
                 />
               ) : (
-                <p>{docData}</p>
+                <p>{docState.data}</p>
               )}
             </DialogDescription>
           </DialogHeader>
 
           <DialogFooter className="flex justify-end space-x-2">
-            {editMode ? (
-              <button
-                onClick={handleSaveClick}
-                className="bg-green-500 text-white px-4 py-2 rounded"
-              >
-                Save
-              </button>
-            ) : (
-              <button
-                onClick={handleEditClick}
-                className="bg-yellow-500 text-white px-4 py-2 rounded"
-              >
-                Edit
-              </button>
-            )}
-
-            <button
-              onClick={handleSubmitDoc}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
+            <Button onClick={toggleEditMode} variant="secondary">
+              {docState.editMode ? "Save" : "Edit"}
+            </Button>
+            <Button onClick={handleSubmitDoc} variant="default">
               Submit
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Pop Up For Deleting The Bot */}
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="w-[80%]  lg:max-w-[425px]">
+      <Dialog
+        open={dialogState.isOpen}
+        onOpenChange={(open) =>
+          setDialogState((prev) => ({ ...prev, isOpen: open }))
+        }
+      >
+        <DialogContent className="w-[80%] lg:max-w-[425px]">
           <DialogTitle>Are you sure you want to delete?</DialogTitle>
           <div className="space-x-4 flex">
             <Button
-              onClick={() => handleDelete(id)}
+              onClick={handleDelete}
               className="bg-red-500 hover:bg-red-600 flex-1"
             >
               Yes
             </Button>
             <Button
-              onClick={() => setIsOpen(false)}
+              onClick={() =>
+                setDialogState((prev) => ({ ...prev, isOpen: false }))
+              }
               className="bg-[#4d7dfb] hover:bg-[#3068f5] flex-1"
             >
               No

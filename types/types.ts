@@ -108,3 +108,39 @@ export interface FeedbackByChatSessionIdResponse {
 export interface FeedbacksByChatSessionIdVariables {
   chat_session_id: number;
 }
+
+export interface ClusteredFeedback {
+  cluster: string;
+  feedbacks: string[];
+}
+
+export interface CommonFeedbackResponse {
+  clusteredQueries: ClusteredFeedback[];
+}
+
+export interface TotalTimeInteractedProps {
+  filteredSessions: ChatSession[];
+  handleTotalMessages: (count: number) => void;
+}
+
+export interface FeedbackSentimentCalcProps {
+  filteredSessions: ChatSession[];
+  handleTotalFeedback: (count: number) => void;
+}
+
+export interface TotalGuestsProps {
+  text: string;
+  count: number;
+  loadingCount: boolean;
+}
+
+export interface PieChartProps {
+  messageCount: number; // Current number of sessions
+  maxLimit: number; // Maximum sessions allowed
+}
+
+export interface SentimentPieChartProps {
+  neutral: number;
+  positive: number;
+  negative: number;
+}

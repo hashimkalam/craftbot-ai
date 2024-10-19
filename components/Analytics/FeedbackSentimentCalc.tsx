@@ -7,6 +7,7 @@ import {
   Feedback,
   FeedbackByChatSessionIdResponse,
   FeedbacksByChatSessionIdVariables,
+  FeedbackSentimentCalcProps,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState, Suspense, lazy } from "react";
@@ -15,11 +16,6 @@ import { Button } from "../ui/button";
 // import { CiExport } from "react-icons/ci";
 
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
-
-interface FeedbackSentimentCalcProps {
-  filteredSessions: ChatSession[];
-  handleTotalFeedback: (count: number) => void;
-}
 
 function FeedbackSentimentCalc({
   filteredSessions,

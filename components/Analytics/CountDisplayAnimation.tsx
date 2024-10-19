@@ -1,12 +1,7 @@
 "use client";
 import Loading from "@/app/dashboard/loading";
 import NumberTicker from "../ui/number-ticker";
-
-interface TotalGuestsProps {
-  text: string;
-  count: number;
-  loadingCount: boolean;
-}
+import { TotalGuestsProps } from "@/types/types";
 
 const CountDisplayAnimation: React.FC<TotalGuestsProps> = ({
   text,
@@ -23,7 +18,11 @@ const CountDisplayAnimation: React.FC<TotalGuestsProps> = ({
         <Loading />
       ) : (
         <p className="text-5xl font-extrabold">
-          <NumberTicker value={count} decimalPlaces={0} className="text-primary" />
+          <NumberTicker
+            value={count}
+            decimalPlaces={0}
+            className="text-primary"
+          />
         </p>
       )}
     </div>

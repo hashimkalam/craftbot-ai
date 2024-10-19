@@ -18,7 +18,8 @@ const SignInPage: React.FC = () => {
       footer: "hidden",
       socialButtons: "dark:text-white",
       socialButton: "dark:text-white hover:underline",
-      formFieldLabel: "dark:text-white text-[10px] md:text-[12px] lg:text-[14px]",
+      formFieldLabel:
+        "dark:text-white text-[10px] md:text-[12px] lg:text-[14px]",
       formFieldError: "text-red-500 text-[10px] md:text-[12px] lg:text-[14px]",
       button:
         "bg-primary hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white",

@@ -2,20 +2,15 @@
 
 import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
-  ChatSession,
   Message,
   MessageByChatSessionIdVariables,
   MessagesByChatSessionIdResponse,
+  TotalTimeInteractedProps,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Loading from "@/app/dashboard/loading";
-
-interface TotalTimeInteractedProps {
-  filteredSessions: ChatSession[];
-  handleTotalMessages: (count: number) => void;
-}
 
 const TotalTimeInteracted = ({
   filteredSessions,

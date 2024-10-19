@@ -3,21 +3,14 @@ import Loading from "@/app/dashboard/loading";
 import { GET_FEEDBACKS_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
+  ClusteredFeedback,
+  CommonFeedbackResponse,
   Feedback,
   FeedbackByChatSessionIdResponse,
   FeedbacksByChatSessionIdVariables,
 } from "@/types/types";
 import { useLazyQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
-
-interface ClusteredFeedback {
-  cluster: string;
-  feedbacks: string[];
-}
-
-interface CommonFeedbackResponse {
-  clusteredQueries: ClusteredFeedback[];
-}
 
 function CommonFeedback({
   filteredSessions,

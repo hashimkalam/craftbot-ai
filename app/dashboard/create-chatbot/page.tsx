@@ -45,7 +45,7 @@ const CreateChatBot = () => {
       // Reset form fields
       setName("");
       setSelectedPersonality(null);
-      setError(null); // Clear error message on successful creation
+      setError(null);
       // console.log("Bot created successfully:", data);
 
       router.push(`/dashboard/edit-chatbot/${data.insertChatbots.id}`);
@@ -77,6 +77,7 @@ const CreateChatBot = () => {
         src={logo}
         alt="Logo"
         className="w-16 lg:w-24 flex-0 mb-4 lg:mb-0"
+        loading="lazy"
       />
       <div className="flex-1">
         <h1 className="text-xl lg:text-3xl font-semibold">Create</h1>

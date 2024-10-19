@@ -30,7 +30,6 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
 
     // console.log("id: ", id);
 
-    // destructure the response
     const {
       data: { chat_sessions },
     } = response;

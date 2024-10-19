@@ -76,6 +76,7 @@ async function ViewChatbots() {
                       src={logo}
                       alt="Logo"
                       className="w-16 lg:w-24 mr-2 lg:mr-4"
+                      loading="lazy"
                     />
                     <h2 className="text-xl font-bold">{chatbot.name}</h2>
                   </div>
