@@ -4,11 +4,7 @@ import { useCallback, useEffect, useState, lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BASE_URL } from "@/graphql/ApolloClient";
-import {
-  ADD_CHARACTERISTIC,
-  DELETE_CHATBOT,
-  UPDATE_CHATBOT,
-} from "@/graphql/mutation";
+import { ADD_CHARACTERISTIC, DELETE_CHATBOT } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { useMutation, useQuery } from "@apollo/client";
@@ -22,13 +18,18 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import Loading from "../../loading";
-import mammoth from "mammoth";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
-import ChatbotDetails from "@/components/editchatbot/ChatbotDetails";
 
+// Lazy-loaded components
+const ChatbotDetails = lazy(
+  () => import("@/components/editchatbot/ChatbotDetails")
+);
 const Characteristic = lazy(() => import("@/components/Characteristic"));
 const Form = lazy(() => import("@/components/Form"));
 const LinkToChat = lazy(() => import("@/components/editchatbot/LinkToChat"));
+
+// Import mammoth normally, but we'll use it in a lazy manner
+import mammoth from "mammoth";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const [url, setUrl] = useState<string>("");
@@ -101,7 +102,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   );
 
   const handleFileChange = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
         const reader = new FileReader();
