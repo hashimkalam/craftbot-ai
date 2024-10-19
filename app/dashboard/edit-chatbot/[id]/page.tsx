@@ -112,6 +112,8 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
             if (arrayBuffer instanceof ArrayBuffer) {
               const { value } = await mammoth.extractRawText({ arrayBuffer });
               setDocState((prev) => ({ ...prev, data: value, isOpen: true }));
+              // Clear the file input after successful upload
+              event.target.value = "";
             } else {
               console.error(
                 "Error: arrayBuffer is not an instance of ArrayBuffer"
@@ -131,7 +133,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
     setDocState((prev) => ({
       ...prev,
       editMode: !prev.editMode,
-      editedData: prev.editMode ? prev.data : prev.editedData,
+      editedData: !prev.editMode ? prev.data : prev.editedData,
     }));
   }, []);
 
