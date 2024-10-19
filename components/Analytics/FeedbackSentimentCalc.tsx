@@ -98,7 +98,7 @@ function FeedbackSentimentCalc({
             POSITIVE: totalPositive,
             NEGATIVE: totalNegative,
           });
-     
+
           const totalFeedbackCount =
             totalNeutral + totalNegative + totalPositive;
 
@@ -154,10 +154,14 @@ function FeedbackSentimentCalc({
     document.body.removeChild(link);
   };
 
-
-  if (loadingFeedback) return <div><Loading /></div>;
-  if (errorFeedback) return <div>Error fetching feedbacks: {errorFeedback.message}</div>;
-
+  if (loadingFeedback)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  if (errorFeedback)
+    return <div>Error fetching feedbacks: {errorFeedback.message}</div>;
 
   return (
     <>

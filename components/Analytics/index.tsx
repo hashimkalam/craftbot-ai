@@ -163,7 +163,7 @@ function Index({
         </div>
       </div>
 
-      <CommonFeedback />
+      <CommonFeedback filteredSessions={filteredSessions} />
       <Suspense fallback={<Loading />}>
         <ChatSessionTable filteredSessions={filteredSessions} />
       </Suspense>
