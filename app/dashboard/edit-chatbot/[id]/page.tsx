@@ -162,7 +162,9 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           <ChatbotDetails id={id} />
         </Suspense>
 
-        <h2 className="text-xl font-bold mt-10">Here's what your AI knows</h2>
+        <h2 className="text-xl font-bold mt-10">
+          Here&apos;s what your AI knows
+        </h2>
         <p>
           Your chatbot is equipped with the following information to assist you
           in your conversation with your customers & users
