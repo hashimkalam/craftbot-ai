@@ -39,6 +39,7 @@
     "ml-kmeans": "^6.0.0",
     "next": "^14.2.14",
     "next-themes": "^0.3.0",
+    "node-fetch": "^3.3.2",
     "openai": "^4.52.7",
     "path-to-regexp": "^6.3.0",
     "pdf-lib": "^1.17.1",

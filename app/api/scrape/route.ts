@@ -2,19 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { JSDOM } from "jsdom";
 import https from "https";
 import http from "http";
+import fetch from "node-fetch"; // Ensure you install node-fetch
 
-import { CohereClient } from "cohere-ai";
+const hfApiKey = process.env.HUGGING_FACE_API_TOKEN;
 
-const cohereApiKey = process.env.COHERE_API_KEY;
-
-if (!cohereApiKey) {
-  throw new Error("COHERE_API_KEY is not defined in the environment variables");
+if (!hfApiKey) {
+  throw new Error(
+    "HUGGING_FACE_API_KEY is not defined in the environment variables"
+  );
 }
-
-// Initialize the Cohere client
-const cohere = new CohereClient({
-  token: cohereApiKey,
-});
 
 // Helper function to fetch HTML from the given URL
 const fetchHTML = (url: string): Promise<string> => {
@@ -37,6 +33,36 @@ const fetchHTML = (url: string): Promise<string> => {
       });
     });
   });
+};
+
+// Helper function to summarize text using Hugging Face API
+const summarizeText = async (text: string): Promise<string> => {
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${hfApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: `${text}\n\nSummarize the key points in a clear, human-like manner. Focus on the most relevant and important achievements and roles. Avoid unnecessary details and repetition. Ensure the summary reads naturally, emphasizing clarity and conciseness.`,
+        parameters: {
+          max_length: 200, // Adjusted for concise output
+          min_length: 100, // Ensuring some detail is kept
+          do_sample: false, // Disable sampling for deterministic summaries
+        },
+      }),
+    }
+  );
+
+  const result = (await response.json()) as { summary_text: string }[];
+
+  if (response.ok) {
+    return result[0].summary_text;
+  } else {
+    throw new Error(`Failed to summarize: ${result}`);
+  }
 };
 
 export async function POST(req: NextRequest) {
@@ -63,27 +89,38 @@ export async function POST(req: NextRequest) {
       document.querySelectorAll("h1, h2, h3, h4, h5, h6")
     ).map((el) => el.textContent);
 
-    // Extract paragraphs (p)
-    const paragraphs = Array.from(document.querySelectorAll("p")).map(
-      (el) => el.textContent
-    );
+    // Extract paragraphs (p) while avoiding unnecessary sections like footer, aside, and nav
+    const paragraphs = Array.from(document.querySelectorAll("p"))
+      .map((el) => {
+        // Filter out content from irrelevant sections like footer, nav, and script
+        if (
+          el.closest("footer") ||
+          el.closest("aside") ||
+          el.closest("nav") ||
+          el.closest("script")
+        ) {
+          return null; // Return null for irrelevant content
+        }
+        return el.textContent; // Keep relevant paragraph text
+      })
+      .filter(Boolean); // Filter out any `null` values
 
-    // Generate summary from Cohere
-    const promptText = `${title}\n${headings.join("\n")}\n${paragraphs.join(
-      "\n"
-    )}`;
-    const prompt = `Summarize the following data concisely, retaining only the crucial details. \n${promptText}. Only just directly give me the summarized version.`;
+    // Filter out sections like advertisements and footers using jsdom selectors
+    const mainContent = paragraphs.join("\n");
 
-    const cohereResponse = await cohere.generate({
-      model: "command",
-      prompt: prompt, // Here, we pass the plain string prompt
-      maxTokens: 500, // Adjust this as needed
-    });
-    const scrapedDataSummary = cohereResponse.generations[0].text;
+    // Prepare the text to be summarized with clear separation of relevant sections
+    const promptText = `
+      Title: ${title}
+      Headings: ${headings.join("\n")}
+      Main Content: ${mainContent}
+    `;
+
+    // Generate summary using Hugging Face model
+    const scrapedDataSummary = await summarizeText(promptText);
 
     console.log("summary: ", scrapedDataSummary);
 
-    // Return the scraped data
+    // Return the scraped data and summary
     return NextResponse.json({
       title,
       headings,
