@@ -1,4 +1,4 @@
-import ClientHome from "@/components/opening/ClientHome";
+import ClientHome from "@/components/Opening/ClientHome";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
