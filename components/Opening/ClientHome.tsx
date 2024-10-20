@@ -7,7 +7,7 @@ import Link from "next/link";
 import { lazy, Suspense, useMemo } from "react";
 import Loading from "@/app/dashboard/loading";
 
-const Video = lazy(() => import("@/components/opening/Video"));
+const Video = lazy(() => import("@/components/Opening/Video"));
 
 // Extract the static elements to avoid re-rendering
 const StaticFeatures = ({ features }: any) => (
