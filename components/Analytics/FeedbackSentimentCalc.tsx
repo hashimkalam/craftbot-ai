@@ -3,7 +3,6 @@
 import Loading from "@/app/dashboard/loading";
 import { GET_FEEDBACKS_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
-  ChatSession,
   Feedback,
   FeedbackByChatSessionIdResponse,
   FeedbacksByChatSessionIdVariables,

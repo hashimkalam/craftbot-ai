@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 
-const Analytics = lazy(() => import("@/components/Analytics"));
+const Analytics = lazy(() => import("@/components/analytics"));
 
 import { GET_USER_CHATBOTS } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";

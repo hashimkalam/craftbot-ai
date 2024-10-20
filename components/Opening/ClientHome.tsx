@@ -4,10 +4,10 @@ import { ModeToggle } from "@/components/ModeToggle";
 import { Button } from "@/components/ui/button";
 import { FEATURES } from "@/data/data";
 import Link from "next/link";
-import { lazy, Suspense, useMemo } from "react"; 
+import { lazy, Suspense, useMemo } from "react";
 import Loading from "@/app/dashboard/loading";
 
-const Video = lazy(() => import("@/components/Opening/Video"));
+const Video = lazy(() => import("@/components/opening/Video"));
 
 // Extract the static elements to avoid re-rendering
 const StaticFeatures = ({ features }: any) => (
@@ -57,13 +57,12 @@ const ClientHome = ({ userId }: { userId: string | null }) => {
                 <span className="font-bold text-primary">Craftbot AI</span>
                 <br />
                 <br />
-                
-                 Design and deploy custom AI
-                chatbots in minutes! Personalize your bot&apos;s personality and
-                functionality, complete with an integrated feedback section and
-                insightful analytics. Elevate your ideas into engaging
-                interactions with the <span className="font-bold">Custom Chatbot Generator</span> and watch
-                your productivity soar!
+                Design and deploy custom AI chatbots in minutes! Personalize
+                your bot&apos;s personality and functionality, complete with an
+                integrated feedback section and insightful analytics. Elevate
+                your ideas into engaging interactions with the{" "}
+                <span className="font-bold">Custom Chatbot Generator</span> and
+                watch your productivity soar!
               </p>
             </div>
 

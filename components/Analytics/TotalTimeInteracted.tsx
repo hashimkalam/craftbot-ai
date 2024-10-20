@@ -109,9 +109,9 @@ const TotalTimeInteracted = ({
 
     return (
       <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-4 w-full flex flex-col items-center justify-center space-y-2">
-        <h2 className="text-md font-medium text-gray-600 dark:text-gray-300">
-          <h2>Total Time Spent:</h2>
-        </h2>
+        <h1 className="text-md font-medium text-gray-600 dark:text-gray-300">
+          Total Time Spent:
+        </h1>
 
         {loadingMessages ? (
           <Loading />

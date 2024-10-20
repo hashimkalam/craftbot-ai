@@ -6,13 +6,13 @@ import { useMutation } from "@apollo/client";
 import { DELETE_CHATSESSION } from "@/graphql/mutation";
 import { toast } from "sonner";
 import Loading from "@/app/dashboard/loading";
-import CommonFeedback from "./CommonFeedback";
+import CountDisplayAnimation from "./CountDisplayAnimation";
+import PieChartComponent from "./PieChartComponent";
+import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
+import TotalTimeInteracted from "./TotalTimeInteracted";
 
-const CountDisplayAnimation = lazy(() => import("./CountDisplayAnimation"));
-const PieChartComponent = lazy(() => import("./PieChartComponent"));
-const TotalTimeInteracted = lazy(() => import("./TotalTimeInteracted"));
+const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
-const FeedbackSentimentCalc = lazy(() => import("./FeedbackSentimentCalc"));
 
 function Index({
   chatbots,
@@ -114,32 +114,25 @@ function Index({
     <div className="min-h-screen">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
-          <Suspense fallback={<Loading />}>
-            <TotalTimeInteracted
-              filteredSessions={filteredSessions}
-              handleTotalMessages={handleTotalMessages}
-            />
-          </Suspense>
+          <TotalTimeInteracted
+            filteredSessions={filteredSessions}
+            handleTotalMessages={handleTotalMessages}
+          />
         </div>
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
-          <Suspense fallback={<Loading />}>
-            <CountDisplayAnimation
-              text="Total Guest Count:"
-              count={totalGuests}
-              loadingCount={loadingCount}
-            />
-          </Suspense>
+          <CountDisplayAnimation
+            text="Total Guest Count:"
+            count={totalGuests}
+            loadingCount={loadingCount}
+          />
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
-          <Suspense fallback={<Loading />}>
-            {" "}
-            <CountDisplayAnimation
-              text="Total Feedback Count:"
-              count={totalFeedback}
-              loadingCount={loadingCount}
-            />
-          </Suspense>
+          <CountDisplayAnimation
+            text="Total Feedback Count:"
+            count={totalFeedback}
+            loadingCount={loadingCount}
+          />
         </div>
       </div>
 
@@ -148,22 +141,22 @@ function Index({
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
-          <Suspense fallback={<Loading />}>
-            <PieChartComponent messageCount={totalMessages} maxLimit={500} />
-          </Suspense>
+
+          <PieChartComponent messageCount={totalMessages} maxLimit={500} />
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
-          <Suspense fallback={<Loading />}>
-            <FeedbackSentimentCalc
-              filteredSessions={filteredSessions}
-              handleTotalFeedback={handleTotalFeedback}
-            />
-          </Suspense>
+          <FeedbackSentimentCalc
+            filteredSessions={filteredSessions}
+            handleTotalFeedback={handleTotalFeedback}
+          />
         </div>
       </div>
 
-      <CommonFeedback filteredSessions={filteredSessions} />
+      <Suspense fallback={<Loading />}>
+        <CommonFeedback filteredSessions={filteredSessions} />{" "}
+      </Suspense>
+
       <Suspense fallback={<Loading />}>
         <ChatSessionTable filteredSessions={filteredSessions} />
       </Suspense>

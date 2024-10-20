@@ -71,7 +71,10 @@ const ChatSessionTable = ({ filteredSessions }) => {
             >
               <thead>
                 {headerGroups.map((headerGroup) => (
-                  <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
+                  <tr
+                    key={headerGroup.id}
+                    {...headerGroup.getHeaderGroupProps()}
+                  >
                     {headerGroup.headers.map((column) => (
                       <th
                         key={column.id}

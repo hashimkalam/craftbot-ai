@@ -1,5 +1,4 @@
 import { PieChartProps } from "@/types/types";
-import React from "react";
 import {
   PieChart,
   Pie,

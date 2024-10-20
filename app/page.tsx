@@ -1,6 +1,6 @@
-import ClientHome from "@/components/Opening/ClientHome";
+import ClientHome from "@/components/opening/ClientHome";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation"; 
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const { userId } = await auth();

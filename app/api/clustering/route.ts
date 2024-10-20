@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const numClusters = Math.min(5, numFeedbacks); // Ensure we don't create more clusters than we have feedbacks
     const options = {
       iterations: 300,
-      tolerance: 1e-6,
+      tolerance: 1e-2,
       withIterations: false,
       initialization: "kmeans++" as "kmeans++", // You may consider a fixed initialization method
     };
