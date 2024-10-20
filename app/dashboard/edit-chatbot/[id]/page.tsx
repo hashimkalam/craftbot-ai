@@ -21,15 +21,14 @@ import Loading from "../../loading";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 // Lazy-loaded components
-const ChatbotDetails = lazy(
-  () => import("@/components/editchatbot/ChatbotDetails")
-);
+
 const Characteristic = lazy(() => import("@/components/Characteristic"));
 const Form = lazy(() => import("@/components/Form"));
 const LinkToChat = lazy(() => import("@/components/editchatbot/LinkToChat"));
 
 // Import mammoth normally, but we'll use it in a lazy manner
 import mammoth from "mammoth";
+import ChatbotDetails from "@/components/editchatbot/ChatbotDetails";
 
 const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
   const [url, setUrl] = useState<string>("");
@@ -161,9 +160,7 @@ const EditChatbot = ({ params: { id } }: { params: { id: string } }) => {
           X
         </Button>
 
-        <Suspense fallback={<Loading />}>
-          <ChatbotDetails id={id} />
-        </Suspense>
+        <ChatbotDetails id={id} />
 
         <h2 className="text-xl font-bold mt-10">
           Here&apos;s what your AI knows

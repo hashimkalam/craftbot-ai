@@ -25,6 +25,7 @@ const fetchHTML = (url: string): Promise<string> => {
       });
 
       response.on("end", () => {
+        console.log("Fetched HTML content: ", data); // Debug log for fetched HTML
         resolve(data);
       });
 
@@ -48,8 +49,8 @@ const summarizeText = async (text: string): Promise<string> => {
       body: JSON.stringify({
         inputs: `${text}\n\nSummarize the key points in a clear, human-like manner. Focus on the most relevant and important achievements and roles. Avoid unnecessary details and repetition. Ensure the summary reads naturally, emphasizing clarity and conciseness.`,
         parameters: {
-          max_length: 200, // Adjusted for concise output
-          min_length: 100, // Ensuring some detail is kept
+          max_length: 500, // Maximum summary length
+          min_length: 150, // Minimum summary length
           do_sample: false, // Disable sampling for deterministic summaries
         },
       }),
@@ -61,8 +62,21 @@ const summarizeText = async (text: string): Promise<string> => {
   if (response.ok) {
     return result[0].summary_text;
   } else {
-    throw new Error(`Failed to summarize: ${result}`);
+    throw new Error(`Failed to summarize: ${JSON.stringify(result)}`);
   }
+};
+
+// Helper function to split long text into smaller chunks (if needed)
+const splitTextIntoChunks = (
+  text: string,
+  maxTokens: number = 1024
+): string[] => {
+  const words = text.split(/\s+/);
+  const chunks = [];
+  for (let i = 0; i < words.length; i += maxTokens) {
+    chunks.push(words.slice(i, i + maxTokens).join(" "));
+  }
+  return chunks;
 };
 
 export async function POST(req: NextRequest) {
@@ -75,6 +89,15 @@ export async function POST(req: NextRequest) {
 
     // Fetch HTML from the given URL
     const html = await fetchHTML(url);
+
+    // Check if HTML is empty
+    if (!html || html.trim().length === 0) {
+      console.error("No HTML content retrieved");
+      return NextResponse.json(
+        { error: "Failed to retrieve HTML from the website" },
+        { status: 500 }
+      );
+    }
 
     // Parse HTML using jsdom
     const dom = new JSDOM(html);
@@ -105,20 +128,32 @@ export async function POST(req: NextRequest) {
       })
       .filter(Boolean); // Filter out any `null` values
 
-    // Filter out sections like advertisements and footers using jsdom selectors
+    // Join paragraphs into main content text
     const mainContent = paragraphs.join("\n");
 
-    // Prepare the text to be summarized with clear separation of relevant sections
-    const promptText = `
-      Title: ${title}
-      Headings: ${headings.join("\n")}
-      Main Content: ${mainContent}
-    `;
+    console.log(`Main content length: ${mainContent.length}`); // Debug log for content length
 
-    // Generate summary using Hugging Face model
-    const scrapedDataSummary = await summarizeText(promptText);
+    // Check if the main content has less than 50 characters
+    if (mainContent.length < 50) {
+      console.log("Not enough content to summarize");
+      return NextResponse.json(
+        {
+          error: "Not enough content to summarize",
+        },
+        { status: 400 }
+      );
+    }
 
-    console.log("summary: ", scrapedDataSummary);
+    // Split the main content if it's too long for the model (based on token limit)
+    const textChunks = splitTextIntoChunks(mainContent);
+
+    let scrapedDataSummary = "";
+    for (const chunk of textChunks) {
+      const chunkSummary = await summarizeText(chunk);
+      scrapedDataSummary += chunkSummary + " ";
+    }
+
+    console.log("Summary: ", scrapedDataSummary);
 
     // Return the scraped data and summary
     return NextResponse.json({

@@ -14,7 +14,7 @@ import { ADD_CHARACTERISTIC } from "@/graphql/mutation";
 import { formatISO } from "date-fns";
 import { toast } from "sonner";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
-import { GET_CHATBOT_BY_ID } from "@/graphql/query"; 
+import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
@@ -80,7 +80,8 @@ function Form({ id }: { id: string }) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to scrape the website");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to scrape the website");
       }
 
       const data = await response.json();
@@ -94,7 +95,7 @@ function Form({ id }: { id: string }) {
       setError((err as Error).message);
     } finally {
       setLoading(false);
-      setUrl("")
+      setUrl("");
     }
   };
 
@@ -120,10 +121,12 @@ function Form({ id }: { id: string }) {
     if (finalSummary) {
       // Call the function to add characteristic with the final summary (either edited or original)
       await handleAddCharacteristic(finalSummary);
-      setIsOpen(false); 
+      setIsOpen(false);
       setEditMode(false);
     }
   };
+
+  //  console.log("error from frontend: ", error);
 
   return (
     <>
@@ -146,12 +149,12 @@ function Form({ id }: { id: string }) {
           {loading ? "Scraping..." : "Scrape"}
         </Button>
       </form>
-      <p className="text-red-700">{error}</p>
+      <p className="text-red-700 font-semibold mb-4">{error}</p>
 
       {/* Dialog for Scraped Data Summary */}
       {scrapedData?.scrapedDataSummary && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent className="h-[80%] flex flex-col"> 
+          <DialogContent className="h-[80%] flex flex-col">
             <DialogTitle>Scraped Data Summary</DialogTitle>
             <DialogHeader className="flex-grow overflow-y-scroll">
               {/* Adjust height and scroll */}
