@@ -13,11 +13,13 @@ if (!hfApiKey) {
 }
 
 // Helper function to fetch HTML from the given URL
-const fetchHTML = (url: string): Promise<string> => {
+const MAX_RETRIES = 5;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
+
+const fetchHTML = (url: string, retryCount: number = 0): Promise<string> => {
   return new Promise((resolve, reject) => {
     const protocol = url.startsWith("https") ? https : http;
-
-    protocol.get(url, (response) => {
+    const request = protocol.get(url, { timeout: 60000 }, (response) => {
       let data = "";
 
       response.on("data", (chunk) => {
@@ -25,13 +27,45 @@ const fetchHTML = (url: string): Promise<string> => {
       });
 
       response.on("end", () => {
-        console.log("Fetched HTML content: ", data); // Debug log for fetched HTML
+        // console.log("Fetched HTML content: ", data); // Debug log for fetched HTML
         resolve(data);
       });
 
       response.on("error", (err) => {
-        reject(err);
+        if (retryCount < MAX_RETRIES) {
+          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
+          /* console.log(
+            `Retrying fetch for ${url} (attempt ${retryCount + 1}) in ${
+              retryDelay / 1000
+            } seconds`
+          ); /]*/
+          setTimeout(() => {
+            fetchHTML(url, retryCount + 1)
+              .then(resolve)
+              .catch(reject);
+          }, retryDelay);
+        } else {
+          reject(err);
+        }
       });
+    });
+
+    request.on("error", (err) => {
+      if (retryCount < MAX_RETRIES) {
+        const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
+        /*console.log(
+          `Retrying fetch for ${url} (attempt ${retryCount + 1}) in ${
+            retryDelay / 1000
+          } seconds`
+        );*/
+        setTimeout(() => {
+          fetchHTML(url, retryCount + 1)
+            .then(resolve)
+            .catch(reject);
+        }, retryDelay);
+      } else {
+        reject(err);
+      }
     });
   });
 };
@@ -131,11 +165,11 @@ export async function POST(req: NextRequest) {
     // Join paragraphs into main content text
     const mainContent = paragraphs.join("\n");
 
-    console.log(`Main content length: ${mainContent.length}`); // Debug log for content length
+    // console.log(`Main content length: ${mainContent.length}`); // Debug log for content length
 
     // Check if the main content has less than 50 characters
     if (mainContent.length < 50) {
-      console.log("Not enough content to summarize");
+      // console.log("Not enough content to summarize");
       return NextResponse.json(
         {
           error: "Not enough content to summarize",
