@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import puppeteer, { Browser, Page } from "puppeteer";
+import { chromium, Page } from "playwright"; // Import Playwright
 import { summarizeText } from "@/utils/summarizeText";
 import { ScrapeConfig, ScrapedResponse, ScrapeResult } from "@/types/types";
 
@@ -75,15 +75,15 @@ const cleanContent = (content: string[]): string[] =>
 
 // Page setup function
 const setupPage = async (page: Page): Promise<void> => {
-  page.setDefaultNavigationTimeout(config.timeout);
-  await page.setRequestInterception(true);
+  await page.setDefaultNavigationTimeout(config.timeout);
 
-  page.on("request", (request) => {
-    const resourceType = request.resourceType();
+  // Set up request interception
+  await page.route("**/*", (route) => {
+    const resourceType = route.request().resourceType();
     if (["image", "stylesheet", "font", "media"].includes(resourceType)) {
-      request.abort();
+      route.abort(); // Abort requests for specified resource types
     } else {
-      request.continue();
+      route.continue(); // Continue other requests
     }
   });
 };
@@ -168,8 +168,8 @@ const scrapeWithRetry = async (
   url: string,
   retryCount = 0
 ): Promise<ScrapeResult> => {
-  const browser: Browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  const browser = await chromium.launch({
+    headless: true, // Set to false if you want to see the browser UI
   });
 
   try {
