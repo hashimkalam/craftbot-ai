@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `Please summarize the following user feedback as short and simple as possible. Ignore any spam messages and focus on summarizing valid feedback concisely:`,
+        content: `Summarize the following user feedback in a concise sentence, mentioning the key points. 
+        For example, input user feedback {pointA, pointB} should result in the output 'The user suggests pointA and pointB.'`,
       },
       ...userFeedback.map((feedback: any) => ({
         role: "user",
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     const aiResponse = cohereResponse.generations[0].text.trim();
 
-   //  console.log("summary ai response: ", aiResponse);
+    //  console.log("summary ai response: ", aiResponse);
 
     // Return AI-generated response
     return NextResponse.json({

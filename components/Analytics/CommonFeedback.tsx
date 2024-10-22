@@ -153,6 +153,7 @@ function CommonFeedback({
       }
 
       const data: CommonFeedbackResponse = await response.json();
+      console.log("data: ", data);
       if (type === "positive") {
         setCommonFeedbackPositive(data.clusteredQueries);
       } else {
@@ -179,10 +180,10 @@ function CommonFeedback({
 
   // Step 4: Filter common feedbacks with more than 2 items
   const filteredCommonFeedbackPositive = commonFeedbackPositive.filter(
-    (item) => item.feedbacks.length > 3
+    (item) => item.feedbacks && item.feedbacks.length > 2
   );
   const filteredCommonFeedbackNegative = commonFeedbackNegative.filter(
-    (item) => item.feedbacks.length > 3
+    (item) => item.feedbacks && item.feedbacks.length > 2
   );
 
   return (
@@ -204,11 +205,18 @@ function CommonFeedback({
                         <li key={feedbackIndex}>{feedback}</li>
                       ))}
                     </ul>
+                    {/* Display summarized feedback if available */}
+                    {item?.feedbackSummarize && (
+                      <p className="text-gray-500 mt-2">
+                        <strong>Summary: </strong>
+                        {item.feedbackSummarize}
+                      </p>
+                    )}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>Not Enough Feedbacks (atleast 3)</p>
+              <p>Not Enough Feedbacks (at least 3)</p>
             )}
           </div>
           <div className="bg-white dark:bg-primary/20 p-4 shadow-lg rounded-xl h-fit w-full ">
@@ -224,11 +232,18 @@ function CommonFeedback({
                         <li key={feedbackIndex}>{feedback}</li>
                       ))}
                     </ul>
+                    {/* Display summarized feedback if available */}
+                    {item.feedbackSummarize && (
+                      <p className="text-gray-500 mt-2">
+                        <strong>Summary: </strong>
+                        {item.feedbackSummarize}
+                      </p>
+                    )}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>Not Enough Feedbacks (atleast 3)</p>
+              <p>Not Enough Feedbacks (at least 3)</p>
             )}
           </div>
         </div>

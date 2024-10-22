@@ -1,18 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kmeans } from "ml-kmeans";
-
-// Define our own interface for the kmeans result
-interface KMeansResult {
-  clusters: number[];
-  centroids: number[][];
-  iterations: number;
-  converged: boolean;
-}
-
-// Type for the request body
-interface RequestBody {
-  feedbacks: string[];
-}
+import {
+  RequestBody,
+  ClusteredFeedback,
+  CommonFeedbackResponse,
+  KMeansResult,
+} from "@/types/types";
+// import { summarizeText } from "@/utils/summarizer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -67,12 +61,39 @@ export async function POST(req: NextRequest) {
     const result = kmeans(data, numClusters, options) as KMeansResult;
 
     // Format the results
-    const clusteredQueries = Array.from({ length: numClusters }, (_, i) => ({
-      cluster: `Cluster ${i + 1}`,
-      feedbacks: feedbacks.filter((_, index) => result.clusters[index] === i),
-    }));
+    const clusteredFeedbacks: ClusteredFeedback[] = Array.from(
+      { length: numClusters },
+      (_, i) => ({
+        cluster: `Cluster ${i + 1}`,
+        feedbacks: feedbacks.filter((_, index) => result.clusters[index] === i),
+      })
+    );
 
-    return NextResponse.json({ clusteredQueries });
+    // Summarize the feedback in each cluster
+    /* for (const cluster of clusteredFeedbacks) {
+      const clusterFeedbacks = cluster.feedbacks;
+      const clusterFeedbacksText = clusterFeedbacks.join("\n");
+
+      // Ensure no cluster has too little text for summarization
+      if (clusterFeedbacksText.length < 50) {
+        cluster.feedbackSummarize = "Not enough content to summarize";
+      } else {
+        try {
+          const clusterFeedbackSummary = await summarizeText(
+            clusterFeedbacksText
+          );
+          cluster.feedbackSummarize = clusterFeedbackSummary;
+        } catch (error) {
+          cluster.feedbackSummarize = "Error summarizing cluster feedback.";
+          console.error("Error summarizing cluster:", error);
+        }
+      }
+    } */
+
+    // Return the response using the expected `CommonFeedbackResponse` format
+    return NextResponse.json({
+      clusteredQueries: clusteredFeedbacks,
+    } as CommonFeedbackResponse);
   } catch (error) {
     console.error("Error processing request:", error);
     return NextResponse.json(

@@ -15,7 +15,9 @@ import {
 const cohereApiKey = process.env.COHERE_API_KEY;
 
 if (!cohereApiKey) {
-  throw new Error("Oops! COHERE_API_KEY is missing in your environment variables.");
+  throw new Error(
+    "Oops! COHERE_API_KEY is missing in your environment variables."
+  );
 }
 
 // Initialize the Cohere client
@@ -38,7 +40,10 @@ export async function POST(req: NextRequest) {
     const chatbot = data?.chatbots;
 
     if (!chatbot) {
-      return NextResponse.json({ error: "Sorry, we couldn't find that chatbot." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Sorry, we couldn't find that chatbot." },
+        { status: 404 }
+      );
     }
 
     // console.log("Chatbot data:", data);

@@ -24,7 +24,8 @@ const cohere = new CohereClient({
 });
 
 export async function POST(req: NextRequest) {
-  const { chat_session_id, chatbot_id, content, name, personality } = await req.json();
+  const { chat_session_id, chatbot_id, content, name, personality } =
+    await req.json();
   // console.log( "chat_session_id: ", chat_session_id, " content: ", content, " chatbot_id: ", chatbot_id, " name: ", name);
 
   try {
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
       
         These are the previous messages, so please adjust your response accordingly: ${formattedPrevMessages}. 
       
-        DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN the specified topics. Make the response as short as possible. Less thank 200 characters`
+        DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN the specified topics. Make the response as short as possible. Less thank 200 characters`,
       },
       ...formattedPrevMessages,
       {
