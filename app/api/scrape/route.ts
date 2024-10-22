@@ -1,205 +1,233 @@
 import { NextRequest, NextResponse } from "next/server";
-import { JSDOM } from "jsdom";
-import https from "https";
-import http from "http";
-import fetch from "node-fetch"; // Ensure you install node-fetch
+import puppeteer, { Browser, Page } from "puppeteer";
+import { summarizeText } from "@/utils/summarizeText";
+import { ScrapeConfig, ScrapedResponse, ScrapeResult } from "@/types/types";
 
-const hfApiKey = process.env.HUGGING_FACE_API_TOKEN;
+// Configuration
+const config: ScrapeConfig = {
+  maxRetries: 3,
+  timeout: 60000, // 60 seconds
+  minContentLength: 10,
+  maxParagraphs: 15,
+};
 
-if (!hfApiKey) {
-  throw new Error(
-    "HUGGING_FACE_API_KEY is not defined in the environment variables"
-  );
-}
+// Boilerplate patterns
+const boilerplatePatterns: RegExp[] = [
+  /cookie policy/i,
+  /privacy policy/i,
+  /terms of service/i,
+  /accept cookies/i,
+  /newsletter signup/i,
+  /subscribe to our/i,
+  /follow us on/i,
+  /share this/i,
+  /copyright © /i,
+  /all rights reserved/i,
+  /for confidential support/i,
+  /call the samaritans/i,
+  /suicide prevention/i,
+  /helpline/i,
+  /support line/i,
+  /crisis line/i,
+  /\b1-800-[0-9-]+\b/i,
+  /\b0800[0-9 ]+\b/i,
+  /\b08457[0-9 ]+\b/i,
+  /samaritans\.org/i,
+  /suicidepreventionlifeline\.org/i,
+  /for details/i,
+  /click here/i,
+  /visit (a local|http)/i,
+];
 
-// Helper function to fetch HTML from the given URL
-const MAX_RETRIES = 5;
-const INITIAL_RETRY_DELAY = 1000; // 1 second
+// Content selectors
+const contentSelectors: string[] = [
+  "article",
+  "main",
+  ".content",
+  ".article-content",
+  "#main-content",
+  ".main-content",
+  ".post-content", // For blog posts
+  ".entry-content", // For WordPress
+  ".page-content", // For static pages
+  "section", // General sections
+];
 
-const fetchHTML = (url: string, retryCount: number = 0): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith("https") ? https : http;
-    const request = protocol.get(url, { timeout: 60000 }, (response) => {
-      let data = "";
+// Content cleaning functions
+const isBoilerplateContent = (text: string): boolean =>
+  boilerplatePatterns.some((pattern) => pattern.test(text));
 
-      response.on("data", (chunk) => {
-        data += chunk;
-      });
+const cleanContent = (content: string[]): string[] =>
+  content
+    .filter((text) => text && text.length >= 10 && !isBoilerplateContent(text))
+    .filter((text) => {
+      const hasExcessiveNumbers = (text.match(/\d/g) || []).length > 10;
+      const hasExcessiveUrls =
+        (text.match(/\b(https?:\/\/|www\.)\S+/g) || []).length > 3;
+      return !hasExcessiveNumbers && !hasExcessiveUrls;
+    })
+    .map((text) =>
+      text
+        .replace(/\s+/g, " ")
+        .replace(/\b\d{5,}\b/g, "")
+        .trim()
+    );
 
-      response.on("end", () => {
-        // console.log("Fetched HTML content: ", data); // Debug log for fetched HTML
-        resolve(data);
-      });
+// Page setup function
+const setupPage = async (page: Page): Promise<void> => {
+  page.setDefaultNavigationTimeout(config.timeout);
+  await page.setRequestInterception(true);
 
-      response.on("error", (err) => {
-        if (retryCount < MAX_RETRIES) {
-          const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
-          /* console.log(
-            `Retrying fetch for ${url} (attempt ${retryCount + 1}) in ${
-              retryDelay / 1000
-            } seconds`
-          ); /]*/
-          setTimeout(() => {
-            fetchHTML(url, retryCount + 1)
-              .then(resolve)
-              .catch(reject);
-          }, retryDelay);
-        } else {
-          reject(err);
-        }
-      });
-    });
-
-    request.on("error", (err) => {
-      if (retryCount < MAX_RETRIES) {
-        const retryDelay = INITIAL_RETRY_DELAY * Math.pow(2, retryCount);
-        /*console.log(
-          `Retrying fetch for ${url} (attempt ${retryCount + 1}) in ${
-            retryDelay / 1000
-          } seconds`
-        );*/
-        setTimeout(() => {
-          fetchHTML(url, retryCount + 1)
-            .then(resolve)
-            .catch(reject);
-        }, retryDelay);
-      } else {
-        reject(err);
-      }
-    });
+  page.on("request", (request) => {
+    const resourceType = request.resourceType();
+    if (["image", "stylesheet", "font", "media"].includes(resourceType)) {
+      request.abort();
+    } else {
+      request.continue();
+    }
   });
 };
 
-// Helper function to summarize text using Hugging Face API
-const summarizeText = async (text: string): Promise<string> => {
-  const response = await fetch(
-    "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${hfApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: `${text}\n\nSummarize the key points in a clear, human-like manner. Focus on the most relevant and important achievements and roles. Avoid unnecessary details and repetition. Ensure the summary reads naturally, emphasizing clarity and conciseness.`,
-        parameters: {
-          max_length: 500, // Maximum summary length
-          min_length: 150, // Minimum summary length
-          do_sample: false, // Disable sampling for deterministic summaries
-        },
-      }),
+// Content extraction function
+const extractContent = async (page: Page): Promise<ScrapeResult> => {
+  // Get the title of the page
+  const title = await page.title();
+  console.log("title: ", title);
+
+  // Initialize an array for paragraphs
+  let paragraphs: string[] = [];
+
+  // Extract paragraphs based on content selectors
+  for (const selector of contentSelectors) {
+    const contentParagraphs = await page.$$eval(`${selector} p`, (elements) =>
+      elements.map((el) => el.textContent?.trim() || "")
+    );
+
+    if (contentParagraphs.length > 0) {
+      paragraphs = contentParagraphs;
+      break;
     }
+  }
+
+  // Fallback to all <p> elements if no paragraphs are found
+  if (paragraphs.length === 0) {
+    paragraphs = await page.$$eval("p", (elements) =>
+      elements.map((el) => el.textContent?.trim() || "")
+    );
+  }
+
+  console.log("paragraphs: ", paragraphs);
+  const cleanedParagraphs = cleanContent(paragraphs);
+  console.log("cleanedParagraphs: ", cleanedParagraphs);
+
+  // Extract headings
+  const headings = cleanContent(
+    await page.$$eval(
+      contentSelectors.map((s) => `${s} h1, ${s} h2, ${s} h3`).join(", "),
+      (elements) => elements.map((el) => el.textContent?.trim() || "")
+    )
   );
 
-  const result = (await response.json()) as { summary_text: string }[];
-
-  if (response.ok) {
-    return result[0].summary_text;
-  } else {
-    throw new Error(`Failed to summarize: ${JSON.stringify(result)}`);
+  // Construct mainContent with all extracted details
+  // let mainContent = title + "\n\n"; // Start with the title
+  let mainContent = "";
+  if (headings.length > 0) {
+    mainContent += headings.join("\n") + "\n\n"; // Add headings
   }
+  if (cleanedParagraphs.length > 0) {
+    mainContent += cleanedParagraphs.join("\n") + "\n\n"; // Add headings
+  }
+
+  console.log("mainContent: ", mainContent);
+
+  return {
+    title,
+    headings,
+    paragraphs: cleanedParagraphs,
+    mainContent,
+  };
 };
 
-// Helper function to split long text into smaller chunks (if needed)
-const splitTextIntoChunks = (
-  text: string,
-  maxTokens: number = 1024
-): string[] => {
-  const words = text.split(/\s+/);
-  const chunks = [];
-  for (let i = 0; i < words.length; i += maxTokens) {
-    chunks.push(words.slice(i, i + maxTokens).join(" "));
-  }
-  return chunks;
-};
+// Main scraping function with retries
+const scrapeWithRetry = async (
+  url: string,
+  retryCount = 0
+): Promise<ScrapeResult> => {
+  const browser: Browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
 
-export async function POST(req: NextRequest) {
   try {
-    const { url } = await req.json();
+    const page = await browser.newPage();
+    await setupPage(page);
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    return await extractContent(page);
+  } catch (error) {
+    if (retryCount < config.maxRetries) {
+      console.log(`Retry ${retryCount + 1} for URL: ${url}`);
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * (retryCount + 1))
+      );
+      return scrapeWithRetry(url, retryCount + 1);
+    }
+    throw error;
+  } finally {
+    await browser.close();
+  }
+};
+
+// Main handler
+export async function POST(
+  req: NextRequest
+): Promise<
+  NextResponse<ScrapedResponse | { error: string; details?: string }>
+> {
+  try {
+    const { url } = (await req.json()) as { url?: string };
 
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Fetch HTML from the given URL
-    const html = await fetchHTML(url);
+    console.log(`Starting scrape for URL: ${url}`);
+    const startTime = Date.now();
 
-    // Check if HTML is empty
-    if (!html || html.trim().length === 0) {
-      console.error("No HTML content retrieved");
+    const { title, headings, paragraphs, mainContent } = await scrapeWithRetry(
+      url
+    );
+
+    if (mainContent.length < config.minContentLength) {
+      console.log("Insufficient content found");
       return NextResponse.json(
-        { error: "Failed to retrieve HTML from the website" },
-        { status: 500 }
-      );
-    }
-
-    // Parse HTML using jsdom
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
-
-    // Extract title
-    const title =
-      document.querySelector("title")?.textContent || "No title found";
-
-    // Extract headings (h1, h2, h3, h4, h5, h6)
-    const headings = Array.from(
-      document.querySelectorAll("h1, h2, h3, h4, h5, h6")
-    ).map((el) => el.textContent);
-
-    // Extract paragraphs (p) while avoiding unnecessary sections like footer, aside, and nav
-    const paragraphs = Array.from(document.querySelectorAll("p"))
-      .map((el) => {
-        // Filter out content from irrelevant sections like footer, nav, and script
-        if (
-          el.closest("footer") ||
-          el.closest("aside") ||
-          el.closest("nav") ||
-          el.closest("script")
-        ) {
-          return null; // Return null for irrelevant content
-        }
-        return el.textContent; // Keep relevant paragraph text
-      })
-      .filter(Boolean); // Filter out any `null` values
-
-    // Join paragraphs into main content text
-    const mainContent = paragraphs.join("\n");
-
-    // console.log(`Main content length: ${mainContent.length}`); // Debug log for content length
-
-    // Check if the main content has less than 50 characters
-    if (mainContent.length < 50) {
-      // console.log("Not enough content to summarize");
-      return NextResponse.json(
-        {
-          error: "Not enough content to summarize",
-        },
+        { error: "Not enough content to summarize" },
         { status: 400 }
       );
     }
 
-    // Split the main content if it's too long for the model (based on token limit)
-    const textChunks = splitTextIntoChunks(mainContent);
+    const scrapedDataSummary = await summarizeText(mainContent);
+    const duration = Date.now() - startTime;
 
-    let scrapedDataSummary = "";
-    for (const chunk of textChunks) {
-      const chunkSummary = await summarizeText(chunk);
-      scrapedDataSummary += chunkSummary + " ";
-    }
-
-    console.log("Summary: ", scrapedDataSummary);
-
-    // Return the scraped data and summary
-    return NextResponse.json({
+    const response: ScrapedResponse = {
       title,
       headings,
-      paragraphs,
+      paragraphs: paragraphs.slice(0, config.maxParagraphs), // Limit paragraphs returned
       scrapedDataSummary,
-    });
+      metadata: {
+        processingTimeMs: duration,
+        totalParagraphs: paragraphs.length,
+        contentLength: mainContent.length,
+      },
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error("Error scraping website:", error);
+    console.error("Error processing request:", error);
+
     return NextResponse.json(
-      { error: "Failed to scrape the website" },
+      {
+        error: "Failed to process the website",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

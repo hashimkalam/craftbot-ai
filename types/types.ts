@@ -112,10 +112,22 @@ export interface FeedbacksByChatSessionIdVariables {
 export interface ClusteredFeedback {
   cluster: string;
   feedbacks: string[];
+  feedbackSummarize?: string;
 }
 
 export interface CommonFeedbackResponse {
   clusteredQueries: ClusteredFeedback[];
+}
+
+export interface KMeansResult {
+  clusters: number[];
+  centroids: number[][];
+  iterations: number;
+  converged: boolean;
+}
+
+export interface RequestBody {
+  feedbacks: string[];
 }
 
 export interface TotalTimeInteractedProps {
@@ -143,4 +155,33 @@ export interface SentimentPieChartProps {
   neutral: number;
   positive: number;
   negative: number;
+}
+
+// Type definitions
+export interface ScrapeResult {
+  title: string;
+  headings: string[];
+  paragraphs: string[];
+  mainContent: string;
+}
+
+export interface ScrapedResponse {
+  title: string;
+  headings: string[];
+  paragraphs: string[];
+  scrapedDataSummary: string;
+  metadata: ResponseMetadata;
+}
+
+export interface ResponseMetadata {
+  processingTimeMs: number;
+  totalParagraphs: number;
+  contentLength: number;
+}
+
+export interface ScrapeConfig {
+  maxRetries: number;
+  timeout: number;
+  minContentLength: number;
+  maxParagraphs: number;
 }
