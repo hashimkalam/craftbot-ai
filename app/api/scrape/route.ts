@@ -135,7 +135,7 @@ const extractContent = async (page: Page): Promise<ScrapeResult> => {
     mainContent += headings.join("\n") + "\n\n"; // Add headings
   }
   if (cleanedParagraphs.length > 0) {
-    mainContent += cleanedParagraphs.join("\n") + "\n\n"; // Add headings
+    mainContent += cleanedParagraphs.join("\n") + "\n\n";
   }
 
   console.log("mainContent: ", mainContent);
