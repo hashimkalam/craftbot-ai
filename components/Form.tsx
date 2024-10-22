@@ -149,7 +149,7 @@ function Form({ id }: { id: string }) {
           {loading ? "Scraping..." : "Scrape"}
         </Button>
       </form>
-      <p className="text-red-700 font-semibold mb-4">{error}</p>
+      <span className="text-red-700 font-semibold mb-4">{error}</span>
 
       {/* Dialog for Scraped Data Summary */}
       {scrapedData?.scrapedDataSummary && (
@@ -167,7 +167,7 @@ function Form({ id }: { id: string }) {
                     rows={5}
                   />
                 ) : (
-                  <p>{scrapedData.scrapedDataSummary}</p>
+                  <>{scrapedData.scrapedDataSummary}</>
                 )}
               </DialogDescription>
             </DialogHeader>

@@ -90,52 +90,67 @@ const setupPage = async (page: Page): Promise<void> => {
 
 // Content extraction function
 const extractContent = async (page: Page): Promise<ScrapeResult> => {
-  // Get the title of the page
   const title = await page.title();
   console.log("title: ", title);
 
-  // Initialize an array for paragraphs
   let paragraphs: string[] = [];
 
-  // Extract paragraphs based on content selectors
+  // Modified paragraph extraction to avoid nested paragraphs
   for (const selector of contentSelectors) {
-    const contentParagraphs = await page.$$eval(`${selector} p`, (elements) =>
+    // Only select direct paragraph children using '>'
+    const directParagraphs = await page.$$eval(`${selector} > p`, (elements) =>
       elements.map((el) => el.textContent?.trim() || "")
     );
 
-    if (contentParagraphs.length > 0) {
-      paragraphs = contentParagraphs;
+    // Also get paragraphs from other containers that might be semantic sections
+    const containerParagraphs = await page.$$eval(
+      `${selector} div > p, ${selector} section > p, ${selector} article > p`,
+      (elements) => elements.map((el) => el.textContent?.trim() || "")
+    );
+
+    // Combine and deduplicate paragraphs
+    const allParagraphs = [
+      ...new Set([...directParagraphs, ...containerParagraphs]),
+    ];
+
+    if (allParagraphs.length > 0) {
+      paragraphs = allParagraphs;
       break;
     }
   }
 
-  // Fallback to all <p> elements if no paragraphs are found
+  // Fallback to direct p elements if no paragraphs are found, avoiding nesting
   if (paragraphs.length === 0) {
-    paragraphs = await page.$$eval("p", (elements) =>
-      elements.map((el) => el.textContent?.trim() || "")
+    const directParagraphs = await page.$$eval(
+      "body > p, body > div > p, body > section > p, body > article > p",
+      (elements) => elements.map((el) => el.textContent?.trim() || "")
     );
+    paragraphs = [...new Set(directParagraphs)];
   }
 
   console.log("paragraphs: ", paragraphs);
   const cleanedParagraphs = cleanContent(paragraphs);
   console.log("cleanedParagraphs: ", cleanedParagraphs);
 
-  // Extract headings
+  // Modified heading extraction to avoid potential nesting
   const headings = cleanContent(
     await page.$$eval(
-      contentSelectors.map((s) => `${s} h1, ${s} h2, ${s} h3`).join(", "),
+      "h1, h2, h3", // Simplified heading selection
       (elements) => elements.map((el) => el.textContent?.trim() || "")
     )
   );
 
-  // Construct mainContent with all extracted details
-  // let mainContent = title + "\n\n"; // Start with the title
+  // Construct mainContent
   let mainContent = "";
+
   if (headings.length > 0) {
-    mainContent += headings.join("\n") + "\n\n"; // Add headings
+    mainContent += headings.map((heading) => `${heading}`).join("\n\n");
   }
+
   if (cleanedParagraphs.length > 0) {
-    mainContent += cleanedParagraphs.join("\n") + "\n\n";
+    mainContent +=
+      (mainContent ? "\n\n" : "") +
+      cleanedParagraphs.map((para) => `${para}`).join("\n\n");
   }
 
   console.log("mainContent: ", mainContent);
