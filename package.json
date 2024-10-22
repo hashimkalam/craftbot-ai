@@ -26,6 +26,7 @@
     "dayjs": "^1.11.13",
     "framer-motion": "^11.11.8",
     "graphql": "^16.9.0",
+    "http-proxy-middleware": "^3.0.3",
     "jsdom": "^25.0.1",
     "lucide-react": "^0.399.0",
     "mammoth": "^1.8.0",
