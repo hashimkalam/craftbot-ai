@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { chromium, Page } from "playwright"; // Import Playwright
+import { JSDOM } from "jsdom"; // Import jsdom
+import axios from "axios"; // For HTTP requests
 import { summarizeText } from "@/utils/summarizeText";
 import { ScrapeConfig, ScrapedResponse, ScrapeResult } from "@/types/types";
 
@@ -39,7 +40,7 @@ const boilerplatePatterns: RegExp[] = [
   /visit (a local|http)/i,
 ];
 
-// Content selectors
+// Content selectors - modified to cover more scenarios
 const contentSelectors: string[] = [
   "article",
   "main",
@@ -47,10 +48,11 @@ const contentSelectors: string[] = [
   ".article-content",
   "#main-content",
   ".main-content",
-  ".post-content", // For blog posts
-  ".entry-content", // For WordPress
-  ".page-content", // For static pages
-  "section", // General sections
+  ".post-content",
+  ".entry-content",
+  ".page-content",
+  "section",
+  "div", // Adding div to cover general content blocks
 ];
 
 // Content cleaning functions
@@ -73,70 +75,36 @@ const cleanContent = (content: string[]): string[] =>
         .trim()
     );
 
-// Page setup function
-const setupPage = async (page: Page): Promise<void> => {
-  await page.setDefaultNavigationTimeout(config.timeout);
-
-  // Set up request interception
-  await page.route("**/*", (route) => {
-    const resourceType = route.request().resourceType();
-    if (["image", "stylesheet", "font", "media"].includes(resourceType)) {
-      route.abort(); // Abort requests for specified resource types
-    } else {
-      route.continue(); // Continue other requests
-    }
-  });
-};
-
 // Content extraction function
-const extractContent = async (page: Page): Promise<ScrapeResult> => {
-  const title = await page.title();
+const extractContent = async (html: string): Promise<ScrapeResult> => {
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+
+  const title = document.title;
   console.log("title: ", title);
 
   let paragraphs: string[] = [];
 
-  // Modified paragraph extraction to avoid nested paragraphs
+  // Extract paragraphs using content selectors
   for (const selector of contentSelectors) {
-    // Only select direct paragraph children using '>'
-    const directParagraphs = await page.$$eval(`${selector} > p`, (elements) =>
-      elements.map((el) => el.textContent?.trim() || "")
+    const elements = document.querySelectorAll(`${selector} p`);
+    const paragraphTexts = Array.from(elements).map(
+      (el) => el.textContent?.trim() || ""
     );
 
-    // Also get paragraphs from other containers that might be semantic sections
-    const containerParagraphs = await page.$$eval(
-      `${selector} div > p, ${selector} section > p, ${selector} article > p`,
-      (elements) => elements.map((el) => el.textContent?.trim() || "")
-    );
-
-    // Combine and deduplicate paragraphs
-    const allParagraphs = [
-      ...new Set([...directParagraphs, ...containerParagraphs]),
-    ];
-
-    if (allParagraphs.length > 0) {
-      paragraphs = allParagraphs;
+    if (paragraphTexts.length > 0) {
+      paragraphs = paragraphTexts;
       break;
     }
-  }
-
-  // Fallback to direct p elements if no paragraphs are found, avoiding nesting
-  if (paragraphs.length === 0) {
-    const directParagraphs = await page.$$eval(
-      "body > p, body > div > p, body > section > p, body > article > p",
-      (elements) => elements.map((el) => el.textContent?.trim() || "")
-    );
-    paragraphs = [...new Set(directParagraphs)];
   }
 
   console.log("paragraphs: ", paragraphs);
   const cleanedParagraphs = cleanContent(paragraphs);
   console.log("cleanedParagraphs: ", cleanedParagraphs);
 
-  // Modified heading extraction to avoid potential nesting
   const headings = cleanContent(
-    await page.$$eval(
-      "h1, h2, h3", // Simplified heading selection
-      (elements) => elements.map((el) => el.textContent?.trim() || "")
+    Array.from(document.querySelectorAll("h1, h2, h3")).map(
+      (el) => el.textContent?.trim() || ""
     )
   );
 
@@ -168,15 +136,9 @@ const scrapeWithRetry = async (
   url: string,
   retryCount = 0
 ): Promise<ScrapeResult> => {
-  const browser = await chromium.launch({
-    headless: true, // Set to false if you want to see the browser UI
-  });
-
   try {
-    const page = await browser.newPage();
-    await setupPage(page);
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-    return await extractContent(page);
+    const { data: html } = await axios.get(url, { timeout: config.timeout });
+    return await extractContent(html);
   } catch (error) {
     if (retryCount < config.maxRetries) {
       console.log(`Retry ${retryCount + 1} for URL: ${url}`);
@@ -186,8 +148,6 @@ const scrapeWithRetry = async (
       return scrapeWithRetry(url, retryCount + 1);
     }
     throw error;
-  } finally {
-    await browser.close();
   }
 };
 

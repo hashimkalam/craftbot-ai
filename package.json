@@ -29,6 +29,7 @@
     "framer-motion": "^11.11.8",
     "glob": "^10.4.2",
     "graphql": "^16.9.0",
+    "jsdom": "^25.0.1",
     "lru-cache": "^10.3.0",
     "lucide-react": "^0.399.0",
     "mammoth": "^1.8.0",
