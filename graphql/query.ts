@@ -38,12 +38,14 @@ export const GET_CHATBOT_BY_ID = gql`
           id
           content
           created_at
+          sender
         }
         feedbacks {
           id
           content  
           sentiment
           created_at
+          sender
         }
       }
     }

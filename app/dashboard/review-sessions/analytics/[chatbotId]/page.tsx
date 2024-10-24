@@ -10,7 +10,8 @@ import {
   GetUserChatbotsVariables,
 } from "@/types/types";
 import { auth } from "@clerk/nextjs/server";
-import Loading from "@/app/dashboard/loading";
+import Loading from "@/app/dashboard/loading"; 
+import { fetchFeedbacksByChatbotId } from "@/utils/fetchAndExtractFeedbacks";
 
 async function ReviewSessions({
   params: { chatbotId },
@@ -41,6 +42,7 @@ async function ReviewSessions({
   const filteredChatbots: Chatbot[] = sortedChatbotsByUser.filter(
     (chatbot) => chatbot.clerk_user_id === userId
   );
+  const feedbackData = await fetchFeedbacksByChatbotId(chatbotId);
 
   return (
     <div className="flex-1 px-10 min-h-screen">
@@ -52,7 +54,11 @@ async function ReviewSessions({
       </h2>
 
       <Suspense fallback={<Loading />}>
-        <Analytics chatbots={filteredChatbots} chatbotId={chatbotId} />
+        <Analytics
+          feedbackData={feedbackData}
+          chatbots={filteredChatbots}
+          chatbotId={chatbotId}
+        />
       </Suspense>
     </div>
   );

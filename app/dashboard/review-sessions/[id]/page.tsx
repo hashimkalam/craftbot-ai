@@ -1,11 +1,6 @@
-import { lazy, Suspense } from "react";
-import { GET_CHAT_SESSION_MESSAGES } from "@/graphql/query";
-import { serverClient } from "@/lib/server/serverClient";
-import {
-  GetChatSessionMessagesResponse,
-  GetChatSessionMessagesVariables,
-} from "@/types/types";
+import { lazy, Suspense } from "react"; 
 import Loading from "../../loading";
+import { fetchAndExtractFeedbacks } from "@/utils/fetchAndExtractFeedbacks";
 
 const MessagesContainer = lazy(() => import("@/components/MessagesContainer"));
 
@@ -15,60 +10,39 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
   try {
     // Parse and validate chat session ID
     const chatSessionId = parseInt(id);
-    // console.log("chatSessionId(ReviewSession): ", chatSessionId);
     if (isNaN(chatSessionId)) {
       return <div>Invalid session ID.</div>;
     }
 
-    const response = await serverClient.query<
-      GetChatSessionMessagesResponse,
-      GetChatSessionMessagesVariables
-    >({
-      query: GET_CHAT_SESSION_MESSAGES,
-      variables: { id: chatSessionId },
-    });
-
-    // console.log("id: ", id);
-
+    // Use the utility function to fetch and extract data
     const {
-      data: { chat_sessions },
-    } = response;
-
-    if (!chat_sessions) {
-      return <div>No chat session found with this ID.</div>;
-    }
-
-    const chatSession = chat_sessions;
-    const {
-      created_at,
       messages,
       feedbacks,
-      chatbots: { name },
-      guests: { name: guestName, email },
-    } = chatSession;
-
-    // console.log("chatsession: ", chatSession);
+      chatbotName,
+      guestName,
+      guestEmail,
+      createdAt,
+    } = await fetchAndExtractFeedbacks(chatSessionId);
 
     return (
       <div className="flex-1 p-10 pb-24">
         <h1 className="text-xl lg:text-3xl font-semibold">Session Review</h1>
         <p className="font-light text-xs text-gray-400 mt-2">
-          Started at {new Date(created_at).toLocaleString()}
+          Started at {new Date(createdAt).toLocaleString()}
         </p>
 
         <h2 className="font-light mt-2">
-          Between {name} &{" "}
+          Between {chatbotName} &{" "}
           <span className="font-extrabold">
-            {guestName} ({email})
+            {guestName} ({guestEmail})
           </span>
         </h2>
 
         <Suspense fallback={<Loading />}>
-          {/* Pass fetched data to a client-side component */}
           <MessagesContainer
             messages={messages}
             feedbacks={feedbacks}
-            chatbotName={name}
+            chatbotName={chatbotName}
           />
         </Suspense>
       </div>

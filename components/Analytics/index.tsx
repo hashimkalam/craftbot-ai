@@ -9,17 +9,20 @@ import Loading from "@/app/dashboard/loading";
 import CountDisplayAnimation from "./CountDisplayAnimation";
 import PieChartComponent from "./PieChartComponent";
 import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
-import TotalTimeInteracted from "./TotalTimeInteracted";
+import TotalTimeInteracted from "./TotalTimeInteracted"; 
 
 const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
+const LineChart = lazy(() => import("./LineChart"));
 
-function Index({
+async function Index({
   chatbots,
   chatbotId,
+  feedbackData,
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
+  feedbackData: any; // Ensure you have the correct type for feedbackData
 }) {
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
@@ -28,49 +31,36 @@ function Index({
   const [totalGuests, setTotalGuests] = useState<number>(0);
   const [loadingCount, setLoadingCount] = useState<boolean>(false);
 
-  // Sort according to the number of sessions available in each bot
+  // Sort chatbots based on number of sessions
   useEffect(() => {
     const sortedArray = [...chatbots].sort(
       (a, b) => b.chat_sessions.length - a.chat_sessions.length
     );
-
     setSortedChatbots(sortedArray);
   }, [chatbots]);
 
-  // Filter sessions based on the chatbotId
+  // Filter sessions based on chatbotId
   useEffect(() => {
-    // console.log("chatbotId: ", chatbotId);
-    setLoadingCount(true); // Set loading state to true at the start
-
+    setLoadingCount(true); // Set loading state to true
     try {
       if (chatbotId) {
         const currentChatbot = sortedChatbots.find(
           (chatbot) => Number(chatbot.id) === Number(chatbotId)
         );
-        // console.log("currentChatbot: ", currentChatbot);
 
         if (currentChatbot) {
-          // console.log("Chat Sessions: ", currentChatbot.chat_sessions);
-
-          // Update filteredSessions first
           const newFilteredSessions = currentChatbot.chat_sessions;
           setFilteredSessions(newFilteredSessions);
-
-          // Set totalGuests after filtering sessions
           setTotalGuests(newFilteredSessions.length);
         } else {
-          // console.log("No matching chatbot found.");
           setFilteredSessions([]);
           setTotalGuests(0);
         }
       }
     } finally {
-      setLoadingCount(false); // Set loading state to false after completion
+      setLoadingCount(false); // Set loading state to false
     }
   }, [chatbotId, sortedChatbots]);
-
-  // console.log("sortedChatbots: ", sortedChatbots);
-  // console.log("filteredSessions: ", filteredSessions);
 
   const [deleteChatSession] = useMutation(DELETE_CHATSESSION, {
     refetchQueries: ["GetChatbotById"],
@@ -98,17 +88,14 @@ function Index({
     });
   };
 
-  // Handle the total messages count from TotalTimeInteracted
+  // Handle messages and feedback counts
   const handleTotalMessages = (messagesCount: number) => {
     setTotalMessages(messagesCount);
   };
 
-  // Handle the total feedback count from TotalTimeInteracted
   const handleTotalFeedback = (feedbackCount: number) => {
     setTotalFeedback(feedbackCount);
   };
-
-  // console.log("totalMessages: ", totalMessages);
 
   return (
     <div className="min-h-screen">
@@ -126,7 +113,6 @@ function Index({
             loadingCount={loadingCount}
           />
         </div>
-
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
           <CountDisplayAnimation
             text="Total Feedback Count:"
@@ -141,7 +127,6 @@ function Index({
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
-
           <PieChartComponent messageCount={totalMessages} maxLimit={500} />
         </div>
 
@@ -154,14 +139,20 @@ function Index({
       </div>
 
       <Suspense fallback={<Loading />}>
-        <CommonFeedback filteredSessions={filteredSessions} />{" "}
+        <LineChart
+          feedbackData={feedbackData} // Pass feedbackData directly
+        />
       </Suspense>
-
+      <Suspense fallback={<Loading />}>
+        <CommonFeedback filteredSessions={filteredSessions} />
+      </Suspense>
       <Suspense fallback={<Loading />}>
         <ChatSessionTable filteredSessions={filteredSessions} />
       </Suspense>
     </div>
   );
 }
+
+// Fetch data on the server side
 
 export default Index;
