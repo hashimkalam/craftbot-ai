@@ -15,7 +15,7 @@ const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
 const LineChart = lazy(() => import("./LineChart"));
 
-async function Index({
+function Index({
   chatbots,
   chatbotId,
   feedbackData,
