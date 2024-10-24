@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     }));
 
     // Combine characteristics into a system prompt
-    const systemPrompt = chatbot.chatbot_characteristics
+    const chatbotCharacteristics = chatbot.chatbot_characteristics
       .map((char) => char.content)
       .join(" + ");
     // console.log("systemPrompt: ", systemPrompt);
@@ -68,29 +68,36 @@ export async function POST(req: NextRequest) {
     const prompt = [
       {
         role: "system",
-        content: `You are a helpful assistant talking to ${name}. Respond in a ${personality} manner. If a question is generic or irrelevant to the specified topics, kindly inform the user that they can only search for the specified content. 
-      
-        Use emojis where appropriate to enhance engagement. Be engaging but concise—get straight to the point while being helpful. 
-      
-        Here are some key pieces of information you need to be aware of: ${systemPrompt}. 
-      
-        Ensure your responses are formatted well and reflect the selected personality. Adjust your tone and style based on the personality trait assigned: 
-        - **Friendly**: Be warm and approachable 😊.
-        - **Professional**: Maintain a formal and informative tone 🧑‍💼.
-        - **Straightforward**: Be clear and direct; avoid unnecessary details or embellishments. Stick to the facts! 🚀
-        - **Casual**: Keep it light and conversational ✌️.
-        - **Empathetic**: Show understanding and support 🤗.
-        - **Humorous**: Add a touch of humor where fitting 😄.
-      
-        These are the previous messages, so please adjust your response accordingly: ${formattedPrevMessages}. 
-      
-        DO NOT REPEAT YOUR SCOPE IF THE QUESTION ASKED IS WITHIN the specified topics. Make the response as short as possible. Less thank 200 characters`,
+        content: `You are assisting ${name}. Focus on ${chatbotCharacteristics}.
+    
+    Key parameters:
+    - Style: ${personality} 
+    - Scope: Limited to specified topics only
+    - Length: Max 200 characters
+    - Format: Clear, well-structured responses
+    
+    Tone guide:
+    friendly: warm, approachable
+    professional: formal, precise
+    straightforward: direct, factual
+    casual: conversational
+    empathetic: supportive
+    humorous: light, playful
+    
+    Context from previous exchanges: ${formattedPrevMessages}
+    
+    Guidelines:
+    - Stay within defined topic scope
+    - Correct minor typos automatically
+    - Use relevant emojis sparingly
+    - Prioritize brevity and clarity
+    - Skip scope reminders for on-topic questions`
       },
       ...formattedPrevMessages,
       {
         role: "user",
-        content: content,
-      },
+        content: content
+      }
     ];
 
     // Generate response using Cohere

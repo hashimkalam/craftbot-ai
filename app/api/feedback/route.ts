@@ -1,152 +1,167 @@
+import { CohereClient } from "cohere-ai";
+import { formatISO } from "date-fns";
+import { NextRequest, NextResponse } from "next/server";
 import {
   GET_FEEDBACKS_BY_CHAT_SESSION_ID,
   INSERT_FEEDBACK,
 } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
-import { NextRequest, NextResponse } from "next/server";
-import { formatISO } from "date-fns";
-import { CohereClient } from "cohere-ai";
-import {
-  FeedbackByChatSessionIdResponse,
-  GetChatbotByIdResponse,
+import { 
+  FeedbackByChatSessionIdResponse, 
+  GetChatbotByIdResponse 
 } from "@/types/types";
 
-const cohereApiKey = process.env.COHERE_API_KEY;
-
-if (!cohereApiKey) {
-  throw new Error(
-    "Oops! COHERE_API_KEY is missing in your environment variables."
-  );
+interface PromptMessage {
+  role: "system" | "user";
+  content: string;
 }
 
-// Initialize the Cohere client
+interface RequestBody {
+  id: string;
+  content: string;
+  sentiment: 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
+  chatbot_id: string;
+}
+
+const COHERE_API_KEY = process.env.COHERE_API_KEY;
+
+if (!COHERE_API_KEY) {
+  throw new Error("COHERE_API_KEY is required");
+}
+
 const cohere = new CohereClient({
-  token: cohereApiKey,
+  token: COHERE_API_KEY,
 });
 
-export async function POST(req: NextRequest) {
-  // Destructure the incoming request
-  const { id, content, sentiment, chatbot_id } = await req.json();
-  // console.log("Feedback submission received:", { id, content, sentiment, chatbot_id });
+const createPrompt = (
+  chatbotCharacteristics: string,
+  formattedPrevFeedback: PromptMessage[],
+  content: string
+): PromptMessage[] => {
+  return [
+    {
+      role: "system",
+      content: `Role: Feedback collector
+Scope: ${chatbotCharacteristics}
 
+STRICT RESPONSE RULES:
+- ANY message containing:
+  * Question words (who, what, where, when, why, how, tell, show, can)
+  * Question marks
+  * Names or terms asked about the mentioned Scope
+  * Requests for information
+  * Words like "about", "describe", "explain"
+MUST ONLY RECEIVE THIS EXACT RESPONSE:
+"Please use our 'Get to Know More' section for questions. Toggle to that section to get detailed answers."
+
+FEEDBACK HANDLING:
+- For feedback about the mentioned Scope: acknowledge naturally
+- Max response: 50 chars 
+
+Previous feedback: ${JSON.stringify(formattedPrevFeedback)}`
+    },
+    ...formattedPrevFeedback,
+    {
+      role: "user",
+      content: content
+    }
+  ];
+};
+
+export async function POST(req: NextRequest) {
   try {
-    // Step 1: Get the chatbot's details
-    const { data } = await serverClient.query<GetChatbotByIdResponse>({
+    const { id, content, sentiment, chatbot_id } = await req.json() as RequestBody;
+
+    // Get chatbot details
+    const { data: chatbotData } = await serverClient.query<GetChatbotByIdResponse>({
       query: GET_CHATBOT_BY_ID,
       variables: { id: chatbot_id },
     });
 
-    const chatbot = data?.chatbots;
-
-    if (!chatbot) {
+    if (!chatbotData?.chatbots) {
       return NextResponse.json(
-        { error: "Sorry, we couldn't find that chatbot." },
+        { error: "Chatbot not found" },
         { status: 404 }
       );
     }
 
-    // console.log("Chatbot data:", data);
-
-    // Step 2: Retrieve previous feedback messages
-    const { data: feedbackData } =
-      await serverClient.query<FeedbackByChatSessionIdResponse>({
-        query: GET_FEEDBACKS_BY_CHAT_SESSION_ID,
-        variables: { chat_session_id: Number(id) },
-        fetchPolicy: "no-cache",
-      });
-
-    // console.log("Previous Feedback Data:", feedbackData);
-
-    if (!feedbackData || !feedbackData?.chat_sessions) {
-      return NextResponse.json(
-        { error: "No previous feedback found." },
-        { status: 404 }
-      );
-    }
+    // Get previous feedback
+    const { data: feedbackData } = await serverClient.query<FeedbackByChatSessionIdResponse>({
+      query: GET_FEEDBACKS_BY_CHAT_SESSION_ID,
+      variables: { chat_session_id: Number(id) },
+      fetchPolicy: "no-cache",
+    });
 
     const prevFeedback = feedbackData?.chat_sessions?.feedbacks || [];
-
-    // Clean up the feedback array
-    const validFeedback = prevFeedback.filter((feedback) => feedback !== null);
-
-    // Prepare feedback for Cohere
-    const formattedPrevFeedback = validFeedback.map((feedback) => ({
-      role: feedback?.sender === "ai" ? "system" : "user",
+    const formattedPrevFeedback: PromptMessage[] = prevFeedback
+    .filter(Boolean)
+    .map(feedback => ({
+      role: feedback?.sender === "ai" ? "system" : "user" as "system" | "user",
       content: feedback?.content,
     }));
-    // console.log("formattedPrevFeedback:", formattedPrevFeedback);
-
-    // Create a system prompt using chatbot characteristics
-    const systemPrompt = chatbot?.chatbot_characteristics
-      .map((char) => char?.content)
+  
+    const chatbotCharacteristics = chatbotData.chatbots.chatbot_characteristics
+      .map(char => char?.content)
+      .filter(Boolean)
       .join(" + ");
-    // console.log("System prompt created:", systemPrompt);
 
-    const prompt = [
-      {
-        role: "system",
-        content: `You are a feedback assistant. You are to only accept feedbacks and not answer questions. Here are some details about you: ${systemPrompt}. You should acknowledge feedback politely and positively, without providing help. Here's the customer's feedback: ${formattedPrevFeedback}. Keep your response under 50 words - as short as possible.`,
-      },
-      ...formattedPrevFeedback,
-      {
-        role: "user",
-        content: content,
-      },
-    ];
+    // Create prompt using the specified structure
+    const prompt = createPrompt(
+      chatbotCharacteristics,
+      formattedPrevFeedback,
+      content
+    );
 
-    // Generate a response with Cohere
+    // Generate response with Cohere
     const response = await cohere.generate({
       model: "command",
-      prompt: prompt.map((p) => p.content).join("\n"),
+      prompt: prompt.map(p => p.content).join("\n"),
       maxTokens: 100,
+      temperature: 0.3, // Lower temperature for more consistent responses
+      stopSequences: ["Human:", "Assistant:"],
     });
 
-    // console.log("Generated prompt:", prompt.map((p) => p.content).join("\n"));
-
-    const aiResponse = response.generations[0].text.trim();
-    // console.log("AI response:", aiResponse);
+    const aiResponse = response.generations[0]?.text?.trim();
 
     if (!aiResponse) {
-      return NextResponse.json({
-        error: "AI response generation failed.",
-        status: 500,
-      });
+      throw new Error("Failed to generate response");
     }
 
-    // Step 3: Save user feedback
-    const userFeedbackResult = await serverClient.mutate({
-      mutation: INSERT_FEEDBACK,
-      variables: {
-        chat_session_id: Number(id),
-        sender: "user",
-        content,
-        sentiment,
-        created_at: formatISO(new Date()),
-      },
-    });
-
-    // Step 4: Save AI's response as a message
-    const aiFeedbackResult = await serverClient.mutate({
-      mutation: INSERT_FEEDBACK,
-      variables: {
-        chat_session_id: Number(id),
-        sender: "ai",
-        content: aiResponse,
-        sentiment: "NEUTRAL",
-        created_at: formatISO(new Date()),
-      },
-    });
+    // Save feedback in parallel
+    const [userFeedback, aiFeedback] = await Promise.all([
+      serverClient.mutate({
+        mutation: INSERT_FEEDBACK,
+        variables: {
+          chat_session_id: Number(id),
+          sender: "user",
+          content,
+          sentiment,
+          created_at: formatISO(new Date()),
+        },
+      }),
+      serverClient.mutate({
+        mutation: INSERT_FEEDBACK,
+        variables: {
+          chat_session_id: Number(id),
+          sender: "ai",
+          content: aiResponse,
+          sentiment: "NEUTRAL",
+          created_at: formatISO(new Date()),
+        },
+      }),
+    ]);
 
     return NextResponse.json({
-      userFeedbackId: userFeedbackResult?.data?.insertFeedback?.id,
-      aiFeedbackId: aiFeedbackResult?.data?.insertFeedback?.id,
+      userFeedbackId: userFeedback?.data?.insertFeedback?.id,
+      aiFeedbackId: aiFeedback?.data?.insertFeedback?.id,
       content: aiResponse,
     });
+
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error("Feedback processing error:", error);
     return NextResponse.json(
-      { error: error || "Internal Server Error" },
+      { error: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 }
     );
   }
