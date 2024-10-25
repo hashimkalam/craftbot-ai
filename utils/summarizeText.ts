@@ -31,7 +31,8 @@ const config: ScrapeConfig = {
 
 export const summarizeText = async (
   text: string,
-  retryCount = 0
+  retryCount = 0,
+  noTokens?:number
 ): Promise<string> => {
   try {
     // Construct the prompt for summarization
@@ -51,7 +52,7 @@ export const summarizeText = async (
     const response = await cohere.generate({
       model: "command",
       prompt: prompt.map((p) => p.content).join("\n"),
-      maxTokens: 500,
+      maxTokens: noTokens ? noTokens : 500,
     });
 
     // Ensure the response is valid
