@@ -13,7 +13,7 @@ import TotalTimeInteracted from "./TotalTimeInteracted";
 
 const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
-const LineChart = lazy(() => import("./LineChart"));
+const FeedbackLineChart = lazy(() => import("./FeedbackLineChart"));
 
 function Index({
   chatbots,
@@ -122,7 +122,7 @@ function Index({
         </div>
       </div>
 
-      <div className="relative mt-4 flex flex-col lg:flex-row items-center space-x-0 lg:space-x-5">
+      <div className="relative mt-4 flex flex-col lg:flex-row items-center gap-5">
         <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg p-1">
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
@@ -138,11 +138,12 @@ function Index({
         </div>
       </div>
 
-      <Suspense fallback={<Loading />}>
-        <LineChart
-          feedbackData={feedbackData} // Pass feedbackData directly
-        />
-      </Suspense>
+      <div className="bg-white dark:bg-primary/20 shadow-lg rounded-xl p-4 w-full h-full mt-5">
+        <Suspense fallback={<Loading />}>
+          <FeedbackLineChart feedbackData={feedbackData} />
+        </Suspense>
+      </div>
+
       <Suspense fallback={<Loading />}>
         <CommonFeedback filteredSessions={filteredSessions} />
       </Suspense>
