@@ -1,124 +1,79 @@
 "use client";
 
-import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
-import {
-  Message,
-  MessageByChatSessionIdVariables,
-  MessagesByChatSessionIdResponse,
-  TotalTimeInteractedProps,
-} from "@/types/types";
-import { useLazyQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import Loading from "@/app/dashboard/loading";
+import { Message } from "@/types/types";
+import { useState, useEffect } from "react"; 
 
-const TotalTimeInteracted = ({
-  filteredSessions, 
-}: TotalTimeInteractedProps) => {
-  const [ids, setIds] = useState<number[]>([]);
+const TotalTimeInteracted = ({ messageData }: { messageData: Message[] }) => {
   const [messagesBySession, setMessagesBySession] = useState<{
     [key: number]: Message[];
   }>({});
-  {
-    const [fetchMessages, { loading: loadingMessages, error: errorMessages }] =
-      useLazyQuery<
-        MessagesByChatSessionIdResponse,
-        MessageByChatSessionIdVariables
-      >(GET_MESSAGES_BY_CHAT_SESSION_ID);
 
-    useEffect(() => {
-      const sessionIds: number[] = filteredSessions.map(
-        (session) => session.id
-      );
-      setIds(sessionIds);
-    }, [filteredSessions]);
+  // Group messages by session and set them in state
+  useEffect(() => {
+    const messageMap: { [key: number]: Message[] } = {};
 
-    useEffect(() => {
-      const fetchAllData = async () => {
-        if (ids.length > 0) {
-          try {
-            const allMessages = await Promise.all(
-              ids.map(async (chatId) => {
-                const { data: messageData } = await fetchMessages({
-                  variables: { chat_session_id: chatId },
-                });
-                // console.log("messageData: ", messageData); // Log message data
+    messageData.forEach((message) => {
+      if (!messageMap[message.chat_session_id]) {
+        messageMap[message.chat_session_id] = [];
+      }
+      messageMap[message.chat_session_id].push(message);
+    });
 
-                return {
-                  chatId,
-                  messages: messageData?.chat_sessions?.messages || [],
-                };
-              })
-            );
+    setMessagesBySession(messageMap);
+  }, [messageData]);
 
-            const messageMap: { [key: number]: Message[] } = {};
+  // Function to calculate the total time spent across all sessions
+  const getTotalTimeSpent = () => {
+    let totalSeconds = 0;
 
-            allMessages.forEach(({ chatId, messages }) => {
-              messageMap[chatId] = messages;
-            });
+    // Loop through each session's messages
+    Object.values(messagesBySession).forEach((messages) => {
+      if (messages.length > 1) {
+        // Sort messages by their creation time
+        const sortedMessages = messages.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
 
-            setMessagesBySession(messageMap);
-          } catch (error) {
-            console.error("Error fetching data: ", error);
+        let sessionTime = 0;
+        const threshold = 1.15 * 60 * 1000; // 5 minutes in milliseconds
+
+        // Calculate the interaction time by summing time gaps between consecutive messages
+        for (let i = 1; i < sortedMessages.length; i++) {
+          const currentMessageTime = new Date(sortedMessages[i].created_at).getTime();
+          const previousMessageTime = new Date(sortedMessages[i - 1].created_at).getTime();
+          const timeDiff = currentMessageTime - previousMessageTime;
+
+          // Only count time differences that are less than or equal to the threshold
+          if (timeDiff <= threshold) {
+            sessionTime += timeDiff;
           }
         }
-      };
 
-      fetchAllData();
-    }, [ids, fetchMessages]);
+        // Convert session time to seconds and add to the total
+        totalSeconds += sessionTime / 1000;
+      }
+    });
 
-    const getTotalTimeSpent = () => {
-      let totalSeconds = 0;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = Math.floor(totalSeconds % 60);
 
-      Object.entries(messagesBySession).forEach(([sessionId, messages]) => {
-        if (messages.length > 0) {
-          const sortedMessages = messages.sort(
-            (a, b) =>
-              new Date(a.created_at).getTime() -
-              new Date(b.created_at).getTime()
-          );
+    return { totalMinutes, remainingSeconds };
+  };
 
-          const firstMessageTime = dayjs(sortedMessages[0].created_at);
-          const lastMessageTime = dayjs(
-            sortedMessages[sortedMessages.length - 1].created_at
-          );
+  const { totalMinutes, remainingSeconds } = getTotalTimeSpent();
 
-          const sessionDuration = lastMessageTime.diff(
-            firstMessageTime,
-            "second"
-          );
-          totalSeconds += sessionDuration;
-        }
-      });
+  return (
+    <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-4 w-full flex flex-col items-center justify-center space-y-2">
+      <h1 className="text-md font-medium text-gray-600 dark:text-gray-300">
+        Approx Total Time Spent:
+      </h1>
 
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const remainingSeconds = totalSeconds % 60;
-
-      return { totalMinutes, remainingSeconds };
-    };
-
-    const { totalMinutes, remainingSeconds } = getTotalTimeSpent();
-
-    return (
-      <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-4 w-full flex flex-col items-center justify-center space-y-2">
-        <h1 className="text-md font-medium text-gray-600 dark:text-gray-300">
-          Total Time Spent:
-        </h1>
-
-        {loadingMessages ? (
-          <Loading />
-        ) : (
-          <p className="text-5xl font-extrabold text-primary dark:text-white tracking-wider text-center">
-            {totalMinutes} min {remainingSeconds} secs
-          </p>
-        )}
-
-        {errorMessages && (
-          <p>Error fetching messages: {errorMessages.message}</p>
-        )}
-      </div>
-    );
-  }
+      <p className="text-5xl font-extrabold text-primary dark:text-white tracking-wider text-center">
+        {totalMinutes} min {remainingSeconds} secs
+      </p>
+    </div>
+  );
 };
 
 export default TotalTimeInteracted;

@@ -10,7 +10,7 @@ import Loading from "@/app/dashboard/loading";
 import {
   fetchFeedbacksByChatbotId,
   fetchMessagesByChatbotId,
-} from "@/utils/fetchAndExtractData";
+} from "@/utils/fetchAndExtractData"; // Import your fetch functions
 import { Suspense } from "react";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -27,20 +27,21 @@ export default async function ReviewSessions({
 }: {
   params: { chatbotId: number };
 }) {
+  // Authenticate user using Clerk
   const { userId } = await auth();
   if (!userId) return <div>User ID not found. Please log in.</div>;
 
   try {
-    // Fetch all data concurrently
+    // Fetch chatbots, feedback, and messages concurrently
     const [chatbotsResponse, feedbackData, messageData] = await Promise.all([
       serverClient.query<GetUserChatbotsResponse, GetUserChatbotsVariables>({
         query: GET_USER_CHATBOTS,
         variables: {
-          userId,
+          userId, // Pass the authenticated user's ID
         },
       }),
-      fetchFeedbacksByChatbotId(chatbotId),
-      fetchMessagesByChatbotId(chatbotId)
+      fetchFeedbacksByChatbotId(chatbotId), // Fetch feedbacks for this chatbot
+      fetchMessagesByChatbotId(chatbotId),  // Fetch messages for this chatbot
     ]);
 
     if (!chatbotsResponse) {
@@ -49,12 +50,13 @@ export default async function ReviewSessions({
 
     const { data } = chatbotsResponse;
 
-    // Sorting chatbots by created_at date
+    // Sort chatbots by creation date
     const sortedChatbotsByUser: Chatbot[] = [...data?.chatbotsList].sort(
       (a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
+    // Filter chatbots that belong to the logged-in user
     const filteredChatbots: Chatbot[] = sortedChatbotsByUser.filter(
       (chatbot) => chatbot.clerk_user_id === userId
     );
@@ -74,18 +76,18 @@ export default async function ReviewSessions({
               Chat Sessions - ({chatbotId})
             </h1>
             <h2 className="mb-5">
-              Review all the chat sessions the chat bots have and with your
-              customers
+              Review all the chat sessions the chatbots have with your customers
             </h2>
           </div>
         </div>
 
+        {/* Use Suspense for loading state while the Analytics component loads */}
         <Suspense fallback={<Loading />}>
           <Analytics
-            feedbackData={feedbackData}
-            messageData={messageData}
-            chatbots={filteredChatbots}
-            chatbotId={chatbotId}
+            feedbackData={feedbackData}  
+            messageData={messageData}   
+            chatbots={filteredChatbots}  
+            chatbotId={chatbotId}       
           />
         </Suspense>
       </div>

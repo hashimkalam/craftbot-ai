@@ -130,14 +130,6 @@ export interface RequestBody {
   feedbacks: string[];
 }
 
-export interface TotalTimeInteractedProps {
-  filteredSessions: ChatSession[]; 
-}
-
-export interface FeedbackSentimentCalcProps { 
-  feedbackData: Feedback[]
-}
-
 export interface TotalGuestsProps {
   text: string;
   count: number;

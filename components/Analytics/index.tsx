@@ -10,10 +10,10 @@ import CountDisplayAnimation from "./CountDisplayAnimation";
 import PieChartComponent from "./PieChartComponent";
 import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
 import TotalTimeInteracted from "./TotalTimeInteracted";
+import FeedbackLineChart from "./FeedbackLineChart";
 
 const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
-const FeedbackLineChart = lazy(() => import("./FeedbackLineChart"));
 
 function Index({
   chatbots,
@@ -119,9 +119,15 @@ function Index({
   return (
     <div className="min-h-screen">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Suspense fallback={<div className="col-span-2"><Loading /></div>}>
+        <Suspense
+          fallback={
+            <div className="col-span-2">
+              <Loading />
+            </div>
+          }
+        >
           <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
-            <TotalTimeInteracted filteredSessions={filteredSessions} />
+            <TotalTimeInteracted messageData={messageData} />
           </div>
         </Suspense>
 
@@ -144,26 +150,27 @@ function Index({
       <div className="relative mt-4 flex flex-col lg:flex-row items-center gap-5">
         <Suspense fallback={<Loading />}>
           <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg p-1">
-            <h1 className="text-xl font-bold underline ml-2">Total Messages Usage</h1>
-            <PieChartComponent messageCount={totalMessagesCount} maxLimit={500} />
+            <h1 className="text-xl font-bold underline ml-2">
+              Total Messages Usage
+            </h1>
+            <PieChartComponent
+              messageCount={totalMessagesCount}
+              maxLimit={500}
+            />
           </div>
         </Suspense>
 
-        <Suspense fallback={<Loading />}>
-          <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
-            <FeedbackSentimentCalc feedbackData={feedbackData} />
-          </div>
-        </Suspense>
+        <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
+          <FeedbackSentimentCalc feedbackData={feedbackData} />
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-primary/20 shadow-lg rounded-xl p-4 w-full h-full mt-5">
+        <FeedbackLineChart feedbackData={feedbackData} />
       </div>
 
       <Suspense fallback={<Loading />}>
-        <div className="bg-white dark:bg-primary/20 shadow-lg rounded-xl p-4 w-full h-full mt-5">
-          <FeedbackLineChart feedbackData={feedbackData} />
-        </div>
-      </Suspense>
-
-      <Suspense fallback={<Loading />}>
-        <CommonFeedback filteredSessions={filteredSessions} />
+        <CommonFeedback feedbackData={feedbackData} />
       </Suspense>
 
       <Suspense fallback={<Loading />}>

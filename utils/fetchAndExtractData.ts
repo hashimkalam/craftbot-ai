@@ -5,8 +5,11 @@ import {
   GetChatSessionMessagesResponse,
   GetChatSessionMessagesVariables,
   Feedback,
-  Message, 
+  Message,
+  MessagesByChatSessionIdResponse,
+  MessageByChatSessionIdVariables, 
 } from "@/types/types";
+import { GET_MESSAGES_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 
 // Function to extract feedbacks and messages from a chat session ID
 export const fetchAndExtractFeedbacks_Messages = async (
@@ -105,4 +108,24 @@ export const fetchMessagesByChatbotId = async (chatbotId: number): Promise<Messa
   console.log("Extracted Feedbacks:", allMessages);
 
   return allMessages;
+};
+
+
+export const fetchMessagesBySessionId = async (chat_session_id: number): Promise<Message[]> => {
+  // Fetch the messages by chat session ID
+  const response = await serverClient.query<MessagesByChatSessionIdResponse, MessageByChatSessionIdVariables>({
+      query: GET_MESSAGES_BY_CHAT_SESSION_ID,
+      variables: { chat_session_id },
+  });
+
+  // Log the response for debugging
+  console.log("Response from GET_MESSAGES_BY_CHAT_SESSION_ID:", response.data);
+
+  // Extract messages directly from the response
+  const messages = response.data.chat_sessions?.messages || [];
+
+  // Log the extracted messages for debugging
+  console.log("Extracted Messages:", messages);
+
+  return messages;
 };

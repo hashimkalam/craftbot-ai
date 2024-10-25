@@ -1,26 +1,18 @@
 "use client";
 import Loading from "@/app/dashboard/loading";
-import { GET_FEEDBACKS_BY_CHAT_SESSION_ID } from "@/graphql/mutation";
 import {
   ChatSession,
   ClusteredFeedback,
   CommonFeedbackResponse,
   Feedback,
-  FeedbackByChatSessionIdResponse,
-  FeedbacksByChatSessionIdVariables,
 } from "@/types/types";
-import { useLazyQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 
-function CommonFeedback({
-  filteredSessions,
-}: {
-  filteredSessions: ChatSession[];
+function CommonFeedback({ 
+  feedbackData,
+}: { 
+  feedbackData: Feedback[];
 }) {
-  const [ids, setIds] = useState<number[]>([]);
-  const [feedbackBySession, setFeedbackBySession] = useState<{
-    [key: number]: Feedback[];
-  }>({});
   const [commonFeedbackPositive, setCommonFeedbackPositive] = useState<
     ClusteredFeedback[]
   >([]);
@@ -39,92 +31,33 @@ function CommonFeedback({
     neutral: [],
   });
 
-  const [
-    fetchFeedback,
-    { loading: loadingFeedback, data, error: errorFeedback },
-  ] = useLazyQuery<
-    FeedbackByChatSessionIdResponse,
-    FeedbacksByChatSessionIdVariables
-  >(GET_FEEDBACKS_BY_CHAT_SESSION_ID, {
-    fetchPolicy: "cache-first", // Use cached data first
-  });
-
-  // Step 1: Extract session IDs
+  // Step 1: Process feedback data
   useEffect(() => {
-    const sessionIds: number[] = filteredSessions.map((session) => session.id);
-    setIds(sessionIds);
-  }, [filteredSessions]);
+    const positiveFeedbackArray: string[] = [];
+    const negativeFeedbackArray: string[] = [];
+    const neutralFeedbackArray: string[] = [];
 
-  // Step 2: Fetch feedbacks for all session IDs
-  useEffect(() => {
-    const fetchAllData = async () => {
-      if (ids.length > 0) {
-        setLoading(true);
-        try {
-          const allFeedbacks = await Promise.all(
-            ids.map(async (chatId) => {
-              const { data } = await fetchFeedback({
-                variables: { chat_session_id: chatId },
-              });
-
-              // Filter feedback where the sender is 'user'
-              const userFeedbacks =
-                data?.chat_sessions?.feedbacks.filter(
-                  (feedback) => feedback.sender === "user"
-                ) || [];
-
-              // Return the chatId and filtered user feedbacks
-              return {
-                chatId,
-                feedback: userFeedbacks,
-              };
-            })
-          );
-
-          // Build feedback map and separate positive/negative feedback
-          const feedbackMap: { [key: number]: Feedback[] } = {};
-          const positiveFeedbackArray: string[] = [];
-          const negativeFeedbackArray: string[] = [];
-          const neutralFeedbackArray: string[] = [];
-
-          allFeedbacks.forEach(({ chatId, feedback }) => {
-            // Save feedback by session
-            feedbackMap[chatId] = feedback;
-
-            // Extract positive and negative feedback content
-            feedback.forEach((fb) => {
-              if (fb.sentiment === "POSITIVE") {
-                positiveFeedbackArray.push(fb.content);
-              } else if (fb.sentiment === "NEGATIVE") {
-                negativeFeedbackArray.push(fb.content);
-              } else if (fb.sentiment === "NEUTRAL") {
-                neutralFeedbackArray.push(fb.content);
-              }
-            });
-          });
-
-          // Set feedback by session into state
-          setFeedbackBySession(feedbackMap);
-
-          // Save both positive and negative feedback into combined state
-          setFeedbackSentiment({
-            positive: positiveFeedbackArray,
-            negative: negativeFeedbackArray,
-            neutral: neutralFeedbackArray,
-          });
-        } catch (error) {
-          console.error("Error fetching data: ", error);
-          setError("Error fetching feedbacks.");
-        } finally {
-          setLoading(false);
+    feedbackData.forEach((feedback) => {
+      if (feedback.sender === "user") {
+        if (feedback.sentiment === "POSITIVE") {
+          positiveFeedbackArray.push(feedback.content);
+        } else if (feedback.sentiment === "NEGATIVE") {
+          negativeFeedbackArray.push(feedback.content);
+        } else if (feedback.sentiment === "NEUTRAL") {
+          neutralFeedbackArray.push(feedback.content);
         }
       }
-    };
+    });
 
-    fetchAllData();
-  }, [ids, fetchFeedback]);
+    // Save both positive and negative feedback into combined state
+    setFeedbackSentiment({
+      positive: positiveFeedbackArray,
+      negative: negativeFeedbackArray,
+      neutral: neutralFeedbackArray,
+    });
+  }, [feedbackData]);
 
-  // Step 3: Submit feedbacks for clustering
+  // Step 2: Submit feedbacks for clustering
   async function submitFeedback(
     feedbackArray: string[],
     type: "positive" | "negative"
@@ -136,7 +69,7 @@ function CommonFeedback({
       // Sort feedback array before sending
       const sortedFeedbackArray = feedbackArray.sort((a, b) => {
         // Example: Sort by length of feedback (ascending)
-        return a.length - b.length; // Change this logic based on your sorting requirement
+        return a.length - b.length;
       });
 
       const response = await fetch("/api/clustering", {
@@ -178,7 +111,7 @@ function CommonFeedback({
     }
   }, [feedbackSentiment]);
 
-  // Step 4: Filter common feedbacks with more than 2 items
+  // Step 3: Filter common feedbacks with more than 2 items
   const filteredCommonFeedbackPositive = commonFeedbackPositive.filter(
     (item) => item.feedbacks && item.feedbacks.length > 2
   );
