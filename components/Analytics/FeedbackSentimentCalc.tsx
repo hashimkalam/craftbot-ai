@@ -12,14 +12,11 @@ import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState, Suspense, lazy } from "react";
 import { Button } from "../ui/button";
 
-// import { CiExport } from "react-icons/ci";
-
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
 function FeedbackSentimentCalc({
-  filteredSessions, 
+  feedbackData,
 }: FeedbackSentimentCalcProps) {
-  const [ids, setIds] = useState<number[]>([]);
   const [feedbackBySession, setFeedbackBySession] = useState<{
     [key: number]: Feedback[];
   }>({});
@@ -32,74 +29,41 @@ function FeedbackSentimentCalc({
   });
 
   const [fetchFeedback, { loading: loadingFeedback, error: errorFeedback }] =
-    useLazyQuery<
-      FeedbackByChatSessionIdResponse,
-      FeedbacksByChatSessionIdVariables
-    >(GET_FEEDBACKS_BY_CHAT_SESSION_ID);
+    useLazyQuery<FeedbackByChatSessionIdResponse, FeedbacksByChatSessionIdVariables>(
+      GET_FEEDBACKS_BY_CHAT_SESSION_ID
+    );
 
   useEffect(() => {
-    const sessionIds: number[] = filteredSessions.map((session) => session.id);
-    setIds(sessionIds);
-    // console.log("Filtered Session IDs: ", sessionIds); // Log session IDs
-  }, [filteredSessions]);
+    if (feedbackData) {
+      const feedbackMap: { [key: number]: Feedback[] } = {};
+      let totalNeutral = 0;
+      let totalPositive = 0;
+      let totalNegative = 0;
 
-  useEffect(() => {
-    const fetchAllData = async () => {
-      if (ids.length > 0) {
-        // console.log("Fetching feedbacks for IDs: ", ids); // Log IDs before fetching data
-        try {
-          const allFeedbacks = await Promise.all(
-            ids.map(async (chatId) => {
-              const { data: feedbackData } = await fetchFeedback({
-                variables: { chat_session_id: chatId },
-              });
-              // console.log( `Feedback Data for Chat ID ${chatId}: `, feedbackData); // Log feedback data for each ID
-
-              return {
-                chatId,
-                feedback: feedbackData?.chat_sessions?.feedbacks || [],
-              };
-            })
-          );
-
-          const feedbackMap: { [key: number]: Feedback[] } = {};
-          let totalNeutral = 0;
-          let totalPositive = 0;
-          let totalNegative = 0;
-
-          allFeedbacks.forEach(({ chatId, feedback }) => {
-            feedbackMap[chatId] = feedback;
-
-            // Log feedbacks collected for each session
-            // console.log(`Collected Feedback for Chat ID ${chatId}: `, feedback);
-
-            // Count the number of feedbacks for each sentiment
-            feedback.forEach((fb) => {
-              if (fb.sender === "user") {
-                if (fb.sentiment === "NEUTRAL") totalNeutral++;
-                else if (fb.sentiment === "POSITIVE") totalPositive++;
-                else if (fb.sentiment === "NEGATIVE") totalNegative++;
-              }
-            });
-          });
-
-          setFeedbackBySession(feedbackMap);
-          // console.log("Feedback by Session: ", feedbackMap); // Log feedbacks mapped by session ID
-
-          // Update the state with the total count for each sentiment
-          setSentimentCount({
-            NEUTRAL: totalNeutral,
-            POSITIVE: totalPositive,
-            NEGATIVE: totalNegative,
-          });
-        } catch (error) {
-          console.error("Error fetching data: ", error);
+      // Assuming feedbackData is an array of feedbacks
+      feedbackData.forEach((feedback) => {
+        const sessionId = feedback.chat_session_id; // Adjust according to your data structure
+        if (!feedbackMap[sessionId]) {
+          feedbackMap[sessionId] = [];
         }
-      }
-    };
+        feedbackMap[sessionId].push(feedback);
 
-    fetchAllData();
-  }, [ids, fetchFeedback]);
+        // Count sentiment
+        if (feedback.sender === "user") {
+          if (feedback.sentiment === "NEUTRAL") totalNeutral++;
+          else if (feedback.sentiment === "POSITIVE") totalPositive++;
+          else if (feedback.sentiment === "NEGATIVE") totalNegative++;
+        }
+      });
+
+      setFeedbackBySession(feedbackMap);
+      setSentimentCount({
+        NEUTRAL: totalNeutral,
+        POSITIVE: totalPositive,
+        NEGATIVE: totalNegative,
+      });
+    }
+  }, [feedbackData]);
 
   const handleExport = () => {
     // Prepare the feedback data for export
@@ -109,6 +73,7 @@ function FeedbackSentimentCalc({
       sentiment: string;
       createdAt: string;
     }[] = [];
+
     Object.entries(feedbackBySession).forEach(([sessionId, feedbacks]) => {
       feedbacks.forEach((feedback) => {
         feedback.sender === "user" &&
@@ -159,7 +124,6 @@ function FeedbackSentimentCalc({
           onClick={handleExport}
           className="mb-4 bg-blue-500 text-white mx-4 my-2 rounded absolute top-0 right-0"
         >
-          {/*<CiExport size={24} />*/}
           EXPORT
         </Button>
       </div>

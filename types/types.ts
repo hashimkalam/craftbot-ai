@@ -134,8 +134,8 @@ export interface TotalTimeInteractedProps {
   filteredSessions: ChatSession[]; 
 }
 
-export interface FeedbackSentimentCalcProps {
-  filteredSessions: ChatSession[];
+export interface FeedbackSentimentCalcProps { 
+  feedbackData: Feedback[]
 }
 
 export interface TotalGuestsProps {

@@ -151,7 +151,7 @@ function Index({
 
         <Suspense fallback={<Loading />}>
           <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
-            <FeedbackSentimentCalc filteredSessions={filteredSessions} />
+            <FeedbackSentimentCalc feedbackData={feedbackData} />
           </div>
         </Suspense>
       </div>
