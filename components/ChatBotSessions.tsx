@@ -2,7 +2,7 @@
 
 import { Chatbot } from "@/types/types";
 import { Accordion } from "@radix-ui/react-accordion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import logo from "@/public/images/just_logo.webp";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
@@ -12,17 +12,18 @@ import Image from "next/image";
 
 import { ExternalLink } from "lucide-react";
 import NotCreatedChatbot from "./NotCreatedChatbot";
+import Loading from "@/app/dashboard/loading"; // Import the Loading component
 
 function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
   const router = useRouter();
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
+  const [pendingChatbotId, setPendingChatbotId] = useState<number | null>(null); // Track specific chatbot loading
 
   // Sort according to the number of sessions available in each bot
   useEffect(() => {
     const sortedArray = [...chatbots].sort(
       (a, b) => b.chat_sessions.length - a.chat_sessions.length
     );
-
     setSortedChatbots(sortedArray);
   }, [chatbots]);
 
@@ -59,6 +60,11 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
     }
   };
 
+  const handleNavigate = (chatbotId: number) => {
+    setPendingChatbotId(chatbotId); // Set the loading state for the specific chatbot
+    router.push(`/dashboard/review-sessions/analytics/${chatbotId}`);
+  };
+
   return (
     <div className="bg-white dark:bg-primary-DARK">
       <Accordion type="single" collapsible>
@@ -68,24 +74,25 @@ function ChatBotSessions({ chatbots }: { chatbots: Chatbot[] }) {
               return (
                 <div key={chatbot.id} className="px-10 py-5">
                   <div className="w-full">
-                    <div className="flex text-left items-center w-full">
-                      <Image
-                        src={logo}
-                        alt="Logo"
-                        className="h-10 w-10 mr-4"
-                        loading="lazy"
-                      />
-                      <div className="flex items-center justify-between w-full">
-                        <p>{chatbot.name}</p>
-
-                        <ExternalLink
-                          onClick={() =>
-                            router.push(
-                              `/dashboard/review-sessions/analytics/${chatbot.id}`
-                            )
-                          }
-                          className="cursor-pointer"
+                    <div className="flex text-left items-center justify-between w-full">
+                      <div className="flex items-center">
+                        <Image
+                          src={logo}
+                          alt="Logo"
+                          className="h-10 w-10 mr-4"
+                          loading="lazy"
                         />
+                        <p>{chatbot.name}</p>
+                      </div>
+                      <div className="">
+                        {pendingChatbotId === chatbot.id ? (
+                          <Loading className="w-6 h-6" />
+                        ) : (
+                          <ExternalLink
+                            onClick={() => handleNavigate(chatbot?.id)}
+                            className="cursor-pointer"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
