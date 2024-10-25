@@ -9,7 +9,7 @@ import Loading from "@/app/dashboard/loading";
 import CountDisplayAnimation from "./CountDisplayAnimation";
 import PieChartComponent from "./PieChartComponent";
 import FeedbackSentimentCalc from "./FeedbackSentimentCalc";
-import TotalTimeInteracted from "./TotalTimeInteracted"; 
+import TotalTimeInteracted from "./TotalTimeInteracted";
 
 const CommonFeedback = lazy(() => import("./CommonFeedback"));
 const ChatSessionTable = lazy(() => import("./ChatSessionTable"));
@@ -19,25 +19,20 @@ function Index({
   chatbots,
   chatbotId,
   feedbackData,
-  messageData
+  messageData,
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
   feedbackData: any;
-  messageData: any
+  messageData: any;
 }) {
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
-  const [filteredSessions, setFilteredSessions] = useState<any[]>([]); 
+  const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
   const [totalGuests, setTotalGuests] = useState<number>(0);
   const [loadingCount, setLoadingCount] = useState<boolean>(true);
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
 
-  // Initial data check
-  if (!messageData || !feedbackData) {
-    return <Loading />;
-  }
-
-  // Sort chatbots based on number of sessions
+  // Hooks must be declared before any return statement
   useEffect(() => {
     const sortData = async () => {
       setLoadingCount(true);
@@ -47,16 +42,15 @@ function Index({
       setSortedChatbots(sortedArray);
       setLoadingCount(false);
     };
-    
+
     sortData();
   }, [chatbots]);
 
-  // Filter sessions based on chatbotId
   useEffect(() => {
     const filterSessions = async () => {
       setLoadingCount(true);
       setIsDataReady(false);
-      
+
       try {
         if (chatbotId) {
           const currentChatbot = sortedChatbots.find(
@@ -117,7 +111,8 @@ function Index({
   const totalFeedbackCount = filteredFeedbackData.length;
   const totalMessagesCount = messageData.length;
 
-  if (!isDataReady) {
+  // Now move the conditional return after all hooks have been called
+  if (!messageData || !feedbackData || !isDataReady) {
     return <Loading />;
   }
 
@@ -126,12 +121,10 @@ function Index({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Suspense fallback={<div className="col-span-2"><Loading /></div>}>
           <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
-            <TotalTimeInteracted
-              filteredSessions={filteredSessions} 
-            />
+            <TotalTimeInteracted filteredSessions={filteredSessions} />
           </div>
         </Suspense>
-        
+
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
           <CountDisplayAnimation
             text="Total Guest Count:"
@@ -151,18 +144,14 @@ function Index({
       <div className="relative mt-4 flex flex-col lg:flex-row items-center gap-5">
         <Suspense fallback={<Loading />}>
           <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg p-1">
-            <h1 className="text-xl font-bold underline ml-2">
-              Total Messages Usage
-            </h1>
+            <h1 className="text-xl font-bold underline ml-2">Total Messages Usage</h1>
             <PieChartComponent messageCount={totalMessagesCount} maxLimit={500} />
           </div>
         </Suspense>
 
         <Suspense fallback={<Loading />}>
           <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
-            <FeedbackSentimentCalc
-              filteredSessions={filteredSessions}
-            />
+            <FeedbackSentimentCalc filteredSessions={filteredSessions} />
           </div>
         </Suspense>
       </div>
