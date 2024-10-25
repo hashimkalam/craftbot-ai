@@ -17,8 +17,7 @@ import { Button } from "../ui/button";
 const SentimentPieChart = lazy(() => import("./SentimentPieChart"));
 
 function FeedbackSentimentCalc({
-  filteredSessions,
-  handleTotalFeedback,
+  filteredSessions, 
 }: FeedbackSentimentCalcProps) {
   const [ids, setIds] = useState<number[]>([]);
   const [feedbackBySession, setFeedbackBySession] = useState<{
@@ -93,12 +92,6 @@ function FeedbackSentimentCalc({
             POSITIVE: totalPositive,
             NEGATIVE: totalNegative,
           });
-
-          const totalFeedbackCount =
-            totalNeutral + totalNegative + totalPositive;
-
-          // console.log("Total Feedback Count: ", totalFeedbackCount); // Log total feedback count
-          handleTotalFeedback(totalFeedbackCount);
         } catch (error) {
           console.error("Error fetching data: ", error);
         }
@@ -106,7 +99,7 @@ function FeedbackSentimentCalc({
     };
 
     fetchAllData();
-  }, [ids, fetchFeedback, handleTotalFeedback]);
+  }, [ids, fetchFeedback]);
 
   const handleExport = () => {
     // Prepare the feedback data for export

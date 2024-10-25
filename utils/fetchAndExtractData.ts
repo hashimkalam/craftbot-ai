@@ -1,15 +1,15 @@
 // feedbackUtils.ts
 import { serverClient } from "@/lib/server/serverClient";
-import { GET_CHAT_SESSION_MESSAGES, GET_CHATBOT_BY_ID, GET_FEEDBACK_MESSAGES } from "@/graphql/query";
+import { GET_CHAT_SESSION_MESSAGES, GET_CHATBOT_BY_ID } from "@/graphql/query";
 import {
   GetChatSessionMessagesResponse,
   GetChatSessionMessagesVariables,
   Feedback,
-  ChatSession, // Assuming you have this type defined in your types
+  Message, 
 } from "@/types/types";
 
 // Function to extract feedbacks and messages from a chat session ID
-export const fetchAndExtractFeedbacks = async (
+export const fetchAndExtractFeedbacks_Messages = async (
   chatSessionId: number
 ): Promise<{
   messages: any[]; // Adjust the type according to your messages structure
@@ -77,4 +77,32 @@ export const fetchFeedbacksByChatbotId = async (chatbotId: number): Promise<Feed
     console.log("Extracted Feedbacks:", allFeedbacks);
 
     return allFeedbacks;
+};
+
+
+export const fetchMessagesByChatbotId = async (chatbotId: number): Promise<Message[]> => {
+  // Fetch the chatbot by ID, which includes its chat sessions and feedbacks
+  const response = await serverClient.query({
+      query: GET_CHATBOT_BY_ID,
+      variables: { id: chatbotId },
+  });
+
+  // Log the response for debugging
+  console.log("Response from GET_CHATBOT_BY_ID:", response.data);
+
+  const { chatbots } = response.data;
+
+  if (!chatbots || chatbots.length === 0) {
+      throw new Error("No chatbot found with this ID.");
+  }
+
+  const { chat_sessions } = chatbots;
+
+  // Flatten the feedbacks array from all chat sessions
+  const allMessages: Message[] = chat_sessions.flatMap((session: { messages: any; }) => session.messages);
+
+  // Log the extracted feedbacks for debugging
+  console.log("Extracted Feedbacks:", allMessages);
+
+  return allMessages;
 };

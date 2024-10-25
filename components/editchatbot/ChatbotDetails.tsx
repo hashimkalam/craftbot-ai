@@ -19,6 +19,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_CHATBOT } from "@/graphql/mutation";
 import { GetChatbotByIdResponse, GetChatbotByIdVariables } from "@/types/types";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
 
 const Personalities = lazy(() => import("@/components/Personalities"));
 
@@ -78,7 +80,10 @@ function ChatbotDetails({ id }: { id: string }) {
   );
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex items-center space-x-4">
+      <Link href="/dashboard/view-chatbots" className="cursor-pointer hover:bg-gray-100 rounded-lg pr-0.5">
+        <ChevronLeft size={32} />
+      </Link>
       <div className="flex items-center justify-between w-full space-x-2 lg:space-x-4 mt-4">
         <Image
           src={logo}

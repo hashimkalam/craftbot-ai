@@ -131,13 +131,11 @@ export interface RequestBody {
 }
 
 export interface TotalTimeInteractedProps {
-  filteredSessions: ChatSession[];
-  handleTotalMessages: (count: number) => void;
+  filteredSessions: ChatSession[]; 
 }
 
 export interface FeedbackSentimentCalcProps {
   filteredSessions: ChatSession[];
-  handleTotalFeedback: (count: number) => void;
 }
 
 export interface TotalGuestsProps {

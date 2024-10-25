@@ -19,15 +19,15 @@ function Index({
   chatbots,
   chatbotId,
   feedbackData,
+  messageData
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
-  feedbackData: any; // Ensure you have the correct type for feedbackData
+  feedbackData: any;
+  messageData: any
 }) {
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
-  const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
-  const [totalMessages, setTotalMessages] = useState<number>(0);
-  const [totalFeedback, setTotalFeedback] = useState<number>(0);
+  const [filteredSessions, setFilteredSessions] = useState<any[]>([]); 
   const [totalGuests, setTotalGuests] = useState<number>(0);
   const [loadingCount, setLoadingCount] = useState<boolean>(false);
 
@@ -88,22 +88,23 @@ function Index({
     });
   };
 
-  // Handle messages and feedback counts
-  const handleTotalMessages = (messagesCount: number) => {
-    setTotalMessages(messagesCount);
-  };
 
-  const handleTotalFeedback = (feedbackCount: number) => {
-    setTotalFeedback(feedbackCount);
-  };
+  // total feedback
+  const filteredFeedbackData = feedbackData.filter(
+    (item: { sender: string }) => item.sender === "user"
+  );
+  const totalFeedbackCount = filteredFeedbackData.length;
+
+  // total messages
+  const totalMessagesCount = messageData.length
+  
 
   return (
     <div className="min-h-screen">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full grid col-span-2">
           <TotalTimeInteracted
-            filteredSessions={filteredSessions}
-            handleTotalMessages={handleTotalMessages}
+            filteredSessions={filteredSessions} 
           />
         </div>
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
@@ -116,7 +117,7 @@ function Index({
         <div className="bg-white dark:bg-primary/20 shadow-lg rounded-lg p-2 w-full h-full">
           <CountDisplayAnimation
             text="Total Feedback Count:"
-            count={totalFeedback}
+            count={totalFeedbackCount}
             loadingCount={loadingCount}
           />
         </div>
@@ -127,13 +128,12 @@ function Index({
           <h1 className="text-xl font-bold underline ml-2">
             Total Messages Usage
           </h1>
-          <PieChartComponent messageCount={totalMessages} maxLimit={500} />
+          <PieChartComponent messageCount={totalMessagesCount} maxLimit={500} />
         </div>
 
         <div className="bg-white dark:bg-primary/20 shadow-lg min-h-[350px] h-fit w-full flex flex-col relative rounded-lg mt-5 lg:mt-0 p-1">
           <FeedbackSentimentCalc
             filteredSessions={filteredSessions}
-            handleTotalFeedback={handleTotalFeedback}
           />
         </div>
       </div>
@@ -153,7 +153,5 @@ function Index({
     </div>
   );
 }
-
-// Fetch data on the server side
 
 export default Index;

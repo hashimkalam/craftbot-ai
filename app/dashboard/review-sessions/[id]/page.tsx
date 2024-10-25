@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react"; 
 import Loading from "../../loading";
-import { fetchAndExtractFeedbacks } from "@/utils/fetchAndExtractFeedbacks";
+import { fetchAndExtractFeedbacks_Messages } from "@/utils/fetchAndExtractData";
 
 const MessagesContainer = lazy(() => import("@/components/MessagesContainer"));
 
@@ -22,7 +22,7 @@ async function ReviewSession({ params: { id } }: { params: { id: string } }) {
       guestName,
       guestEmail,
       createdAt,
-    } = await fetchAndExtractFeedbacks(chatSessionId);
+    } = await fetchAndExtractFeedbacks_Messages(chatSessionId);
 
     return (
       <div className="flex-1 p-10 pb-24">

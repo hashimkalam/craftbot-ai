@@ -13,8 +13,7 @@ import dayjs from "dayjs";
 import Loading from "@/app/dashboard/loading";
 
 const TotalTimeInteracted = ({
-  filteredSessions,
-  handleTotalMessages,
+  filteredSessions, 
 }: TotalTimeInteractedProps) => {
   const [ids, setIds] = useState<number[]>([]);
   const [messagesBySession, setMessagesBySession] = useState<{
@@ -59,13 +58,6 @@ const TotalTimeInteracted = ({
             });
 
             setMessagesBySession(messageMap);
-
-            const totalMessageCount = allMessages.reduce(
-              (count, { messages }) => count + messages.length,
-              0
-            );
-
-            handleTotalMessages(totalMessageCount);
           } catch (error) {
             console.error("Error fetching data: ", error);
           }
@@ -73,7 +65,7 @@ const TotalTimeInteracted = ({
       };
 
       fetchAllData();
-    }, [ids, fetchMessages, handleTotalMessages]);
+    }, [ids, fetchMessages]);
 
     const getTotalTimeSpent = () => {
       let totalSeconds = 0;
