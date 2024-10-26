@@ -143,8 +143,8 @@ export interface TotalGuestsProps {
 }
 
 export interface PieChartProps {
-  messageCount: number; // Current number of sessions
-  maxLimit: number; // Maximum sessions allowed
+  messageCount: number; // Current number of sessions 
+  subscriptionPlan: string | undefined
 }
 
 export interface SentimentPieChartProps {

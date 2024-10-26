@@ -12,13 +12,25 @@ const COLORS = ["#FF0000", "#007FFF"]; // Colors for the pie segments
 
 const PieChartComponent: React.FC<PieChartProps> = ({
   messageCount,
-  maxLimit,
+  subscriptionPlan
 }) => {
+
+  // calculating maxLimit according to subscriptionPlan 
+  let maxLimit=0;
+
+  if (subscriptionPlan === "normal") {
+    maxLimit=100
+  } else if (subscriptionPlan === "premium") {
+    maxLimit=200
+  }
+
   const remainingCount = maxLimit - messageCount;
   const data = [
     { name: `Used (${messageCount})`, value: messageCount },
     { name: `Remaining (${remainingCount})`, value: remainingCount },
   ];
+
+  
 
   return (
     <ResponsiveContainer width="100%" height={300}>
