@@ -137,3 +137,26 @@ export const GET_FEEDBACK_MESSAGES = gql`
     }
   }
 `;
+
+
+// Query to get user by ID
+export const GET_USER_BY_ID = gql`
+  query GetUserById($clerk_user_id: String!) {
+    user_data(clerk_user_id: $clerk_user_id) { 
+      clerk_user_id
+      subscription_plan
+      created_at
+    }
+  }
+`;
+
+// Query to get all users
+export const GET_ALL_USERS = gql`
+  query GetAllUsers {
+    user_dataList {      
+      clerk_user_id
+      subscription_plan
+      created_at
+    }
+  }
+`;

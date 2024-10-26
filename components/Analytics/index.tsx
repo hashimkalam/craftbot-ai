@@ -155,7 +155,7 @@ function Index({
             </h1>
             <PieChartComponent
               messageCount={totalMessagesCount}
-              maxLimit={500}
+              maxLimit={125}
             />
           </div>
         </Suspense>
@@ -168,10 +168,10 @@ function Index({
       <div className="bg-white dark:bg-primary/20 shadow-lg rounded-xl p-4 w-full h-full mt-5">
         <FeedbackLineChart feedbackData={feedbackData} />
       </div>
-
+      {/* 
       <Suspense fallback={<Loading />}>
         <CommonFeedback feedbackData={feedbackData} />
-      </Suspense>
+      </Suspense> */}
 
       <Suspense fallback={<Loading />}>
         <ChatSessionTable filteredSessions={filteredSessions} />

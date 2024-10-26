@@ -170,3 +170,48 @@ export const GET_FEEDBACKS_BY_CHAT_SESSION_ID = gql`
     }
   }
 `;
+
+
+// Mutation to create a user
+export const INSERT_USER = gql`
+  mutation InsertUser(
+    $clerk_user_id: String!
+    $subscription_plan: String!
+    $created_at: DateTime!
+  ) {
+    insertUser_data(
+      clerk_user_id: $clerk_user_id
+      subscription_plan: $subscription_plan
+      created_at: $created_at
+    ) { 
+      clerk_user_id
+      subscription_plan
+      created_at
+    }
+  }
+`;
+
+// Mutation to update user data
+export const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $clerk_user_id: String!
+    $subscription_plan: String!
+  ) {
+    updateUser_data(
+      clerk_user_id: $clerk_user_id
+      subscription_plan: $subscription_plan
+    ) {
+      clerk_user_id
+      subscription_plan
+    }
+  }
+`;
+
+// Mutation to delete a user
+export const DELETE_USER = gql`
+  mutation DeleteUser($clerk_user_id: String!) {
+    deleteUser_data(clerk_user_id: $clerk_user_id) {
+      clerk_user_id
+    }
+  }
+`;

@@ -32,6 +32,12 @@ export interface ChatSession {
   guests: Guest; // Consider changing to guests: Guest[] if multiple guests are possible
 }
 
+export interface User { 
+  clerk_user_id?: string
+  subscription_plan?: string
+  created_at?: string
+}
+
 export interface Message {
   id: number;
   chat_session_id: number;
