@@ -34,12 +34,8 @@ export const fetchUserByClerkId = async (
 
   const user_data = response?.data?.user_data;
 
-  // Check if user_data exists and return required fields
-  if (!user_data) {
-    throw new Error("No user data found for the provided Clerk ID.");
-  }
-
   return {
-    subscription_plan: user_data.subscription_plan,
+    subscription_plan: user_data?.subscription_plan,
   };
 };
+

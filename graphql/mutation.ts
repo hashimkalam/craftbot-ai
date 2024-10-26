@@ -178,15 +178,18 @@ export const INSERT_USER = gql`
     $clerk_user_id: String!
     $subscription_plan: String!
     $created_at: DateTime!
+    $updated_at: DateTime!
   ) {
     insertUser_data(
       clerk_user_id: $clerk_user_id
       subscription_plan: $subscription_plan
       created_at: $created_at
+      updated_at: $updated_at
     ) { 
       clerk_user_id
       subscription_plan
       created_at
+      updated_at
     }
   }
 `;
@@ -196,13 +199,16 @@ export const UPDATE_USER = gql`
   mutation UpdateUser(
     $clerk_user_id: String!
     $subscription_plan: String!
+    $updated_at: DateTime!
   ) {
     updateUser_data(
       clerk_user_id: $clerk_user_id
       subscription_plan: $subscription_plan
+      updated_at: $updated_at
     ) {
       clerk_user_id
       subscription_plan
+      updated_at
     }
   }
 `;
