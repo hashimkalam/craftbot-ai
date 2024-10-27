@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   GET_FEEDBACKS_BY_CHAT_SESSION_ID,
   INSERT_FEEDBACK,
+  UPDATE_CHATBOT,
 } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
@@ -79,6 +80,8 @@ export async function POST(req: NextRequest) {
       variables: { id: chatbot_id },
     });
 
+    const chatbot = chatbotData.chatbots;
+
     if (!chatbotData?.chatbots) {
       return NextResponse.json(
         { error: "Chatbot not found" },
@@ -151,6 +154,21 @@ export async function POST(req: NextRequest) {
         },
       }),
     ]);
+
+    // Increment the message count for the chatbot
+    const updatedFeedbackCount = chatbot.message_count + 2;
+    console.log("updatedFeedbackCount: (from server - feedback side) ", updatedFeedbackCount);
+
+    const updateResponse= await serverClient.mutate({
+      mutation: UPDATE_CHATBOT,
+      variables: {
+        id: chatbot.id,
+        name: chatbot.name,
+        personality: chatbot.personality,
+        message_count: updatedFeedbackCount,
+      },
+    });
+    console.log("Update response:", updateResponse);
 
     return NextResponse.json({
       userFeedbackId: userFeedback?.data?.insertFeedback?.id,

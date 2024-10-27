@@ -55,13 +55,17 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [sentiment, setSentiment] = useState<string | null>(null);
   const [mode, setMode] = useState(0);
   const [messageCount, setMessageCount] = useState<number>(0);
-  const [isLimitReached, setIsLimitReached] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState<boolean>(false);
+  const [maxNoMessagesSent, setMaxNoMessagesSent] = useState<boolean>(false);
+  const [maxNoFeedbacksSent, setMaxNoFeedbacksSent] = useState<boolean>(false);
+  const [numberOfMessagesSent, setNumberOfMessagesSent] = useState<number>(0);
+  const [numberOfFeedbacksSent, setNumberOfFeedbacksSent] = useState<number>(0);
 
   let messageLimit: number = 0;
   if (subscriptionPlan === "standard") {
-    messageLimit=75
+    messageLimit = 75;
   } else if (subscriptionPlan === "premium") {
-    messageLimit=150
+    messageLimit = 150;
   }
 
   // form setup
@@ -90,7 +94,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     "chatbotData message count: ",
     chatbotData?.chatbots.message_count
   );
-  console.log("messageCOunt: ", messageCount)
+  console.log("messageCOunt: ", messageCount);
 
   // Fetch Messages
   const {
@@ -127,9 +131,9 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
         (msg: any) => msg.sender === "user"
       );
       // setMessageCount(userMessages.length);
-      console.log("messageCount: (client) ", messageCount)
+      console.log("messageCount: (client) ", messageCount);
       setIsLimitReached(userMessages.length >= messageLimit);
-      console.log("isLimitReached: (client)", isLimitReached)
+      console.log("isLimitReached: (client)", isLimitReached);
     }
   }, [messagesData]);
 
@@ -145,7 +149,9 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     setIsOpen(false);
   };
 
-  // onsubmit function
+  // onsubmit message function
+  const maxNumberOfMessagesSent = 1; // Set max limit to 1 (or any other value you prefer)
+
   async function onSubmitMessage(values: z.infer<typeof formSchema>) {
     // Check message limit before processing
     if (isLimitReached) {
@@ -156,34 +162,41 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       return;
     }
 
+    // Increment the message count using setState
+    setNumberOfMessagesSent((prev) => prev + 1);
+    console.log("newMessageCount: ", numberOfMessagesSent);
+    if (numberOfMessagesSent + 1 > maxNumberOfMessagesSent)
+      setMaxNoMessagesSent(true);
+
+    // Set loading state
     setLoading(true);
     const { message: formMessage } = values;
     const message = formMessage;
     form.reset();
 
-    // open form box if necesssary data not taken - email and name
+    // Open form box if necessary data not provided - email and name
     if (!name || !email) {
       setIsOpen(true);
       setLoading(false);
       return;
     }
 
-    // do not suvmit is msg is empty
+    // Do not submit if message is empty
     if (!message.trim()) {
       return;
     }
 
     // Optimistically update message count and check limit
     const newCount = messageCount + 2;
-    console.log("newCount: (client) ", newCount) 
+    console.log("newCount: (client) ", newCount);
     setMessageCount(newCount);
+
     if (newCount >= messageLimit) {
       setIsLimitReached(true);
-      console.log("isLimitReached: (client)", isLimitReached)
-
+      console.log("isLimitReached: (client)", isLimitReached);
     }
 
-    // optimistically update ui w user's msg
+    // Optimistically update UI with user's message
     const userMessage: Message = {
       id: Date.now(),
       content: message,
@@ -192,7 +205,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       sender: "user",
     };
 
-    // showing loading state for ai response
+    // Showing loading state for AI response
     const loadingMessage: Message = {
       id: Date.now() + 1,
       content: "AI Thinking...",
@@ -201,7 +214,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       sender: "ai",
     };
 
-    // set messages
+    // Set messages
     setMessages((prevMessages) => [
       ...prevMessages,
       userMessage,
@@ -226,7 +239,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       const result = await response.json();
       // console.log("ai result response: ", result);
 
-      // updatin loading msg from ai with actual response
+      // Update loading message from AI with actual response
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg.id === loadingMessage.id
@@ -235,11 +248,30 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
         )
       );
     } catch (error) {
-      console.error("error sendin msg: ", error);
+      console.error("error sending message: ", error);
     }
   }
 
+  // submit feedback
+
+  let maxNumberOfFeedbacksSent = 2;
   async function onSubmitFeedback(values: z.infer<typeof formSchema>) {
+    // Check message limit before processing
+    if (isLimitReached) {
+      form.setError("message", {
+        type: "manual",
+        message: "Message limit reached. Please start a new chat.",
+      });
+      return;
+    }
+
+    // Increment the message count using setState
+    setNumberOfFeedbacksSent((prev) => prev + 1);
+    console.log("newMessageCount: ", numberOfFeedbacksSent);
+    // Check if the new message count exceeds the limit
+    if (numberOfFeedbacksSent + 1 > maxNumberOfFeedbacksSent)
+      setMaxNoFeedbacksSent(true);
+
     setLoading(true);
     const { message: formMessage } = values;
 
@@ -251,6 +283,15 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       setIsOpen(true);
       setLoading(false);
       return;
+    }
+
+    // Optimistically update message count and check limit
+    const newCount = messageCount + 2;
+    console.log("newCount: (client) ", newCount);
+    setMessageCount(newCount);
+    if (newCount >= messageLimit) {
+      setIsLimitReached(true);
+      console.log("isLimitReached: (client)", isLimitReached);
     }
 
     // Get sentiment before submitting feedback
@@ -519,18 +560,37 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
               )}
             />
 
-            <Button
-              type="submit"
-              className="h-full"
-              disabled={
-                form.formState.isSubmitting ||
-                !form.formState.isValid ||
-                isLimitReached
-              }
-            >
-                {isLimitReached ? `Limit Reached (${messageCount}/${messageLimit})` : `Send (${messageCount}/${messageLimit})`}
-      
-            </Button>
+            {mode === 0 ? (
+              <Button
+                type="submit"
+                className="h-full"
+                disabled={
+                  form.formState.isSubmitting ||
+                  !form.formState.isValid ||
+                  isLimitReached ||
+                  maxNoMessagesSent
+                }
+              >
+                {isLimitReached || maxNoMessagesSent
+                  ? `Limit Reached (${numberOfMessagesSent}/${maxNumberOfMessagesSent})`
+                  : `Send (${numberOfMessagesSent}/${maxNumberOfMessagesSent})`}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                className="h-full"
+                disabled={
+                  form.formState.isSubmitting ||
+                  !form.formState.isValid ||
+                  isLimitReached ||
+                  maxNoFeedbacksSent
+                }
+              >
+                {isLimitReached || maxNoFeedbacksSent
+                  ? `Limit Reached (${numberOfFeedbacksSent}/${maxNumberOfFeedbacksSent})`
+                  : `Send (${numberOfFeedbacksSent}/${maxNumberOfFeedbacksSent})`}
+              </Button>
+            )}
           </form>
         </Form>
       </div>

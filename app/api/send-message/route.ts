@@ -154,7 +154,6 @@ export async function POST(req: NextRequest) {
         message_count: updatedMessageCount,
       },
     });
-
     console.log("Update response:", updateResponse);
 
     return NextResponse.json({
