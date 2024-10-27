@@ -1,26 +1,33 @@
-"use client"
+"use client";
+import { SubscriptionContextType } from '@/types/types';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-
-interface SubscriptionContextType {
-  subscriptionPlan: string; // Change to non-optional string
-  setSubscriptionPlan: (plan: string) => void; // Update the type accordingly
-}
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [subscriptionPlan, setSubscriptionPlan] = useState<string>(() => {
-    // Get the subscription plan from local storage or default to 'standard'
-    return localStorage.getItem('subscriptionPlan') || 'standard';
-  });
+  const [subscriptionPlan, setSubscriptionPlan] = useState<string>('standard');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Save subscription plan to local storage whenever it changes
-    localStorage.setItem('subscriptionPlan', subscriptionPlan);
-  }, [subscriptionPlan]);
+    const fetchSubscriptionPlan = async () => {
+      try {
+        const response = await fetch('/api/user/subscription');
+        if (response.ok) {
+          const data = await response.json();
+          setSubscriptionPlan(data.subscriptionPlan || 'standard');
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription plan:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSubscriptionPlan();
+  }, []);
 
   return (
-    <SubscriptionContext.Provider value={{ subscriptionPlan, setSubscriptionPlan }}>
+    <SubscriptionContext.Provider value={{ subscriptionPlan, setSubscriptionPlan, isLoading }}>
       {children}
     </SubscriptionContext.Provider>
   );

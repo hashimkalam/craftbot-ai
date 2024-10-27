@@ -27,7 +27,7 @@ export async function registerNewUser(clerk_user_id: string, subscription_plan: 
 }
 
 
-export async function updateUser(clerk_user_id: string, subscription_plan: string) {
+export async function updateUser(clerk_user_id: string | null, subscription_plan: string) {
     try {
       console.log("Subscription Plan Upgrade Started");
       console.log("clerk_user_id: ", clerk_user_id)

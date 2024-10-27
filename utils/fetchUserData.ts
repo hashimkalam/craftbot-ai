@@ -24,7 +24,7 @@ export const fetchUserData = async () => {
 };
 
 export const fetchUserByClerkId = async (
-  clerk_user_id: string
+  clerk_user_id: string | null
 ): Promise<User> => {
   // Fetch the user by Clerk ID
   const response = await serverClient.query({

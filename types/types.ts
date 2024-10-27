@@ -1,3 +1,9 @@
+export interface SubscriptionContextType {
+  subscriptionPlan: string;
+  setSubscriptionPlan: (plan: string) => void;
+  isLoading: boolean;
+}
+
 export interface Chatbot {
   id: number;
   clerk_user_id: string;

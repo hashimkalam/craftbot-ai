@@ -1,25 +1,38 @@
 "use client";
 import { useSubscription } from "@/app/context/SubscriptionContext";
 import { updateUser } from "@/lib/server/newUser";
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 
 interface SubscriptionPlanProps {
   userId: string;
 }
 
-const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
-  userId,
-}) => {
+const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({ userId }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const { subscriptionPlan: globalPlan, setSubscriptionPlan } = useSubscription(); 
+  const { subscriptionPlan: globalPlan, setSubscriptionPlan, isLoading } = useSubscription();
 
   const upgradeHandler = async () => {
     setLoading(true);
-    setMessage(null); 
+    setMessage(null);
     try {
+      // Update subscription on the server
       await updateUser(userId, "premium");
       setSubscriptionPlan("premium");
+      
+      // Also update the server-side subscription status
+      const response = await fetch('/api/user/subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ subscriptionPlan: 'premium', userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update subscription on server');
+      }
+
       setMessage("Successfully upgraded to premium!");
     } catch (error) {
       console.error("Upgrade failed: ", error);
@@ -29,20 +42,26 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
     }
   };
 
+  if (isLoading) {
+    return <div>Loading subscription status...</div>;
+  }
+
   return (
     <div className="lg:absolute right-5 top-5 ml-5 mt-2 lg:mt-0">
       <h2 className="text-lg font-semibold">Subscription Plan:</h2>
       <div className="flex">
-        <p>{globalPlan}</p> {/* Use the global subscription plan */}
-        <button
-          onClick={upgradeHandler}
-          disabled={loading}
-          className={`border-2 border-black px-2 rounded-full text-[10px] ${
-            loading ? "bg-gray-300 cursor-not-allowed" : "bg-green-300"
-          } transition duration-300 ease-in-out`}
-        >
-          {loading ? "Upgrading..." : "Upgrade"}
-        </button>
+        <p>{globalPlan}</p>
+        {globalPlan !== 'premium' && (
+          <button
+            onClick={upgradeHandler}
+            disabled={loading}
+            className={`border-2 border-black px-2 rounded-full text-[10px] ${
+              loading ? "bg-gray-300 cursor-not-allowed" : "bg-green-300"
+            } transition duration-300 ease-in-out`}
+          >
+            {loading ? "Upgrading..." : "Upgrade"}
+          </button>
+        )}
       </div>
       {message && <p className="mt-2 text-[10px] text-red-500">{message}</p>}
     </div>

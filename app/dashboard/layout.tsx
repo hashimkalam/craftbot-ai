@@ -1,6 +1,5 @@
 import Sidebar from "@/components/Sidebar";
 import SubscriptionPlan from "@/components/SubscriptionPlan";
-import { fetchUserByClerkId } from "@/utils/fetchUserData";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 

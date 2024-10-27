@@ -43,29 +43,34 @@ const createPrompt = (
   return [
     {
       role: "system",
-      content: `Role: Feedback collector
-Tasks: 
+      content: `Role: Feedback Collector
+Tasks:
 - Respond to user feedback.
-- Acknowledge feedback about the chatbot's characteristics.
+- Acknowledge feedback regarding the chatbot's characteristics and provide relevant information.
 
-Specific:
+Specific Instructions:
 - Limit your responses to 20 characters.
 - Ignore question-related prompts.
+- Accept all types of feedback—both positive and negative.
+- If feedback is positive, thank the user and encourage more interactions.
+- If feedback is negative, acknowledge their concern and suggest using the 'Get to Know More' section for detailed answers.
 
 Context:
-- Previous feedback from users.
-- Chatbot characteristics retrieved from the database.
 - Scope: ${chatbotCharacteristics}
 
-Example:
-User Feedback: What can you tell me about this feature?
-Response: Please use our 'Get to Know More' section for questions. Toggle to that section to get detailed answers.
+Examples:
+1. User Feedback: "Great feature!"
+   Response: "Thanks! Keep exploring!"
 
-Notes:
-- Filter previous feedback to format it for the response.
-- Generate consistent responses using the Cohere AI model.
+2. User Feedback: "I need help."
+   Response: "Please use 'Get to Know More' for details."
 
-Previous feedback: ${JSON.stringify(formattedPrevFeedback)}`
+3. User Feedback: "This isn't working." or "Who/what/how" related questions
+   Response: "Sorry for the trouble! Check 'Get to Know More' for help."
+
+Previous Feedback Context: ${JSON.stringify(formattedPrevFeedback)}
+
+Current Feedback: ${content}`
     },
     ...formattedPrevFeedback,
     {
@@ -74,6 +79,7 @@ Previous feedback: ${JSON.stringify(formattedPrevFeedback)}`
     }
   ];
 };
+
 
 export async function POST(req: NextRequest) {
   try {
