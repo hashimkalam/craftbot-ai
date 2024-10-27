@@ -20,9 +20,9 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
     setLoading(true);
     setMessage(null); 
     try {
-      await updateUser(userId, "standard");
-      setSubscriptionPlan("standard"); // Update the global subscription plan
-      setMessage("Successfully upgraded to standard!");
+      await updateUser(userId, "premium");
+      setSubscriptionPlan("premium");
+      setMessage("Successfully upgraded to premium!");
     } catch (error) {
       console.error("Upgrade failed: ", error);
       setMessage("Upgrade failed. Please try again.");

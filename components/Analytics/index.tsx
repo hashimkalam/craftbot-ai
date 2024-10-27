@@ -20,13 +20,11 @@ function Index({
   chatbotId,
   feedbackData,
   messageData,
-  subscriptionPlan
 }: {
   chatbots: Chatbot[];
   chatbotId: number;
   feedbackData: any;
   messageData: any;
-  subscriptionPlan: string | undefined
 }) {
   const [sortedChatbots, setSortedChatbots] = useState<Chatbot[]>(chatbots);
   const [filteredSessions, setFilteredSessions] = useState<any[]>([]);
@@ -157,8 +155,6 @@ function Index({
             </h1>
             <PieChartComponent
               messageCount={totalMessagesCount} 
-              subscriptionPlan={subscriptionPlan}
-
             />
           </div>
         </Suspense>

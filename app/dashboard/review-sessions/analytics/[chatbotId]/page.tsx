@@ -1,6 +1,5 @@
-// pages/dashboard/review-sessions/[chatbotId].tsx
 import { fetchReviewSessionData } from "@/utils/fetchReviewSessionData";
-import { notFound } from "next/navigation"; // For handling errors in server-rendered pages
+import { notFound } from "next/navigation"; 
 import Analytics from "@/components/Analytics/index";
 import Loading from "@/app/dashboard/loading";
 import { Suspense } from "react";
@@ -9,7 +8,7 @@ import Link from "next/link";
 
 export default async function ReviewSessions({ params: { chatbotId } }: { params: { chatbotId: number } }) {
   try {
-    const { filteredChatbots, feedbackData, messageData, subscriptionPlan } =
+    const { filteredChatbots, feedbackData, messageData } =
       await fetchReviewSessionData(chatbotId);
 
     return (
@@ -29,7 +28,6 @@ export default async function ReviewSessions({ params: { chatbotId } }: { params
             messageData={messageData}
             chatbots={filteredChatbots}
             chatbotId={chatbotId}
-            subscriptionPlan={subscriptionPlan}
           />
         </Suspense>
       </div>

@@ -144,8 +144,7 @@ export interface TotalGuestsProps {
 }
 
 export interface PieChartProps {
-  messageCount: number; // Current number of sessions 
-  subscriptionPlan: string | undefined
+  messageCount: number;
 }
 
 export interface SentimentPieChartProps {

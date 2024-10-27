@@ -1,3 +1,4 @@
+import { useSubscription } from "@/app/context/SubscriptionContext";
 import { PieChartProps } from "@/types/types";
 import {
   PieChart,
@@ -12,25 +13,25 @@ const COLORS = ["#FF0000", "#007FFF"]; // Colors for the pie segments
 
 const PieChartComponent: React.FC<PieChartProps> = ({
   messageCount,
-  subscriptionPlan
 }) => {
-
-  // calculating maxLimit according to subscriptionPlan 
-  let maxLimit=0;
+  // Calculate maxLimit according to subscriptionPlan 
+  
+  const { subscriptionPlan } = useSubscription();
+  let maxLimit = 0;
 
   if (subscriptionPlan === "standard") {
-    maxLimit=100
+    maxLimit = 75;
   } else if (subscriptionPlan === "premium") {
-    maxLimit=200
+    maxLimit = 150;
   }
 
-  const remainingCount = maxLimit - messageCount;
+  // Calculate remaining count ensuring it doesn't go below 0
+  const remainingCount = Math.max(0, maxLimit - messageCount);
+  
   const data = [
-    { name: `Used (${messageCount})`, value: messageCount },
+    { name: `Used (${messageCount})`, value: messageCount > maxLimit ? maxLimit : messageCount }, // Limit used value to maxLimit
     { name: `Remaining (${remainingCount})`, value: remainingCount },
   ];
-
-  
 
   return (
     <ResponsiveContainer width="100%" height={300}>

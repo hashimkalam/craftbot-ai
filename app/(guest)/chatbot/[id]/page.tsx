@@ -57,6 +57,13 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [messageCount, setMessageCount] = useState<number>(0);
   const [isLimitReached, setIsLimitReached] = useState(false);
 
+  let messageLimit: number = 0;
+  if (subscriptionPlan === "standard") {
+    messageLimit=75
+  } else if (subscriptionPlan === "premium") {
+    messageLimit=150
+  }
+
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,7 +80,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       onCompleted: (data) => {
         if (data && data.chatbots) {
           setMessageCount(data.chatbots.message_count);
-          setIsLimitReached(data.chatbots.message_count >= 74);
+          setIsLimitReached(data.chatbots.message_count >= messageLimit);
         }
       },
     }
@@ -121,7 +128,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
       );
       // setMessageCount(userMessages.length);
       console.log("messageCount: (client) ", messageCount)
-      setIsLimitReached(userMessages.length >= 74);
+      setIsLimitReached(userMessages.length >= messageLimit);
       console.log("isLimitReached: (client)", isLimitReached)
     }
   }, [messagesData]);
@@ -170,7 +177,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     const newCount = messageCount + 2;
     console.log("newCount: (client) ", newCount) 
     setMessageCount(newCount);
-    if (newCount >= 74) {
+    if (newCount >= messageLimit) {
       setIsLimitReached(true);
       console.log("isLimitReached: (client)", isLimitReached)
 
@@ -521,7 +528,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
                 isLimitReached
               }
             >
-                {isLimitReached ? `Limit Reached (${messageCount}/74)` : `Send (${messageCount}/74)`}
+                {isLimitReached ? `Limit Reached (${messageCount}/${messageLimit})` : `Send (${messageCount}/${messageLimit})`}
       
             </Button>
           </form>

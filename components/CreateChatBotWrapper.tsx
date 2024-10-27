@@ -9,14 +9,7 @@ export default async function CreateChatBotWrapper() {
   if (!userId) {
     return null; // Or redirect to login
   }
-
-  const userData = await fetchUserByClerkId(userId);
-  const subscriptionPlan = userData.subscription_plan;
-
-  //user_2nD5yCDaT7JeFZazzpfZPFPAoEH
-  console.log("userId:(create chatbot) ", userId    )
-
   const chatbots = await fetchChatbots(userId);
 
-  return <CreateChatBot subscriptionPlan={subscriptionPlan} chatbots={chatbots} />;
+  return <CreateChatBot chatbots={chatbots} />;
 }
