@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/form";
 import Image from "next/image";
 import Loading from "@/app/dashboard/loading";
+import { useSubscription } from "@/app/context/SubscriptionContext";
 
 const Messages = lazy(() => import("@/components/Messages"));
 
@@ -43,6 +44,7 @@ const formSchema = z.object({
 });
 
 function ChatbotPage({ params: { id } }: { params: { id: string } }) {
+  const { subscriptionPlan } = useSubscription();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isOpen, setIsOpen] = useState(true);
@@ -52,6 +54,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [sentiment, setSentiment] = useState<string | null>(null);
   const [mode, setMode] = useState(0);
+  const [messageCount, setMessageCount] = useState<number>(0);
+  const [isLimitReached, setIsLimitReached] = useState(false);
 
   // form setup
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,10 +70,20 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     GET_CHATBOT_BY_ID,
     {
       variables: { id },
+      onCompleted: (data) => {
+        if (data && data.chatbots) {
+          setMessageCount(data.chatbots.message_count);
+          setIsLimitReached(data.chatbots.message_count >= 74);
+        }
+      },
     }
   );
 
-  // console.log("chatbotData: ", chatbotData);
+  console.log(
+    "chatbotData message count: ",
+    chatbotData?.chatbots.message_count
+  );
+  console.log("messageCOunt: ", messageCount)
 
   // Fetch Messages
   const {
@@ -99,6 +113,19 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   }, [messagesData]);
   // console.log("messages: ", messages);
 
+  // Update message count whenever messages change
+  useEffect(() => {
+    if (messagesData) {
+      const userMessages = messagesData.chat_sessions.messages.filter(
+        (msg: any) => msg.sender === "user"
+      );
+      // setMessageCount(userMessages.length);
+      console.log("messageCount: (client) ", messageCount)
+      setIsLimitReached(userMessages.length >= 74);
+      console.log("isLimitReached: (client)", isLimitReached)
+    }
+  }, [messagesData]);
+
   const handleInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -113,9 +140,17 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
 
   // onsubmit function
   async function onSubmitMessage(values: z.infer<typeof formSchema>) {
+    // Check message limit before processing
+    if (isLimitReached) {
+      form.setError("message", {
+        type: "manual",
+        message: "Message limit reached. Please start a new chat.",
+      });
+      return;
+    }
+
     setLoading(true);
     const { message: formMessage } = values;
-
     const message = formMessage;
     form.reset();
 
@@ -129,6 +164,16 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     // do not suvmit is msg is empty
     if (!message.trim()) {
       return;
+    }
+
+    // Optimistically update message count and check limit
+    const newCount = messageCount + 2;
+    console.log("newCount: (client) ", newCount) 
+    setMessageCount(newCount);
+    if (newCount >= 74) {
+      setIsLimitReached(true);
+      console.log("isLimitReached: (client)", isLimitReached)
+
     }
 
     // optimistically update ui w user's msg
@@ -452,9 +497,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
                   <FormLabel hidden>Message</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Type a messsage..."
+                      placeholder={
+                        isLimitReached
+                          ? "Message limit reached. Please start a new chat."
+                          : "Type a message..."
+                      }
                       {...field}
                       className="p-6"
+                      disabled={isLimitReached}
                     />
                   </FormControl>
                   <FormMessage />
@@ -465,9 +515,14 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
             <Button
               type="submit"
               className="h-full"
-              disabled={form.formState.isSubmitting || !form.formState.isValid}
+              disabled={
+                form.formState.isSubmitting ||
+                !form.formState.isValid ||
+                isLimitReached
+              }
             >
-              Send
+                {isLimitReached ? `Limit Reached (${messageCount}/74)` : `Send (${messageCount}/74)`}
+      
             </Button>
           </form>
         </Form>

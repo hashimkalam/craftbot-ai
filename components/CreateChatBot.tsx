@@ -1,49 +1,38 @@
-// components/CreateChatBot.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { CREATE_CHATBOT } from "@/graphql/mutation";
 import { useMutation } from "@apollo/client";
 import { useUser } from "@clerk/nextjs";
-import { FormEvent, lazy, Suspense, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import { formatISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import logo from "@/public/images/just_logo.webp";
 import Loading from "@/app/dashboard/loading";
-import { Chatbot } from "@/types/types";
+import { Chatbot } from "@/types/types"; 
+import { useSubscription } from "@/app/context/SubscriptionContext";
+
 const Personalities = lazy(() => import("@/components/Personalities"));
 
 interface CreateChatBotProps {
-  subscriptionPlan: string | undefined;
   chatbots: Chatbot[];
 }
 
-const CreateChatBot = ({ subscriptionPlan, chatbots }: CreateChatBotProps) => {
+const CreateChatBot = ({ chatbots }: CreateChatBotProps) => {
   const router = useRouter();
   const { user } = useUser();
+  const { subscriptionPlan } = useSubscription();
   const [name, setName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(
-    null
-  );
-
+  const [selectedPersonality, setSelectedPersonality] = useState<string | null>(null);
   const [createChatbot, { loading }] = useMutation(CREATE_CHATBOT);
 
   // Determine the maximum limit based on the subscription plan
-  let maxLimit = 0;
-  if (subscriptionPlan === "normal") {
-    maxLimit = 1;
-  } else if (subscriptionPlan === "premium") {
-    maxLimit = 5;
-  }
+  const maxLimit = subscriptionPlan === "standard" ? 1 : subscriptionPlan === "premium" ? 5 : 0;
 
-  console.log("chatbots: ", chatbots)
   // Count existing chatbots
   const existingChatbotCount = chatbots?.length || 0;
-  console.log("existingChatbotCount: ", existingChatbotCount)
-
-
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,6 +49,7 @@ const CreateChatBot = ({ subscriptionPlan, chatbots }: CreateChatBotProps) => {
           name,
           created_at: formatISO(new Date()),
           personality: selectedPersonality,
+          message_count: 0
         },
       });
 
@@ -142,6 +132,8 @@ const CreateChatBot = ({ subscriptionPlan, chatbots }: CreateChatBotProps) => {
         </form>
 
         {error && <p className="text-red-500 mt-2">{error}</p>}
+
+        subscriptionPlan:{subscriptionPlan}
 
         {/* Show a message if the user has reached the limit */}
         {existingChatbotCount >= maxLimit && (

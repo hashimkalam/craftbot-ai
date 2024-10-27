@@ -1,6 +1,7 @@
 import {
   GET_MESSAGES_BY_CHAT_SESSION_ID,
   INSERT_MESSAGE,
+  UPDATE_CHATBOT,
 } from "@/graphql/mutation";
 import { GET_CHATBOT_BY_ID } from "@/graphql/query";
 import { serverClient } from "@/lib/server/serverClient";
@@ -91,13 +92,13 @@ export async function POST(req: NextRequest) {
     - Correct minor typos automatically
     - Use relevant emojis sparingly
     - Prioritize brevity and clarity
-    - Skip scope reminders for on-topic questions`
+    - Skip scope reminders for on-topic questions`,
       },
       ...formattedPrevMessages,
       {
         role: "user",
-        content: content
-      }
+        content: content,
+      },
     ];
 
     // Generate response using Cohere
@@ -139,6 +140,22 @@ export async function POST(req: NextRequest) {
         created_at: formatISO(new Date()),
       },
     });
+
+    // Increment the message count for the chatbot
+    const updatedMessageCount = chatbot.message_count + 2;
+    console.log("updatedMessageCount: (from server) ", updatedMessageCount);
+
+    const updateResponse= await serverClient.mutate({
+      mutation: UPDATE_CHATBOT,
+      variables: {
+        id: chatbot.id,
+        name: chatbot.name,
+        personality: chatbot.personality,
+        message_count: updatedMessageCount,
+      },
+    });
+
+    console.log("Update response:", updateResponse);
 
     return NextResponse.json({
       id: aiMessageResult?.data?.insertMessages?.id,

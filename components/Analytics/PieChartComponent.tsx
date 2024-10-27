@@ -18,7 +18,7 @@ const PieChartComponent: React.FC<PieChartProps> = ({
   // calculating maxLimit according to subscriptionPlan 
   let maxLimit=0;
 
-  if (subscriptionPlan === "normal") {
+  if (subscriptionPlan === "standard") {
     maxLimit=100
   } else if (subscriptionPlan === "premium") {
     maxLimit=200

@@ -40,6 +40,7 @@ type Chatbots {
   id: Int!
   name: String!
   personality: String!
+  message_count: Int!
 }
 
 type Guests {
@@ -243,7 +244,7 @@ type Query {
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "clerk_user_id", "created_at", "id", "name" FROM "chatbots" ORDER BY "id" LIMIT $1 OFFSET $2
+      SELECT "clerk_user_id", "created_at", "id", "name", "message_count" FROM "chatbots" ORDER BY "id" LIMIT $1 OFFSET $2
       """
       configuration: "postgresql_config"
     )
@@ -252,7 +253,7 @@ type Query {
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "clerk_user_id", "created_at", "id", "name" FROM "chatbots" WHERE "id" = $1
+      SELECT "clerk_user_id", "created_at", "id", "name", "message_count" FROM "chatbots" WHERE "id" = $1
       """
       configuration: "postgresql_config"
     )
@@ -263,7 +264,7 @@ type Query {
       type: "postgresql"
       schema: "public"
       query: """
-      SELECT "clerk_user_id", "created_at", "id", "name" FROM "chatbots" WHERE "id" = $1
+      SELECT "clerk_user_id", "created_at", "id", "name", "message_count" FROM "chatbots" WHERE "id" = $1
       """
       configuration: "postgresql_config"
     )
@@ -511,6 +512,7 @@ type Mutation {
     name: String!
     clerk_user_id: String!
     personality: String!
+    message_count: Int!
   ): Chatbots
     @dbquery(
       type: "postgresql"
@@ -525,6 +527,7 @@ type Mutation {
     created_at: DateTime
     name: String
     personality: String
+    message_count: Int
   ): Chatbots
     @dbquery(
       type: "postgresql"
@@ -534,7 +537,8 @@ type Mutation {
         "clerk_user_id" = COALESCE($2, "clerk_user_id"),
         "created_at" = COALESCE($3, "created_at"),
         "name" = COALESCE($4, "name"),
-        "personality" = COALESCE($5, "personality")
+        "personality" = COALESCE($5, "personality"),
+        "message_count" = COALESCE($6, "message_count")
       WHERE
         "id" = $1
       RETURNING *

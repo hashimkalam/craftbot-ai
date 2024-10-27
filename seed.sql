@@ -12,6 +12,7 @@ CREATE TABLE chatbots (
     clerk_user_id VARCHAR(255) NOT NULL, -- Clerk's user ID
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    messageCount INT DEFAULT 0 NOT NULL
 );
 
 -- Create the chatbot_characteristics table

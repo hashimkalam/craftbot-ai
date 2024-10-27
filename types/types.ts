@@ -4,6 +4,7 @@ export interface Chatbot {
   name: string;
   created_at: string;
   personality: string;
+  message_count: number;
   chatbot_characteristics: ChatbotCharacteristic[];
   chat_sessions: ChatSession[];
 }

@@ -4,7 +4,8 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import ApolloProviderWrapper from "@/components/ApolloProvider";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider"; 
+import { SubscriptionProvider } from "./context/SubscriptionContext";
 
 export const metadata: Metadata = {
   title: "CraftBot AI",
@@ -18,26 +19,28 @@ export default function RootLayout({
 }>) {
   return (
     <ApolloProviderWrapper>
-      <ClerkProvider>
-        <html lang="en">
-          <head>
-            <link
-              href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
-              rel="stylesheet"
-            />
-          </head>
-          <body className="min-h-screen flex overflow-y-scroll overflow-x-hidden">
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children} <Toaster position="bottom-center" />
-            </ThemeProvider>
-          </body>
-        </html>
-      </ClerkProvider>
+      <SubscriptionProvider> 
+        <ClerkProvider>
+          <html lang="en">
+            <head>
+              <link
+                href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap"
+                rel="stylesheet"
+              />
+            </head>
+            <body className="min-h-screen flex overflow-y-scroll overflow-x-hidden">
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children} <Toaster position="bottom-center" />
+              </ThemeProvider>
+            </body>
+          </html>
+        </ClerkProvider>
+      </SubscriptionProvider>
     </ApolloProviderWrapper>
   );
 }

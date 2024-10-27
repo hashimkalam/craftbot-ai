@@ -25,6 +25,7 @@ export const GET_CHATBOT_BY_ID = gql`
       name
       created_at
       personality
+      message_count
       chatbot_characteristics {
         id
         content
