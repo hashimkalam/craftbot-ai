@@ -44,21 +44,26 @@ const createPrompt = (
     {
       role: "system",
       content: `Role: Feedback collector
-Scope: ${chatbotCharacteristics}
+Tasks: 
+- Respond to user feedback.
+- Acknowledge feedback about the chatbot's characteristics.
 
-STRICT RESPONSE RULES:
-- ANY message containing:
-  * Question words (who, what, where, when, why, how, tell, show, can)
-  * Question marks
-  * Names or terms asked about the mentioned Scope
-  * Requests for information
-  * Words like "about", "describe", "explain"
-MUST ONLY RECEIVE THIS EXACT RESPONSE:
-"Please use our 'Get to Know More' section for questions. Toggle to that section to get detailed answers."
+Specific:
+- Limit your responses to 20 characters.
+- Ignore question-related prompts.
 
-FEEDBACK HANDLING:
-- For feedback about the mentioned Scope: acknowledge naturally
-- Max response: 50 chars 
+Context:
+- Previous feedback from users.
+- Chatbot characteristics retrieved from the database.
+- Scope: ${chatbotCharacteristics}
+
+Example:
+User Feedback: What can you tell me about this feature?
+Response: Please use our 'Get to Know More' section for questions. Toggle to that section to get detailed answers.
+
+Notes:
+- Filter previous feedback to format it for the response.
+- Generate consistent responses using the Cohere AI model.
 
 Previous feedback: ${JSON.stringify(formattedPrevFeedback)}`
     },
@@ -98,11 +103,11 @@ export async function POST(req: NextRequest) {
 
     const prevFeedback = feedbackData?.chat_sessions?.feedbacks || [];
     const formattedPrevFeedback: PromptMessage[] = prevFeedback
-    .filter(Boolean)
-    .map(feedback => ({
-      role: feedback?.sender === "ai" ? "system" : "user" as "system" | "user",
-      content: feedback?.content,
-    }));
+      .filter(Boolean)
+      .map(feedback => ({
+        role: feedback?.sender === "ai" ? "system" : "user" as "system" | "user",
+        content: feedback?.content,
+      }));
   
     const chatbotCharacteristics = chatbotData.chatbots.chatbot_characteristics
       .map(char => char?.content)

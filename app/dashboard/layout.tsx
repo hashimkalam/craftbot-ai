@@ -17,14 +17,12 @@ async function AdminLayout({
     return null; // Ensure no further code runs after redirect
   }
 
-  const userData = await fetchUserByClerkId(userId);
-  const subscriptionPlan = userData.subscription_plan;
 
   return (
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1 lg:flex-row bg-gray-100 dark:bg-primary-DARK/80 relative">
         <Sidebar />
-        <SubscriptionPlan userId={userId} subscriptionPlan={subscriptionPlan} />
+        <SubscriptionPlan userId={userId} />
         <div className="flex-1 flex justify-center lg:justify-start items-start max-w-5xl mx-auto w-full lg:my-[2%]">
           {children}
         </div>

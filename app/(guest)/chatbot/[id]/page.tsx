@@ -150,7 +150,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
   };
 
   // onsubmit message function
-  const maxNumberOfMessagesSent = 1; // Set max limit to 1 (or any other value you prefer)
+  const maxNumberOfMessagesSent = 2;
 
   async function onSubmitMessage(values: z.infer<typeof formSchema>) {
     // Check message limit before processing
@@ -165,8 +165,10 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     // Increment the message count using setState
     setNumberOfMessagesSent((prev) => prev + 1);
     console.log("newMessageCount: ", numberOfMessagesSent);
-    if (numberOfMessagesSent + 1 > maxNumberOfMessagesSent)
+    if (numberOfMessagesSent + 1 >= maxNumberOfMessagesSent) {
+      
       setMaxNoMessagesSent(true);
+    }
 
     // Set loading state
     setLoading(true);
@@ -269,8 +271,9 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
     setNumberOfFeedbacksSent((prev) => prev + 1);
     console.log("newMessageCount: ", numberOfFeedbacksSent);
     // Check if the new message count exceeds the limit
-    if (numberOfFeedbacksSent + 1 > maxNumberOfFeedbacksSent)
+    if (numberOfFeedbacksSent + 1 >= maxNumberOfFeedbacksSent) {
       setMaxNoFeedbacksSent(true);
+    }
 
     setLoading(true);
     const { message: formMessage } = values;
@@ -560,7 +563,7 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
               )}
             />
 
-            {mode === 0 ? (
+            {mode === 0 && (
               <Button
                 type="submit"
                 className="h-full"
@@ -575,7 +578,8 @@ function ChatbotPage({ params: { id } }: { params: { id: string } }) {
                   ? `Limit Reached (${numberOfMessagesSent}/${maxNumberOfMessagesSent})`
                   : `Send (${numberOfMessagesSent}/${maxNumberOfMessagesSent})`}
               </Button>
-            ) : (
+            )}
+            {mode === 1 && (
               <Button
                 type="submit"
                 className="h-full"

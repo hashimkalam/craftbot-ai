@@ -27,7 +27,6 @@ const cohere = new CohereClient({
 export async function POST(req: NextRequest) {
   const { chat_session_id, chatbot_id, content, name, personality } =
     await req.json();
-  // console.log( "chat_session_id: ", chat_session_id, " content: ", content, " chatbot_id: ", chatbot_id, " name: ", name);
 
   try {
     // Fetch chatbot characteristics
@@ -61,38 +60,33 @@ export async function POST(req: NextRequest) {
     const chatbotCharacteristics = chatbot.chatbot_characteristics
       .map((char) => char.content)
       .join(" + ");
-    // console.log("systemPrompt: ", systemPrompt);
 
-    // console.log("formattedPrevMessages: ", formattedPrevMessages);
-
-    // Construct the prompt
+    // Construct the prompt using the specified format
     const prompt = [
       {
         role: "system",
-        content: `You are assisting ${name}. Focus on ${chatbotCharacteristics}.
-    
-    Key parameters:
-    - Style: ${personality} 
-    - Scope: Limited to specified topics only
-    - Length: Max 200 characters
-    - Format: Clear, well-structured responses
-    
-    Tone guide:
-    friendly: warm, approachable
-    professional: formal, precise
-    straightforward: direct, factual
-    casual: conversational
-    empathetic: supportive
-    humorous: light, playful
-    
-    Context from previous exchanges: ${formattedPrevMessages}
-    
-    Guidelines:
-    - Stay within defined topic scope
-    - Correct minor typos automatically
-    - Use relevant emojis sparingly
-    - Prioritize brevity and clarity
-    - Skip scope reminders for on-topic questions`,
+        content: `Role: Assistant to ${name}
+
+        Tasks:
+        - Assist with inquiries based on chatbot characteristics.
+        - Provide responses that are concise and relevant.
+
+        Specific:
+        - Focus on ${chatbotCharacteristics}.
+        - Maintain a tone based on the personality: ${personality}.
+        - Limit responses to a maximum of 200 characters.
+
+        Context:
+        - Previous exchanges: ${JSON.stringify(formattedPrevMessages)}.
+
+        Example:
+        - If the user asks about a specific topic within the defined scope, provide a clear and structured response that reflects the chatbot's personality.
+
+        Notes:
+        - Correct minor typos automatically.
+        - Use relevant emojis sparingly.
+        - Prioritize brevity and clarity.
+        - Skip scope reminders for on-topic questions.`,
       },
       ...formattedPrevMessages,
       {
@@ -108,9 +102,7 @@ export async function POST(req: NextRequest) {
       maxTokens: 250, // Adjust token limit as needed
     });
 
-    // const aiResponse = response.body?.generations[0]?.text?.trim();
     const aiResponse = response.generations[0].text.trim();
-    // console.log("aiResponse: ", aiResponse);
 
     if (!aiResponse) {
       return NextResponse.json({
@@ -145,7 +137,7 @@ export async function POST(req: NextRequest) {
     const updatedMessageCount = chatbot.message_count + 2;
     console.log("updatedMessageCount: (from server) ", updatedMessageCount);
 
-    const updateResponse= await serverClient.mutate({
+    const updateResponse = await serverClient.mutate({
       mutation: UPDATE_CHATBOT,
       variables: {
         id: chatbot.id,

@@ -1,5 +1,5 @@
-"use client"; 
-import React, { createContext, useContext, useState } from 'react';
+"use client"
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface SubscriptionContextType {
   subscriptionPlan: string; // Change to non-optional string
@@ -9,7 +9,15 @@ interface SubscriptionContextType {
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
 export const SubscriptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [subscriptionPlan, setSubscriptionPlan] = useState<string>('standard');
+  const [subscriptionPlan, setSubscriptionPlan] = useState<string>(() => {
+    // Get the subscription plan from local storage or default to 'standard'
+    return localStorage.getItem('subscriptionPlan') || 'standard';
+  });
+
+  useEffect(() => {
+    // Save subscription plan to local storage whenever it changes
+    localStorage.setItem('subscriptionPlan', subscriptionPlan);
+  }, [subscriptionPlan]);
 
   return (
     <SubscriptionContext.Provider value={{ subscriptionPlan, setSubscriptionPlan }}>

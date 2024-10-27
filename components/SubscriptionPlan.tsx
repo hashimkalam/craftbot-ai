@@ -5,12 +5,10 @@ import React, { useState } from "react";
 
 interface SubscriptionPlanProps {
   userId: string;
-  subscriptionPlan: string | undefined;
 }
 
 const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
   userId,
-  subscriptionPlan: initialPlan = 'standard',
 }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -35,7 +33,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
     <div className="lg:absolute right-5 top-5 ml-5 mt-2 lg:mt-0">
       <h2 className="text-lg font-semibold">Subscription Plan:</h2>
       <div className="flex">
-        <p>{globalPlan || initialPlan}</p> {/* Use the global subscription plan */}
+        <p>{globalPlan}</p> {/* Use the global subscription plan */}
         <button
           onClick={upgradeHandler}
           disabled={loading}
