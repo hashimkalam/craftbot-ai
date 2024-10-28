@@ -9,35 +9,37 @@ import {
 export const FEATURES = [
   {
     name: "Easy Customization",
-    desc: "Customize your chatbot's personality, tone, and responses to fit your brand voice effortlessly.",
+    desc: "Customize your chatbot's personality, tone, and responses to fit your brand voice effortlessly, whether for support or feedback collection.",
     icon: GlobeIcon,
   },
   {
-    name: "Natural Language Processing",
-    desc: "Leverage advanced NLP to enable your chatbot to understand and respond to user queries naturally.",
+    name: "Dual Interaction Channels",
+    desc: "Separate sections for customer support and feedback, enabling users to ask questions and provide structured feedback seamlessly.",
     icon: GlobeIcon,
   },
   {
-    name: "Real-Time Conversations",
-    desc: "Engage users in real-time with instant responses, enhancing user interaction and satisfaction.",
+    name: "Sentiment Analysis & Feedback Trends",
+    desc: "Automatically analyze feedback sentiment and view trends over time in a dedicated dashboard, providing insights on user satisfaction.",
     icon: GlobeIcon,
   },
   {
-    name: "Voice Interaction - (In Progress)",
-    desc: "Integrate voice capabilities, allowing users to interact with your chatbot using voice commands.",
+    name: "Real-Time Analytics Dashboard",
+    desc: "Access analytics on user engagement, time spent, total feedback received, and user interaction trends with visual insights.",
     icon: GlobeIcon,
   },
   {
-    name: "Analytics Dashboard - (In Progress)",
-    desc: "Access insightful analytics on chatbot performance, user interactions, and feedback to optimize experiences.",
+    name: "Chat & Feedback History",
+    desc: "Review chat history with sentiment highlights and feedback summaries for efficient review and actionable insights.",
     icon: GlobeIcon,
   },
   {
-    name: "Multi-Platform Deployment - (In Progress)",
-    desc: "Deploy your chatbots across various platforms, including websites and messaging apps, to reach your audience everywhere.",
+    name: "Multi-Platform Deployment",
+    desc: "Easily deploy your chatbot across websites and apps with iframe code, ensuring wide reach and accessibility.",
     icon: GlobeIcon,
   },
 ];
+
+
 
 export const SIDEBAR_OPTIONS = [
   {

@@ -6,24 +6,30 @@ import { FEATURES } from "@/data/data";
 import Link from "next/link";
 import { lazy, Suspense, useMemo } from "react";
 import Loading from "@/app/dashboard/loading";
+import Pricing from "../Pricing";
 
 const Video = lazy(() => import("@/components/Opening/Video"));
 
 // Extract the static elements to avoid re-rendering
 const StaticFeatures = ({ features }: any) => (
-  <dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 text-base leading-7 text-gray-600 dark:text-gray-300 md:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
-    {features.map((feature: any) => (
-      <div key={feature.desc} className="relative pl-9">
-        <dt className="inline font-semibold text-gray-900">
-          <feature.icon
-            aria-hidden="true"
-            className="absolute left-1 top-1 h-5 w-5 text-primary"
-          />
-        </dt>
-        <dd>{feature.desc}</dd>
-      </div>
-    ))}
-  </dl>
+  <div className="my-12"> 
+    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6">
+      Features
+    </h2>
+    <dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 text-base leading-7 text-gray-600 dark:text-gray-300 md:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
+      {features.map((feature: any) => (
+        <div key={feature.desc} className="relative pl-9">
+          <dt className="inline font-semibold text-gray-900">
+            <feature.icon
+              aria-hidden="true"
+              className="absolute left-1 top-1 h-5 w-5 text-primary"
+            />
+          </dt>
+          <dd>{feature.desc}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
 );
 
 const ClientHome = ({ userId }: { userId: string | null }) => {
@@ -82,6 +88,9 @@ const ClientHome = ({ userId }: { userId: string | null }) => {
           <div className="mx-auto mt-16 max-w-7xl px-6 sm:mt-20 md:mt-24 lg:px-8 z-40">
             {memoizedFeatures}
           </div>
+
+          {/* Pricing Compo */}
+          <Pricing userId={userId} />
 
           {/* Get started for free */}
           <div className="flex flex-col items-center justify-center text-center p-4 md:p-6 lg:p-8 h-[45vh] mt-10 -mb-10 z-40">
